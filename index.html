@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Walkman">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/512px-Walkman_logo.svg.png">
     
-    <title>Walkman Cloud V17</title>
+    <title>Walkman Cloud V19</title>
     <style>
         :root { --accent: #1db954; --bg: #000000; --card: #121212; --text: #ffffff; --text-dim: #b3b3b3; --danger: #e74c3c; --hires: #9b59b6; --edit: #3498db; }
         *, *::before, *::after { box-sizing: border-box; }
@@ -22,9 +22,8 @@
         }
 
         .container { 
-            max-width: 800px; margin: 0 auto; width: 100%; 
-            padding: 15px; 
-            padding-top: max(15px, env(safe-area-inset-top)); /* W 100% bezpieczne odsunięcie od paska iOS */
+            max-width: 800px; margin: 0 auto; width: 100%; padding: 15px; 
+            padding-top: max(15px, env(safe-area-inset-top)); 
             display: flex; flex-direction: column; gap: 15px; 
         }
         
@@ -67,11 +66,10 @@
         .close-x { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #fff; cursor: pointer; z-index: 10; }
         
         .detail-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; }
-        .detail-notes { font-style: italic; color: var(--text-dim); font-size: 13px; text-align: center; margin-bottom: 15px; padding: 10px; background: #1a1a1a; border-radius: 8px; }
+        .detail-notes { font-style: italic; color: var(--text-dim); font-size: 13px; text-align: center; margin-bottom: 25px; padding: 10px; background: #1a1a1a; border-radius: 8px; }
         
         .loader { text-align: center; color: var(--accent); font-weight: bold; display: none; padding: 20px; }
         
-        /* Czyste ukrywanie opcji Admina */
         body:not(.is-admin) .admin-only { display: none !important; }
 
         @media (min-width: 600px) { .grid-container, #apiResults { grid-template-columns: repeat(4, 1fr); } }
@@ -95,7 +93,7 @@
     </div>
 
     <div class="panel admin-only" id="addPanel">
-        <h3 class="panel-title">🌐 Szukaj w Discogs</h3>
+        <h3 class="panel-title">Szukaj w Discogs</h3>
         <div class="input-group">
             <input type="text" id="query" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()">
             <button onclick="searchDiscogs()" style="width:80px">Szukaj</button>
@@ -106,7 +104,7 @@
     <div id="loader" class="loader">Synchronizacja...</div>
 
     <div class="panel">
-        <h3 class="panel-title" style="color: var(--accent);">📁 Moja Kolekcja</h3>
+        <h3 class="panel-title" style="color: var(--accent);">Moja Kolekcja</h3>
         <div class="input-group" style="margin-bottom:15px">
             <input type="text" id="localSearch" placeholder="Filtruj listę..." onkeyup="renderGrid()">
         </div>
@@ -132,9 +130,8 @@
         <span class="close-x" onclick="closeDetailsModal()">×</span>
         <img id="detCover" src="" class="detail-cover">
         <h2 id="detAlbum" style="text-align:center; margin:0;"></h2>
-        <p id="detArtist" style="text-align:center; color:var(--text-dim); margin-bottom:15px;"></p>
+        <p id="detArtist" style="text-align:center; color:var(--text-dim); margin-bottom:15px; font-weight:bold;"></p>
         <div id="detNotes" class="detail-notes"></div>
-        <div id="detTracks" style="background:#000; padding:12px; border-radius:10px; font-size:13px; max-height:180px; overflow-y:auto; margin-bottom:20px; color:#ccc;"></div>
         <div style="display:flex; gap:10px;" class="admin-only">
             <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor:pointer;">Edytuj</button>
             <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor:pointer;">Usuń</button>
@@ -154,8 +151,7 @@
             <select id="editStatus"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
             <select id="editFormat"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
         </div>
-        <textarea id="editNotes" placeholder="Notatki..." style="margin-top:10px; height:60px;"></textarea>
-        <textarea id="editTracks" placeholder="Tracklista..." style="margin-top:10px; height:80px; font-size:12px;"></textarea>
+        <textarea id="editNotes" placeholder="Twoje notatki..." style="margin-top:10px; height:80px;"></textarea>
         <div style="display:flex; gap:10px; margin-top:15px;">
             <button onclick="closeEditModal()" style="background:#444; flex:1; padding: 14px; border-radius: 8px; border: none; color:white; font-weight:bold;">Anuluj</button>
             <button onclick="saveEdit()" style="background:var(--accent); flex:1; padding: 14px; border-radius: 8px; border: none; color:black; font-weight:bold;">Zapisz</button>
@@ -198,11 +194,7 @@
     }
 
     async function loadFromSheets() {
-        // SYSTEM OSTRZEGAWCZY: Sprawdza czy dobrze wklejono link
-        if(!GOOGLE_URL || GOOGLE_URL === 'TWOJ_URL_WDROZENIA_Z_GOOGLE_APPS_SCRIPT_TUTAJ' || !GOOGLE_URL.startsWith('http')) {
-            alert("BŁĄD KODU: Musisz wkleić swój poprawny link GOOGLE_URL w kodzie na samym dole. Zostaw apostrofy ' ' wokół linku!");
-            return;
-        }
+        if(!GOOGLE_URL || GOOGLE_URL === 'TWOJ_URL_WDROZENIA_Z_GOOGLE_APPS_SCRIPT_TUTAJ' || !GOOGLE_URL.startsWith('http')) return;
 
         document.getElementById('loader').style.display = 'block';
         try {
@@ -267,16 +259,13 @@
         
         document.getElementById('loader').style.display = 'block';
         try {
-            const res = await fetch(`https://api.discogs.com/releases/${id}?token=${DISCOGS_TOKEN}`);
-            const d = await res.json();
-            const tracks = d.tracklist ? d.tracklist.map(t => t.title).join(', ') : "";
-            
+            // BRAK DRUGIEGO ZAPYTANIA DO DISCOGS - natychmiastowe cięcie nazwy
             let p = title.split(' - ');
             let rawArtist = p.shift() || "?";
             let rawAlbum = p.join(' - ') || "?";
             let cleanArtist = rawArtist.replace(/\s*\(\d+\)\s*/g, '').trim();
             
-            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: f, Okładka: cover, Utwory: tracks, DiscogsID: id, Notatki: "" };
+            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: f, Okładka: cover, Utwory: "", DiscogsID: id, Notatki: "" };
             await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
             
             document.getElementById('apiResults').innerHTML = '';
@@ -291,7 +280,6 @@
         document.getElementById('detAlbum').innerText = i.Album;
         document.getElementById('detArtist').innerText = i.Wykonawca;
         document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek.";
-        document.getElementById('detTracks').innerHTML = (i.Utwory || '').split(',').map((t, n) => `<div style="padding:4px 0; border-bottom:1px solid #222;">${n+1}. ${t.trim()}</div>`).join('');
         document.getElementById('detailsModal').style.display = 'flex';
     }
     function closeDetailsModal() { document.getElementById('detailsModal').style.display = 'none'; }
@@ -304,21 +292,20 @@
         document.getElementById('editStatus').value = i.Status;
         document.getElementById('editFormat').value = i.Format;
         document.getElementById('editNotes').value = i.Notatki;
-        document.getElementById('editTracks').value = i.Utwory;
         closeDetailsModal(); document.getElementById('editModal').style.display = 'flex';
     }
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
     async function saveEdit() {
         const idx = document.getElementById('editIndex').value; const old = myCollection[idx];
-        const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: document.getElementById('editTracks').value };
+        const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: "" };
         closeEditModal(); document.getElementById('loader').style.display = 'block';
         await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         setTimeout(loadFromSheets, 1500);
     }
 
     async function deleteFromDetails() {
-        const i = myCollection[currentDetailsIndex]; if(!confirm("Na pewno usunąć ten album?")) return;
+        const i = myCollection[currentDetailsIndex]; if(!confirm("Na pewno usunąć ten album z bazy?")) return;
         closeDetailsModal(); document.getElementById('loader').style.display = 'block';
         await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({password: ADMIN_PASS, action:"DELETE", Wykonawca:i.Wykonawca, Album:i.Album}) });
         setTimeout(loadFromSheets, 1500);
