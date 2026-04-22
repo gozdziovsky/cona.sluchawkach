@@ -211,16 +211,24 @@
         document.getElementById('countSzukam').innerText = myCollection.filter(i => i.Status === 'SZUKAM').length;
     }
 
-    function renderGrid() {
+function renderGrid() {
         const container = document.getElementById('collectionGrid');
         const q = document.getElementById('localSearch').value.toLowerCase();
         const sF = document.getElementById('statusFilter').value;
         const fF = document.getElementById('formatFilter').value;
         
         const filtered = myCollection.filter(i => {
-            if(!i.Wykonawca) return false;
-            return (i.Wykonawca.toLowerCase().includes(q) || i.Album.toLowerCase().includes(q)) && (sF === "ALL" || i.Status === sF) && (fF === "ALL" || i.Format === fF);
-        }).sort((a,b) => a.Wykonawca.localeCompare(b.Wykonawca));
+            // BEZPIECZNE POBIERANIE TEKSTU: Zamienia liczby/puste pola na czysty tekst
+            const artysta = (i.Wykonawca || "").toString().toLowerCase();
+            const album = (i.Album || "").toString().toLowerCase();
+            
+            // Sprawdza czy wpisany tekst pasuje do Artysty LUB Albumu
+            const pasujeTekst = artysta.includes(q) || album.includes(q);
+            const pasujeStatus = (sF === "ALL" || i.Status === sF);
+            const pasujeFormat = (fF === "ALL" || i.Format === fF);
+            
+            return pasujeTekst && pasujeStatus && pasujeFormat;
+        }).sort((a,b) => (a.Wykonawca || "").toString().localeCompare((b.Wykonawca || "").toString()));
 
         container.innerHTML = filtered.map(item => {
             const idx = myCollection.indexOf(item);
@@ -229,11 +237,11 @@
                 <div class="grid-item" onclick="openDetails(${idx})">
                     <img src="${item.Okładka}" loading="lazy">
                     <div class="format-badge ${bClass}">${item.Status === 'SZUKAM' ? 'SZUKAM' : item.Format}</div>
-                    <div class="grid-overlay"><div class="grid-title">${item.Album}</div></div>
+                    <div class="grid-overlay"><div class="grid-title">${item.Album || "Brak tytułu"}</div></div>
                 </div>`;
         }).join('');
     }
-
+    
     async function searchDiscogs() {
         const q = document.getElementById('query').value;
         if(!q) return;
