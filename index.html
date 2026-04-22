@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Walkman">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/512px-Walkman_logo.svg.png">
     
-    <title>Walkman Cloud Final</title>
+    <title>Walkman Cloud V23</title>
     <style>
         :root { --accent: #1db954; --bg: #000000; --card: #121212; --text: #ffffff; --text-dim: #b3b3b3; --danger: #e74c3c; --hires: #9b59b6; --edit: #3498db; }
         *, *::before, *::after { box-sizing: border-box; }
@@ -163,7 +163,9 @@
         <span class="close-x" onclick="closeDetailsModal()">×</span>
         <img id="detCover" src="" class="detail-cover">
         <h2 id="detAlbum" style="text-align:center; margin:0;"></h2>
-        <p id="detArtist" class="artist-link" style="text-align:center; margin-bottom:15px; font-weight:bold;"></p>
+        
+        <p id="detArtist" style="text-align:center; margin-bottom:15px; font-weight:bold;"></p>
+        
         <div id="detNotes" class="detail-notes"></div>
         <div style="display:flex; gap:10px;" class="admin-only">
             <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor:pointer;">Edytuj</button>
@@ -198,11 +200,41 @@
     // ==========================================
     const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
     const DISCOGS_TOKEN = 'iTRtcEKKihJyGhwufBlyPncxTrMDFjVtwiFNTeAa';
+    
+    // 🛑 LISTA WYJĄTKÓW: Artyści z przecinkami, którzy nie mają być rozdzielani
+    // Dopisz w cudzysłowach kolejnych, oddzielając ich przecinkiem.
+    const ARTIST_EXCEPTIONS = [
+        "Tyler, The Creator",
+        "Earth, Wind & Fire",
+        "Crosby, Stills, Nash & Young"
+    ];
     // ==========================================
 
     let myCollection = [];
     let currentDetailsIndex = -1;
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
+
+    // INTELIGENTNE DZIELENIE ARTYSTÓW (z pominięciem wyjątków)
+    function splitArtists(artistString) {
+        if (!artistString) return [];
+        let tempStr = artistString;
+        let placeholders = {};
+        
+        // Krok 1: Zabezpieczamy wyjątki podmieniając je na specjalny kod
+        ARTIST_EXCEPTIONS.forEach((exc, idx) => {
+            if (tempStr.includes(exc)) {
+                let code = `@@@EXCEPTION${idx}@@@`;
+                tempStr = tempStr.replace(exc, code);
+                placeholders[code] = exc;
+            }
+        });
+        
+        // Krok 2: Dzielimy po przecinkach
+        let arr = tempStr.split(',').map(a => a.trim()).filter(a => a.length > 0);
+        
+        // Krok 3: Przywracamy schowane wyjątki w miejsce kodów
+        return arr.map(a => placeholders[a] ? placeholders[a] : a);
+    }
 
     function toggleAdmin() {
         if (ADMIN_PASS) { 
@@ -367,9 +399,29 @@
         document.getElementById('detCover').src = i.Okładka;
         document.getElementById('detAlbum').innerText = i.Album;
         
+        // NOWOŚĆ: Tworzenie osobnych linków z podziałem po przecinkach
         const detArtistEl = document.getElementById('detArtist');
-        detArtistEl.innerText = i.Wykonawca;
-        detArtistEl.onclick = () => filterByArtist(i.Wykonawca);
+        detArtistEl.innerHTML = ''; // Czyścimy kontener
+        
+        const artistArray = splitArtists(i.Wykonawca);
+        
+        artistArray.forEach((artistName, index) => {
+            const span = document.createElement('span');
+            span.className = 'artist-link';
+            span.innerText = artistName;
+            span.onclick = () => filterByArtist(artistName);
+            detArtistEl.appendChild(span);
+            
+            // Dodaj zwykły przecinek między artystami (żeby nie był zielonym linkiem)
+            if (index < artistArray.length - 1) {
+                const comma = document.createElement('span');
+                comma.innerText = ', ';
+                comma.style.color = 'var(--text-dim)';
+                comma.style.cursor = 'default';
+                comma.style.textDecoration = 'none';
+                detArtistEl.appendChild(comma);
+            }
+        });
 
         document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek.";
         document.getElementById('detailsModal').style.display = 'flex';
@@ -379,7 +431,8 @@
     function openEditFromDetails() {
         const i = myCollection[currentDetailsIndex];
         document.getElementById('editIndex').value = currentDetailsIndex;
-        document.getElementById('editArtist').value = i.Wykonawca;
+        document.getElementById('editArtist').value = i.WyWykonawca; // zabezpieczenie przed błędnym odczytem - upewniam się z property
+        document.getElementById('editArtist').value = i.Wykonawca; 
         document.getElementById('editAlbum').value = i.Album;
         document.getElementById('editCover').value = i.Okładka;
         document.getElementById('editStatus').value = i.Status;
