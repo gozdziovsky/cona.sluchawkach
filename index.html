@@ -218,11 +218,8 @@ function renderGrid() {
         const fF = document.getElementById('formatFilter').value;
         
         const filtered = myCollection.filter(i => {
-            // BEZPIECZNE POBIERANIE TEKSTU: Zamienia liczby/puste pola na czysty tekst
             const artysta = (i.Wykonawca || "").toString().toLowerCase();
             const album = (i.Album || "").toString().toLowerCase();
-            
-            // Sprawdza czy wpisany tekst pasuje do Artysty LUB Albumu
             const pasujeTekst = artysta.includes(q) || album.includes(q);
             const pasujeStatus = (sF === "ALL" || i.Status === sF);
             const pasujeFormat = (fF === "ALL" || i.Format === fF);
@@ -233,9 +230,17 @@ function renderGrid() {
         container.innerHTML = filtered.map(item => {
             const idx = myCollection.indexOf(item);
             let bClass = item.Format === 'FLAC Hi-Res' ? 'hires' : (item.Status === 'SZUKAM' ? 'szukam' : '');
+            
+            // --- MAGIA OPTYMALIZACJI ---
+            // Używamy darmowego CDN, który w locie zmniejsza obrazek do 200px i kompresuje do WebP
+            let szybkaOkladka = item.Okładka;
+            if(item.Okładka && item.Okładka.startsWith('http')) {
+                szybkaOkladka = `https://wsrv.nl/?url=${encodeURIComponent(item.Okładka)}&w=200&h=200&fit=cover&output=webp`;
+            }
+
             return `
                 <div class="grid-item" onclick="openDetails(${idx})">
-                    <img src="${item.Okładka}" loading="lazy">
+                    <img src="${szybkaOkladka}" loading="lazy">
                     <div class="format-badge ${bClass}">${item.Status === 'SZUKAM' ? 'SZUKAM' : item.Format}</div>
                     <div class="grid-overlay"><div class="grid-title">${item.Album || "Brak tytułu"}</div></div>
                 </div>`;
