@@ -10,71 +10,150 @@
     <meta name="apple-mobile-web-app-title" content="Walkman">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/512px-Walkman_logo.svg.png">
     
-    <title>Walkman Cloud V24</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <title>Walkman Cloud V25</title>
     <style>
-        :root { --accent: #1db954; --bg: #000000; --card: #121212; --text: #ffffff; --text-dim: #b3b3b3; --danger: #e74c3c; --hires: #9b59b6; --edit: #3498db; }
+        :root { 
+            --accent: #1db954; 
+            --bg: #09090b; 
+            --card: rgba(24, 24, 27, 0.65); 
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text: #ffffff; 
+            --text-dim: #a1a1aa; 
+            --danger: #ef4444; 
+            --hires: #8b5cf6; 
+            --edit: #3b82f6; 
+        }
+        
         *, *::before, *::after { box-sizing: border-box; }
         
+        /* Customowy Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
         html, body { 
-            overflow-x: hidden; width: 100%; font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-            background: var(--bg); color: var(--text); padding: 0; margin: 0; -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden; width: 100%; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            /* Nowe, głębokie tło z gradientem */
+            background: var(--bg); 
+            background-image: radial-gradient(circle at 50% -10%, rgba(29, 185, 84, 0.15) 0%, var(--bg) 50%);
+            background-attachment: fixed;
+            color: var(--text); padding: 0; margin: 0; -webkit-tap-highlight-color: transparent;
             padding-bottom: env(safe-area-inset-bottom);
         }
 
         .container { 
-            max-width: 800px; margin: 0 auto; width: 100%; padding: 15px; 
-            padding-top: max(15px, env(safe-area-inset-top)); 
-            display: flex; flex-direction: column; gap: 15px; 
+            max-width: 800px; margin: 0 auto; width: 100%; padding: 20px 15px; 
+            padding-top: max(20px, env(safe-area-inset-top)); 
+            display: flex; flex-direction: column; gap: 18px; 
         }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        h1 { color: var(--accent); font-size: 20px; margin: 0; font-weight: 700; }
-        .nav-icons { display: flex; gap: 5px; }
-        .icon-btn { background: none; border: none; font-size: 22px; cursor: pointer; padding: 8px; color: #fff; }
-
-        .counters { display: flex; gap: 10px; }
-        .counter-box { background: #1a1a1a; padding: 12px; border-radius: 12px; flex: 1; text-align: center; border: 1px solid #333; }
-        .counter-value { font-size: 22px; font-weight: 900; color: var(--accent); display: block; }
-        .szukam .counter-value { color: #f1c40f; }
-
-        .panel { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #333; }
-        .panel-title { font-size: 11px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; font-weight: 600; letter-spacing: 1px; text-align: center;}
+        h1 { color: var(--accent); font-size: 24px; margin: 0; font-weight: 900; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(29, 185, 84, 0.3); }
+        .nav-icons { display: flex; gap: 10px; }
         
-        .input-group { display: flex; gap: 8px; width: 100%; flex-wrap: wrap; justify-content: center;}
-        input, button, select, textarea { padding: 14px; border-radius: 8px; border: none; background: #282828; color: white; font-size: 16px; width: 100%; outline: none; }
-        button { background: var(--accent); color: #000; font-weight: bold; cursor: pointer; }
+        .icon-btn { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); 
+            color: #fff; border-radius: 50%; width: 40px; height: 40px; 
+            display: flex; justify-content: center; align-items: center; cursor: pointer; 
+            transition: all 0.2s ease; backdrop-filter: blur(5px);
+        }
+        .icon-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        .icon-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+        .counters { display: flex; gap: 12px; }
+        .counter-box { 
+            background: var(--card); padding: 16px; border-radius: 16px; flex: 1; text-align: center; 
+            border: 1px solid var(--card-border); box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+        .counter-box small { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 600;}
+        .counter-value { font-size: 28px; font-weight: 900; color: var(--accent); display: block; margin-top: 5px; text-shadow: 0 2px 10px rgba(29, 185, 84, 0.2); }
+        .szukam .counter-value { color: #f59e0b; text-shadow: 0 2px 10px rgba(245, 158, 11, 0.2); }
+
+        .panel { 
+            background: var(--card); padding: 20px; border-radius: 16px; 
+            border: 1px solid var(--card-border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .panel-title { font-size: 12px; text-transform: uppercase; color: var(--text-dim); margin-top: 0; margin-bottom: 16px; font-weight: 800; letter-spacing: 1.5px; text-align: center;}
+        
+        .input-group { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; justify-content: center;}
+        input, select, textarea { 
+            padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(0,0,0,0.3); color: white; font-size: 15px; width: 100%; outline: none; 
+            font-family: inherit; transition: border 0.2s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
+        button { 
+            background: var(--accent); color: #000; font-weight: 800; cursor: pointer; 
+            padding: 14px 16px; border-radius: 10px; border: none; font-size: 15px; font-family: inherit;
+            transition: all 0.2s; box-shadow: 0 4px 15px rgba(29, 185, 84, 0.2);
+        }
+        button:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(29, 185, 84, 0.3); }
 
         .search-wrapper { position: relative; width: 100%; }
-        .clear-btn { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #888; font-size: 18px; cursor: pointer; padding: 10px; display: none; }
+        .clear-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; box-shadow: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; padding: 10px; display: none; }
+        .clear-btn:hover { background: transparent; color: white; transform: translateY(-50%); }
 
-        #apiResults { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
-        .search-card { background: #1a1a1a; padding: 10px; border-radius: 12px; border: 1px solid #333; display: flex; flex-direction: column; gap: 8px; }
-        .search-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; }
-        .search-card p { font-size: 11px; font-weight: bold; margin: 0; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .search-card select { padding: 8px; font-size: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 6px; }
+        #apiResults { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+        .search-card { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 14px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 10px; }
+        .search-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .search-card p { font-size: 12px; font-weight: 600; margin: 0; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4; }
+        .search-card select { padding: 10px; font-size: 12px; background: rgba(255,255,255,0.05); }
 
-        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
-        .grid-item { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 1/1; background: #1a1a1a; animation: fadeIn 0.4s ease; cursor: pointer;}
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .grid-item img { width: 100%; height: 100%; object-fit: cover; }
-        .grid-overlay { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.85); padding: 6px 8px; backdrop-filter: blur(4px); }
-        .grid-title { font-size: 10px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;}
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
         
-        .format-badge { position: absolute; top: 5px; right: 5px; background: var(--accent); color: #000; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 10px; z-index: 2; }
-        .format-badge.szukam { background: #f1c40f; }
+        /* Animacje i wygląd kafelka */
+        .grid-item { 
+            position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; 
+            background: #111; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .grid-item:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 12px 30px rgba(0,0,0,0.5); z-index: 2; }
+        .grid-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .grid-item:hover img { transform: scale(1.05); }
+        
+        /* Płynny gradient na okładce */
+        .grid-overlay { 
+            position: absolute; bottom: 0; width: 100%; 
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%); 
+            padding: 20px 10px 10px 10px; 
+        }
+        .grid-title { font-size: 11px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8);}
+        
+        .format-badge { 
+            position: absolute; top: 8px; right: 8px; background: var(--accent); color: #000; 
+            font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 20px; z-index: 2; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.4); letter-spacing: 0.5px;
+        }
+        .format-badge.szukam { background: #f59e0b; color: #fff;}
         .format-badge.hires { background: var(--hires); color: white; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-content { background: var(--card); padding: 20px; border-radius: 16px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; position: relative; }
-        .close-x { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #fff; cursor: pointer; z-index: 10; }
+        /* Ulepszone modale */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .modal-content { 
+            background: var(--card); padding: 25px; border-radius: 24px; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; position: relative; 
+            border: 1px solid var(--card-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        .detail-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; }
-        .detail-notes { font-style: italic; color: var(--text-dim); font-size: 13px; text-align: center; margin-bottom: 25px; padding: 10px; background: #1a1a1a; border-radius: 8px; }
+        .close-x { position: absolute; top: 20px; right: 20px; font-size: 28px; color: var(--text-dim); cursor: pointer; z-index: 10; line-height: 1; transition: color 0.2s;}
+        .close-x:hover { color: white; }
         
-        .artist-link { color: var(--accent); cursor: pointer; text-decoration: underline; text-decoration-color: var(--accent); transition: opacity 0.2s; }
+        .detail-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .detail-notes { font-style: italic; color: var(--text-dim); font-size: 13px; text-align: center; margin-bottom: 25px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);}
+        
+        .artist-link { color: var(--accent); cursor: pointer; font-weight: 800; transition: opacity 0.2s; }
+        .artist-link:hover { text-decoration: underline; text-decoration-color: var(--accent); }
         .artist-link:active { opacity: 0.6; }
 
-        .loader { text-align: center; color: var(--accent); font-weight: bold; display: none; padding: 20px; }
+        .loader { text-align: center; color: var(--accent); font-weight: 800; display: none; padding: 20px; text-transform: uppercase; letter-spacing: 2px; font-size: 12px;}
         body:not(.is-admin) .admin-only { display: none !important; }
 
         @media (min-width: 600px) { .grid-container, #apiResults { grid-template-columns: repeat(4, 1fr); } }
@@ -86,9 +165,15 @@
     <div class="header">
         <h1>Walkman Cloud</h1>
         <div class="nav-icons">
-            <button class="icon-btn" onclick="toggleAdmin()" id="lockBtn">🔒</button>
-            <button class="icon-btn" onclick="loadFromSheets()">🔄</button>
-            <button class="icon-btn admin-only" onclick="exportToCSV()">💾</button>
+            <button class="icon-btn" onclick="toggleAdmin()" id="lockBtn" title="Tryb Admina">
+                <svg id="lockIcon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H5v14h14V8h-1zm-4 0H10V6a2 2 0 0 1 4 0v2z"/></svg>
+            </button>
+            <button class="icon-btn" onclick="loadFromSheets()" title="Odśwież bazę">
+                <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            </button>
+            <button class="icon-btn admin-only" onclick="exportToCSV()" title="Eksportuj CSV">
+                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            </button>
         </div>
     </div>
 
@@ -98,40 +183,40 @@
     </div>
 
     <div class="panel admin-only" id="addPanel">
-        <h3 class="panel-title">🌐 Szukaj w Discogs</h3>
+        <h3 class="panel-title">Szukaj w Discogs</h3>
         <div class="input-group">
-            <input type="text" id="query" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()">
-            <button onclick="searchDiscogs()" style="width:80px">Szukaj</button>
+            <input type="text" id="query" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()" style="flex: 1;">
+            <button onclick="searchDiscogs()" style="width:100px">Szukaj</button>
         </div>
         <div id="apiResults"></div>
     </div>
 
-    <div class="panel admin-only" style="margin-top: 15px;">
-        <h3 class="panel-title">✍️ Ręczne wprowadzanie</h3>
+    <div class="panel admin-only">
+        <h3 class="panel-title">Ręczne wprowadzanie</h3>
         <div class="input-group">
             <input type="text" id="manArtist" placeholder="Wykonawca" style="flex:1">
             <input type="text" id="manAlbum" placeholder="Tytuł albumu" style="flex:1">
         </div>
-        <div class="input-group" style="margin-top:8px;">
+        <div class="input-group" style="margin-top:10px;">
             <select id="manStatus" style="flex:1"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
             <select id="manFormat" style="flex:1"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
         </div>
-        <div class="input-group" style="margin-top:8px;">
+        <div class="input-group" style="margin-top:10px;">
             <input type="text" id="manCover" placeholder="Link do okładki (opcjonalnie)">
         </div>
-        <div class="input-group" style="margin-top:8px;">
-            <textarea id="manNotes" placeholder="Twoje notatki..." style="height:60px;"></textarea>
+        <div class="input-group" style="margin-top:10px;">
+            <textarea id="manNotes" placeholder="Twoje notatki..." style="height:70px;"></textarea>
         </div>
-        <button onclick="addManual()" style="width:100%; margin-top:10px;">DODAJ DO BAZY</button>
+        <button onclick="addManual()" style="width:100%; margin-top:15px;">Dodaj do bazy</button>
     </div>
     
     <div id="loader" class="loader">Synchronizacja...</div>
 
     <div class="panel">
-        <h3 class="panel-title" style="color: var(--accent);">📁 Moja Kolekcja</h3>
+        <h3 class="panel-title" style="color: var(--accent);">Moja Kolekcja</h3>
         
         <div class="search-wrapper" style="margin-bottom:15px">
-            <input type="text" id="localSearch" placeholder="Filtruj wg artysty lub albumu..." oninput="toggleClearBtn(); renderGrid()" style="padding-right: 35px;">
+            <input type="text" id="localSearch" placeholder="Filtruj wg artysty lub albumu..." oninput="toggleClearBtn(); renderGrid()" style="padding-right: 40px; border-radius: 12px; background: rgba(255,255,255,0.05);">
             <button id="clearSearchBtn" class="clear-btn" onclick="clearSearch()">✕</button>
         </div>
 
@@ -142,7 +227,7 @@
                 <option value="NEW">Najnowsze</option>
             </select>
             <select id="statusFilter" onchange="renderGrid()" style="flex:1">
-                <option value="ALL">Statusy</option>
+                <option value="ALL">Wszystkie statusy</option>
                 <option value="MAM">MAM</option>
                 <option value="SZUKAM">SZUKAM</option>
             </select>
@@ -163,34 +248,40 @@
     <div class="modal-content">
         <span class="close-x" onclick="closeDetailsModal()">×</span>
         <img id="detCover" src="" class="detail-cover">
-        <h2 id="detAlbum" style="text-align:center; margin:0;"></h2>
-        <p id="detArtist" style="text-align:center; margin-bottom:15px; font-weight:bold;"></p>
+        <h2 id="detAlbum" style="text-align:center; margin:0 0 5px 0; font-weight: 900; font-size: 22px; letter-spacing: -0.5px;"></h2>
+        <p id="detArtist" style="text-align:center; margin-bottom:20px; font-size: 14px; color: var(--text-dim);"></p>
         <div id="detNotes" class="detail-notes"></div>
-        <div style="display:flex; gap:10px;" class="admin-only">
-            <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor:pointer;">Edytuj</button>
-            <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor:pointer;">Usuń</button>
+        <div style="display:flex; gap:12px;" class="admin-only">
+            <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 16px; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);">Edytuj</button>
+            <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 16px; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">Usuń</button>
         </div>
     </div>
 </div>
 
 <div id="editModal" class="modal" onclick="if(event.target === this) closeEditModal()">
     <div class="modal-content">
-        <h2 style="color: var(--edit); text-align:center; margin-top:0;">Edytuj Album</h2>
+        <h2 style="color: var(--edit); text-align:center; margin-top:0; font-weight: 900;">Edytuj Album</h2>
         <input type="hidden" id="editIndex">
-        <label style="font-size:11px; color:var(--text-dim)">WYKONAWCA</label>
-        <input type="text" id="editArtist">
-        <label style="font-size:11px; color:var(--text-dim); margin-top:10px">ALBUM</label>
-        <input type="text" id="editAlbum">
-        <label style="font-size:11px; color:var(--text-dim); margin-top:10px">LINK DO OKŁADKI</label>
-        <input type="text" id="editCover">
-        <div style="display:flex; gap:10px; margin-top:10px;">
+        
+        <label style="font-size:10px; font-weight: 800; letter-spacing: 1px; color:var(--text-dim)">WYKONAWCA</label>
+        <input type="text" id="editArtist" style="margin-bottom: 12px; margin-top: 4px;">
+        
+        <label style="font-size:10px; font-weight: 800; letter-spacing: 1px; color:var(--text-dim)">ALBUM</label>
+        <input type="text" id="editAlbum" style="margin-bottom: 12px; margin-top: 4px;">
+        
+        <label style="font-size:10px; font-weight: 800; letter-spacing: 1px; color:var(--text-dim)">LINK DO OKŁADKI</label>
+        <input type="text" id="editCover" style="margin-top: 4px;">
+        
+        <div style="display:flex; gap:10px; margin-top:12px;">
             <select id="editStatus"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
             <select id="editFormat"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
         </div>
-        <textarea id="editNotes" placeholder="Twoje notatki..." style="margin-top:10px; height:80px;"></textarea>
-        <div style="display:flex; gap:10px; margin-top:15px;">
-            <button onclick="closeEditModal()" style="background:#444; flex:1; padding: 14px; border-radius: 8px; border: none; color:white; font-weight:bold;">Anuluj</button>
-            <button onclick="saveEdit()" style="background:var(--accent); flex:1; padding: 14px; border-radius: 8px; border: none; color:black; font-weight:bold;">Zapisz</button>
+        
+        <textarea id="editNotes" placeholder="Twoje notatki..." style="margin-top:12px; height:80px;"></textarea>
+        
+        <div style="display:flex; gap:12px; margin-top:20px;">
+            <button onclick="closeEditModal()" style="background:rgba(255,255,255,0.1); flex:1; padding: 16px; border-radius: 12px; color:white; font-weight:800; box-shadow: none;">Anuluj</button>
+            <button onclick="saveEdit()" style="background:var(--accent); flex:1; padding: 16px; border-radius: 12px; color:black; font-weight:800;">Zapisz</button>
         </div>
     </div>
 </div>
@@ -210,10 +301,32 @@
     let myCollection = [];
     let currentFilteredArray = [];
     let currentRenderIndex = 0;
-    const RENDER_CHUNK = 30; // Ile albumów ładujemy na jedno pociągnięcie w dół
+    const RENDER_CHUNK = 30;
 
     let currentDetailsIndex = -1;
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
+
+    // Zmiana ikony kłódki dla admina (Otwarta/Zamknięta)
+    function applyAdminUI() {
+        const iconSvg = document.getElementById('lockIcon');
+        if (ADMIN_PASS) { 
+            iconSvg.innerHTML = '<path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H4v14h16V8h-2zm-4 0H10V6a2 2 0 0 1 4 0v2z"/>'; // Otwarta
+            document.body.classList.add('is-admin'); 
+        } else { 
+            iconSvg.innerHTML = '<path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H5v14h14V8h-1zm-4 0H10V6a2 2 0 0 1 4 0v2z"/>'; // Zamknięta
+            document.body.classList.remove('is-admin'); 
+        }
+    }
+
+    function toggleAdmin() {
+        if (ADMIN_PASS) { 
+            ADMIN_PASS = ''; localStorage.removeItem('admin_pass'); 
+        } else { 
+            const p = prompt("Podaj hasło administratora:"); 
+            if (p) { ADMIN_PASS = p; localStorage.setItem('admin_pass', p); } 
+        }
+        applyAdminUI();
+    }
 
     function splitArtists(artistString) {
         if (!artistString) return [];
@@ -230,22 +343,6 @@
         
         let arr = tempStr.split(',').map(a => a.trim()).filter(a => a.length > 0);
         return arr.map(a => placeholders[a] ? placeholders[a] : a);
-    }
-
-    function toggleAdmin() {
-        if (ADMIN_PASS) { 
-            ADMIN_PASS = ''; localStorage.removeItem('admin_pass'); 
-        } else { 
-            const p = prompt("Podaj hasło administratora:"); 
-            if (p) { ADMIN_PASS = p; localStorage.setItem('admin_pass', p); } 
-        }
-        applyAdminUI();
-    }
-
-    function applyAdminUI() {
-        const btn = document.getElementById('lockBtn');
-        if (ADMIN_PASS) { btn.innerText = '🔓'; document.body.classList.add('is-admin'); } 
-        else { btn.innerText = '🔒'; document.body.classList.remove('is-admin'); }
     }
 
     function toggleClearBtn() {
@@ -282,7 +379,6 @@
         document.getElementById('countSzukam').innerText = myCollection.filter(i => i.Status === 'SZUKAM').length;
     }
 
-    // Odświeżanie logiki i resetowanie widoku (gdy wyszukujesz / zmieniasz filtr)
     function renderGrid() {
         const container = document.getElementById('collectionGrid');
         const q = document.getElementById('localSearch').value.toLowerCase();
@@ -307,14 +403,13 @@
             if (sortMode === 'NEW') return b.originalIndex - a.originalIndex;
         });
 
-        container.innerHTML = ''; // Wyczyść stare kafelki
-        currentRenderIndex = 0;   // Zresetuj licznik paginacji
-        loadMoreItems();          // Załaduj pierwszą paczkę
+        container.innerHTML = ''; 
+        currentRenderIndex = 0;   
+        loadMoreItems();          
     }
 
-    // Funkcja dołączająca kafelki (wywoływana też przez czujnik przewijania)
     function loadMoreItems() {
-        if (currentRenderIndex >= currentFilteredArray.length) return; // Doszliśmy do końca listy
+        if (currentRenderIndex >= currentFilteredArray.length) return;
 
         const chunk = currentFilteredArray.slice(currentRenderIndex, currentRenderIndex + RENDER_CHUNK);
         const container = document.getElementById('collectionGrid');
@@ -340,14 +435,9 @@
         currentRenderIndex += RENDER_CHUNK;
     }
 
-    // Uruchamianie IntersectionObserver'a dla czujnika na dole ekranu
     const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-            loadMoreItems();
-        }
-    }, { rootMargin: "200px" }); // Margin 200px odpala ładowanie zanim dociągniesz do samego końca
-    
-    // Połącz obserwator z czujnikiem w HTMLu
+        if (entries[0].isIntersecting) { loadMoreItems(); }
+    }, { rootMargin: "200px" }); 
     observer.observe(document.getElementById('scrollSentinel'));
 
     async function addManual() {
@@ -388,7 +478,7 @@
                     <p>${r.title}</p>
                     <select id="sStat-${r.id}"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
                     <select id="sForm-${r.id}"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option></select>
-                    <button onclick="addAlbum('${r.title.replace(/'/g,"\\'")}', '${r.cover_image}', '${r.id}')" style="padding:10px; font-size:12px; margin-top: auto; border:none; border-radius:6px; cursor:pointer;">DODAJ</button>
+                    <button onclick="addAlbum('${r.title.replace(/'/g,"\\'")}', '${r.cover_image}', '${r.id}')" style="padding:10px; font-size:12px; margin-top: auto; border:none; border-radius:8px; cursor:pointer; font-weight:800;">DODAJ</button>
                 </div>`).join('');
         } catch(e) { alert("Błąd Discogs API"); }
         document.getElementById('loader').style.display = 'none';
@@ -443,7 +533,7 @@
             }
         });
 
-        document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek.";
+        document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek w bazie.";
         document.getElementById('detailsModal').style.display = 'flex';
     }
     
