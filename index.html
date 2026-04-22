@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Walkman">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/512px-Walkman_logo.svg.png">
     
-    <title>Walkman Cloud V19</title>
+    <title>Walkman Cloud V22</title>
     <style>
         :root { --accent: #1db954; --bg: #000000; --card: #121212; --text: #ffffff; --text-dim: #b3b3b3; --danger: #e74c3c; --hires: #9b59b6; --edit: #3498db; }
         *, *::before, *::after { box-sizing: border-box; }
@@ -44,6 +44,10 @@
         input, button, select, textarea { padding: 14px; border-radius: 8px; border: none; background: #282828; color: white; font-size: 16px; width: 100%; outline: none; }
         button { background: var(--accent); color: #000; font-weight: bold; cursor: pointer; }
 
+        /* Wyszukiwarka z X */
+        .search-wrapper { position: relative; width: 100%; }
+        .clear-btn { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #888; font-size: 18px; cursor: pointer; padding: 10px; display: none; }
+
         #apiResults { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
         .search-card { background: #1a1a1a; padding: 10px; border-radius: 12px; border: 1px solid #333; display: flex; flex-direction: column; gap: 8px; }
         .search-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; }
@@ -68,8 +72,11 @@
         .detail-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; }
         .detail-notes { font-style: italic; color: var(--text-dim); font-size: 13px; text-align: center; margin-bottom: 25px; padding: 10px; background: #1a1a1a; border-radius: 8px; }
         
+        /* Klikalny link w oknie szczegółów */
+        .artist-link { color: var(--accent); cursor: pointer; text-decoration: underline; text-decoration-color: var(--accent); transition: opacity 0.2s; }
+        .artist-link:active { opacity: 0.6; }
+
         .loader { text-align: center; color: var(--accent); font-weight: bold; display: none; padding: 20px; }
-        
         body:not(.is-admin) .admin-only { display: none !important; }
 
         @media (min-width: 600px) { .grid-container, #apiResults { grid-template-columns: repeat(4, 1fr); } }
@@ -93,22 +100,49 @@
     </div>
 
     <div class="panel admin-only" id="addPanel">
-        <h3 class="panel-title">Szukaj w Discogs</h3>
+        <h3 class="panel-title">🌐 Szukaj w Discogs</h3>
         <div class="input-group">
             <input type="text" id="query" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()">
             <button onclick="searchDiscogs()" style="width:80px">Szukaj</button>
         </div>
         <div id="apiResults"></div>
     </div>
+
+    <div class="panel admin-only" style="margin-top: 15px;">
+        <h3 class="panel-title">✍️ Ręczne wprowadzanie</h3>
+        <div class="input-group">
+            <input type="text" id="manArtist" placeholder="Wykonawca" style="flex:1">
+            <input type="text" id="manAlbum" placeholder="Tytuł albumu" style="flex:1">
+        </div>
+        <div class="input-group" style="margin-top:8px;">
+            <select id="manStatus" style="flex:1"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
+            <select id="manFormat" style="flex:1"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
+        </div>
+        <div class="input-group" style="margin-top:8px;">
+            <input type="text" id="manCover" placeholder="Link do okładki (opcjonalnie)">
+        </div>
+        <div class="input-group" style="margin-top:8px;">
+            <textarea id="manNotes" placeholder="Twoje notatki..." style="height:60px;"></textarea>
+        </div>
+        <button onclick="addManual()" style="width:100%; margin-top:10px;">DODAJ DO BAZY</button>
+    </div>
     
     <div id="loader" class="loader">Synchronizacja...</div>
 
     <div class="panel">
-        <h3 class="panel-title" style="color: var(--accent);">Moja Kolekcja</h3>
-        <div class="input-group" style="margin-bottom:15px">
-            <input type="text" id="localSearch" placeholder="Filtruj listę..." onkeyup="renderGrid()">
+        <h3 class="panel-title" style="color: var(--accent);">📁 Moja Kolekcja</h3>
+        
+        <div class="search-wrapper" style="margin-bottom:15px">
+            <input type="text" id="localSearch" placeholder="Filtruj wg artysty lub albumu..." oninput="toggleClearBtn(); renderGrid()" style="padding-right: 35px;">
+            <button id="clearSearchBtn" class="clear-btn" onclick="clearSearch()">✕</button>
         </div>
+
         <div class="input-group">
+            <select id="sortOrder" onchange="renderGrid()" style="flex:1">
+                <option value="AZ">A-Z</option>
+                <option value="ZA">Z-A</option>
+                <option value="NEW">Najnowsze</option>
+            </select>
             <select id="statusFilter" onchange="renderGrid()" style="flex:1">
                 <option value="ALL">Statusy</option>
                 <option value="MAM">MAM</option>
@@ -130,7 +164,7 @@
         <span class="close-x" onclick="closeDetailsModal()">×</span>
         <img id="detCover" src="" class="detail-cover">
         <h2 id="detAlbum" style="text-align:center; margin:0;"></h2>
-        <p id="detArtist" style="text-align:center; color:var(--text-dim); margin-bottom:15px; font-weight:bold;"></p>
+        <p id="detArtist" class="artist-link" style="text-align:center; margin-bottom:15px; font-weight:bold;"></p>
         <div id="detNotes" class="detail-notes"></div>
         <div style="display:flex; gap:10px;" class="admin-only">
             <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor:pointer;">Edytuj</button>
@@ -173,8 +207,7 @@
 
     function toggleAdmin() {
         if (ADMIN_PASS) { 
-            ADMIN_PASS = ''; 
-            localStorage.removeItem('admin_pass'); 
+            ADMIN_PASS = ''; localStorage.removeItem('admin_pass'); 
         } else { 
             const p = prompt("Podaj hasło administratora:"); 
             if (p) { ADMIN_PASS = p; localStorage.setItem('admin_pass', p); } 
@@ -184,18 +217,30 @@
 
     function applyAdminUI() {
         const btn = document.getElementById('lockBtn');
-        if (ADMIN_PASS) { 
-            btn.innerText = '🔓'; 
-            document.body.classList.add('is-admin');
-        } else { 
-            btn.innerText = '🔒'; 
-            document.body.classList.remove('is-admin');
-        }
+        if (ADMIN_PASS) { btn.innerText = '🔓'; document.body.classList.add('is-admin'); } 
+        else { btn.innerText = '🔒'; document.body.classList.remove('is-admin'); }
+    }
+
+    // Funkcje dla wyszukiwarki (X i filtrowanie)
+    function toggleClearBtn() {
+        const val = document.getElementById('localSearch').value;
+        document.getElementById('clearSearchBtn').style.display = val.length > 0 ? 'block' : 'none';
+    }
+    function clearSearch() {
+        document.getElementById('localSearch').value = '';
+        toggleClearBtn();
+        renderGrid();
+    }
+    function filterByArtist(artist) {
+        closeDetailsModal();
+        document.getElementById('localSearch').value = artist;
+        toggleClearBtn();
+        renderGrid();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function loadFromSheets() {
-        if(!GOOGLE_URL || GOOGLE_URL === 'TWOJ_URL_WDROZENIA_Z_GOOGLE_APPS_SCRIPT_TUTAJ' || !GOOGLE_URL.startsWith('http')) return;
-
+        if(!GOOGLE_URL || GOOGLE_URL.includes('TWOJ_URL')) return;
         document.getElementById('loader').style.display = 'block';
         try {
             const res = await fetch(GOOGLE_URL, { redirect: 'follow' });
@@ -211,28 +256,37 @@
         document.getElementById('countSzukam').innerText = myCollection.filter(i => i.Status === 'SZUKAM').length;
     }
 
-function renderGrid() {
+    function renderGrid() {
         const container = document.getElementById('collectionGrid');
         const q = document.getElementById('localSearch').value.toLowerCase();
         const sF = document.getElementById('statusFilter').value;
         const fF = document.getElementById('formatFilter').value;
+        const sortMode = document.getElementById('sortOrder').value;
         
-        const filtered = myCollection.filter(i => {
+        // Zapisujemy oryginalny indeks, żeby aplikacja wiedziała, w który album klikasz
+        let mappedCollection = myCollection.map((item, index) => ({ ...item, originalIndex: index }));
+
+        let filtered = mappedCollection.filter(i => {
             const artysta = (i.Wykonawca || "").toString().toLowerCase();
             const album = (i.Album || "").toString().toLowerCase();
             const pasujeTekst = artysta.includes(q) || album.includes(q);
             const pasujeStatus = (sF === "ALL" || i.Status === sF);
             const pasujeFormat = (fF === "ALL" || i.Format === fF);
-            
             return pasujeTekst && pasujeStatus && pasujeFormat;
-        }).sort((a,b) => (a.Wykonawca || "").toString().localeCompare((b.Wykonawca || "").toString()));
+        });
+
+        // SORTOWANIE (A-Z, Z-A, NAJNOWSZE)
+        filtered.sort((a, b) => {
+            if (sortMode === 'AZ') return (a.Wykonawca || "").toString().localeCompare((b.Wykonawca || "").toString());
+            if (sortMode === 'ZA') return (b.Wykonawca || "").toString().localeCompare((a.Wykonawca || "").toString());
+            if (sortMode === 'NEW') return b.originalIndex - a.originalIndex; // Odwraca listę
+        });
 
         container.innerHTML = filtered.map(item => {
-            const idx = myCollection.indexOf(item);
+            const idx = item.originalIndex;
             let bClass = item.Format === 'FLAC Hi-Res' ? 'hires' : (item.Status === 'SZUKAM' ? 'szukam' : '');
             
-            // --- MAGIA OPTYMALIZACJI ---
-            // Używamy darmowego CDN, który w locie zmniejsza obrazek do 200px i kompresuje do WebP
+            // WSRV Optyamlizacja w locie
             let szybkaOkladka = item.Okładka;
             if(item.Okładka && item.Okładka.startsWith('http')) {
                 szybkaOkladka = `https://wsrv.nl/?url=${encodeURIComponent(item.Okładka)}&w=200&h=200&fit=cover&output=webp`;
@@ -246,7 +300,34 @@ function renderGrid() {
                 </div>`;
         }).join('');
     }
-    
+
+    // DODAWANIE RĘCZNE Z ZABEZPIECZENIEM
+    async function addManual() {
+        const artist = document.getElementById('manArtist').value.trim();
+        const album = document.getElementById('manAlbum').value.trim();
+        
+        if (!artist || !album) { alert("Podaj Wykonawcę i Tytuł!"); return; }
+
+        // Blokada Duplikatów
+        const exists = myCollection.some(i => (i.Wykonawca || "").toLowerCase() === artist.toLowerCase() && (i.Album || "").toLowerCase() === album.toLowerCase());
+        if (exists) { if (!confirm(`Ten album (${artist} - ${album}) jest już w bazie!\n\nNa pewno chcesz dodać duplikat?`)) return; }
+
+        const s = document.getElementById('manStatus').value;
+        const f = document.getElementById('manFormat').value;
+        const cover = document.getElementById('manCover').value.trim();
+        const notes = document.getElementById('manNotes').value.trim();
+
+        document.getElementById('loader').style.display = 'block';
+        try {
+            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: artist, Album: album, Status: s, Format: f, Okładka: cover, Utwory: "", DiscogsID: "", Notatki: notes };
+            await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
+            
+            document.getElementById('manArtist').value = ''; document.getElementById('manAlbum').value = '';
+            document.getElementById('manCover').value = ''; document.getElementById('manNotes').value = '';
+            setTimeout(loadFromSheets, 1500);
+        } catch(e) { alert("Błąd!"); document.getElementById('loader').style.display = 'none'; }
+    }
+
     async function searchDiscogs() {
         const q = document.getElementById('query').value;
         if(!q) return;
@@ -262,36 +343,44 @@ function renderGrid() {
                     <select id="sForm-${r.id}"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option></select>
                     <button onclick="addAlbum('${r.title.replace(/'/g,"\\'")}', '${r.cover_image}', '${r.id}')" style="padding:10px; font-size:12px; margin-top: auto; border:none; border-radius:6px; cursor:pointer;">DODAJ</button>
                 </div>`).join('');
-        } catch(e) { alert("Błąd połączenia z Discogs API"); }
+        } catch(e) { alert("Błąd Discogs API"); }
         document.getElementById('loader').style.display = 'none';
     }
 
+    // DODAWANIE DISCOGS Z ZABEZPIECZENIEM
     async function addAlbum(title, cover, id) {
+        let p = title.split(' - ');
+        let rawArtist = p.shift() || "?";
+        let rawAlbum = p.join(' - ') || "?";
+        let cleanArtist = rawArtist.replace(/\s*\(\d+\)\s*/g, '').trim();
+
+        // Blokada Duplikatów
+        const exists = myCollection.some(i => (i.Wykonawca || "").toLowerCase() === cleanArtist.toLowerCase() && (i.Album || "").toLowerCase() === rawAlbum.toLowerCase());
+        if (exists) { if (!confirm(`Ten album (${cleanArtist} - ${rawAlbum}) jest już w bazie!\n\nNa pewno chcesz dodać duplikat?`)) return; }
+
         const s = document.getElementById(`sStat-${id}`).value;
         const f = s === "MAM" ? document.getElementById(`sForm-${id}`).value : "-";
         
         document.getElementById('loader').style.display = 'block';
         try {
-            // BRAK DRUGIEGO ZAPYTANIA DO DISCOGS - natychmiastowe cięcie nazwy
-            let p = title.split(' - ');
-            let rawArtist = p.shift() || "?";
-            let rawAlbum = p.join(' - ') || "?";
-            let cleanArtist = rawArtist.replace(/\s*\(\d+\)\s*/g, '').trim();
-            
             const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: f, Okładka: cover, Utwory: "", DiscogsID: id, Notatki: "" };
             await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
             
-            document.getElementById('apiResults').innerHTML = '';
-            document.getElementById('query').value = '';
+            document.getElementById('apiResults').innerHTML = ''; document.getElementById('query').value = '';
             setTimeout(loadFromSheets, 1500);
-        } catch(e) { alert("Błąd dodawania. Sprawdź hasło!"); document.getElementById('loader').style.display = 'none'; }
+        } catch(e) { alert("Błąd dodawania!"); document.getElementById('loader').style.display = 'none'; }
     }
 
     function openDetails(idx) {
         currentDetailsIndex = idx; const i = myCollection[idx];
         document.getElementById('detCover').src = i.Okładka;
         document.getElementById('detAlbum').innerText = i.Album;
-        document.getElementById('detArtist').innerText = i.Wykonawca;
+        
+        // Zapisujemy wykonawcę i tworzymy z niego przycisk filtrujący
+        const detArtistEl = document.getElementById('detArtist');
+        detArtistEl.innerText = i.Wykonawca;
+        detArtistEl.onclick = () => filterByArtist(i.Wykonawca);
+
         document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek.";
         document.getElementById('detailsModal').style.display = 'flex';
     }
