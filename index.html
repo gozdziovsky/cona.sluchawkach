@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Walkman">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/512px-Walkman_logo.svg.png">
     
-    <title>Walkman Cloud V22</title>
+    <title>Walkman Cloud Final</title>
     <style>
         :root { --accent: #1db954; --bg: #000000; --card: #121212; --text: #ffffff; --text-dim: #b3b3b3; --danger: #e74c3c; --hires: #9b59b6; --edit: #3498db; }
         *, *::before, *::after { box-sizing: border-box; }
@@ -72,7 +72,6 @@
         .detail-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; }
         .detail-notes { font-style: italic; color: var(--text-dim); font-size: 13px; text-align: center; margin-bottom: 25px; padding: 10px; background: #1a1a1a; border-radius: 8px; }
         
-        /* Klikalny link w oknie szczegółów */
         .artist-link { color: var(--accent); cursor: pointer; text-decoration: underline; text-decoration-color: var(--accent); transition: opacity 0.2s; }
         .artist-link:active { opacity: 0.6; }
 
@@ -181,6 +180,8 @@
         <input type="text" id="editArtist">
         <label style="font-size:11px; color:var(--text-dim); margin-top:10px">ALBUM</label>
         <input type="text" id="editAlbum">
+        <label style="font-size:11px; color:var(--text-dim); margin-top:10px">LINK DO OKŁADKI</label>
+        <input type="text" id="editCover">
         <div style="display:flex; gap:10px; margin-top:10px;">
             <select id="editStatus"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
             <select id="editFormat"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
@@ -194,8 +195,6 @@
 </div>
 
 <script>
-    // ==========================================
-    // ⚠️ UWAGA: ZOSTAW APOSTROFY PRZY WKLEJANIU!
     // ==========================================
     const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
     const DISCOGS_TOKEN = 'iTRtcEKKihJyGhwufBlyPncxTrMDFjVtwiFNTeAa';
@@ -221,7 +220,6 @@
         else { btn.innerText = '🔒'; document.body.classList.remove('is-admin'); }
     }
 
-    // Funkcje dla wyszukiwarki (X i filtrowanie)
     function toggleClearBtn() {
         const val = document.getElementById('localSearch').value;
         document.getElementById('clearSearchBtn').style.display = val.length > 0 ? 'block' : 'none';
@@ -263,7 +261,6 @@
         const fF = document.getElementById('formatFilter').value;
         const sortMode = document.getElementById('sortOrder').value;
         
-        // Zapisujemy oryginalny indeks, żeby aplikacja wiedziała, w który album klikasz
         let mappedCollection = myCollection.map((item, index) => ({ ...item, originalIndex: index }));
 
         let filtered = mappedCollection.filter(i => {
@@ -275,18 +272,16 @@
             return pasujeTekst && pasujeStatus && pasujeFormat;
         });
 
-        // SORTOWANIE (A-Z, Z-A, NAJNOWSZE)
         filtered.sort((a, b) => {
             if (sortMode === 'AZ') return (a.Wykonawca || "").toString().localeCompare((b.Wykonawca || "").toString());
             if (sortMode === 'ZA') return (b.Wykonawca || "").toString().localeCompare((a.Wykonawca || "").toString());
-            if (sortMode === 'NEW') return b.originalIndex - a.originalIndex; // Odwraca listę
+            if (sortMode === 'NEW') return b.originalIndex - a.originalIndex;
         });
 
         container.innerHTML = filtered.map(item => {
             const idx = item.originalIndex;
             let bClass = item.Format === 'FLAC Hi-Res' ? 'hires' : (item.Status === 'SZUKAM' ? 'szukam' : '');
             
-            // WSRV Optyamlizacja w locie
             let szybkaOkladka = item.Okładka;
             if(item.Okładka && item.Okładka.startsWith('http')) {
                 szybkaOkladka = `https://wsrv.nl/?url=${encodeURIComponent(item.Okładka)}&w=200&h=200&fit=cover&output=webp`;
@@ -301,14 +296,12 @@
         }).join('');
     }
 
-    // DODAWANIE RĘCZNE Z ZABEZPIECZENIEM
     async function addManual() {
         const artist = document.getElementById('manArtist').value.trim();
         const album = document.getElementById('manAlbum').value.trim();
         
         if (!artist || !album) { alert("Podaj Wykonawcę i Tytuł!"); return; }
 
-        // Blokada Duplikatów
         const exists = myCollection.some(i => (i.Wykonawca || "").toLowerCase() === artist.toLowerCase() && (i.Album || "").toLowerCase() === album.toLowerCase());
         if (exists) { if (!confirm(`Ten album (${artist} - ${album}) jest już w bazie!\n\nNa pewno chcesz dodać duplikat?`)) return; }
 
@@ -347,14 +340,12 @@
         document.getElementById('loader').style.display = 'none';
     }
 
-    // DODAWANIE DISCOGS Z ZABEZPIECZENIEM
     async function addAlbum(title, cover, id) {
         let p = title.split(' - ');
         let rawArtist = p.shift() || "?";
         let rawAlbum = p.join(' - ') || "?";
         let cleanArtist = rawArtist.replace(/\s*\(\d+\)\s*/g, '').trim();
 
-        // Blokada Duplikatów
         const exists = myCollection.some(i => (i.Wykonawca || "").toLowerCase() === cleanArtist.toLowerCase() && (i.Album || "").toLowerCase() === rawAlbum.toLowerCase());
         if (exists) { if (!confirm(`Ten album (${cleanArtist} - ${rawAlbum}) jest już w bazie!\n\nNa pewno chcesz dodać duplikat?`)) return; }
 
@@ -376,7 +367,6 @@
         document.getElementById('detCover').src = i.Okładka;
         document.getElementById('detAlbum').innerText = i.Album;
         
-        // Zapisujemy wykonawcę i tworzymy z niego przycisk filtrujący
         const detArtistEl = document.getElementById('detArtist');
         detArtistEl.innerText = i.Wykonawca;
         detArtistEl.onclick = () => filterByArtist(i.Wykonawca);
@@ -391,6 +381,7 @@
         document.getElementById('editIndex').value = currentDetailsIndex;
         document.getElementById('editArtist').value = i.Wykonawca;
         document.getElementById('editAlbum').value = i.Album;
+        document.getElementById('editCover').value = i.Okładka;
         document.getElementById('editStatus').value = i.Status;
         document.getElementById('editFormat').value = i.Format;
         document.getElementById('editNotes').value = i.Notatki;
@@ -400,7 +391,7 @@
 
     async function saveEdit() {
         const idx = document.getElementById('editIndex').value; const old = myCollection[idx];
-        const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: "" };
+        const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Okładka: document.getElementById('editCover').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: "" };
         closeEditModal(); document.getElementById('loader').style.display = 'block';
         await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         setTimeout(loadFromSheets, 1500);
