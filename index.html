@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Walkman">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/512px-Walkman_logo.svg.png">
     
-    <title>Walkman Cloud V14</title>
+    <title>Walkman Cloud V15</title>
     <style>
         :root { --accent: #1db954; --bg: #000000; --card: #121212; --text: #ffffff; --text-dim: #b3b3b3; --danger: #e74c3c; --hires: #9b59b6; --edit: #3498db; }
         *, *::before, *::after { box-sizing: border-box; }
@@ -23,7 +23,7 @@
 
         .container { 
             max-width: 800px; margin: 0 auto; width: 100%; padding: 15px; 
-            padding-top: calc(15px + env(safe-area-inset-top)); /* Poprawka dla paska iOS */
+            padding-top: calc(15px + env(safe-area-inset-top)); /* Ochrona przed godziną i baterią iOS */
             display: flex; flex-direction: column; gap: 15px; 
         }
         
@@ -44,7 +44,14 @@
         input, button, select, textarea { padding: 14px; border-radius: 8px; border: none; background: #282828; color: white; font-size: 16px; width: 100%; outline: none; }
         button { background: var(--accent); color: #000; font-weight: bold; cursor: pointer; }
 
-        /* GRID */
+        /* GRID WYSZUKIWANIA DISCOGS (Naprawiony) */
+        #apiResults { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
+        .search-card { background: #1a1a1a; padding: 10px; border-radius: 12px; border: 1px solid #333; display: flex; flex-direction: column; gap: 8px; }
+        .search-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; }
+        .search-card p { font-size: 11px; font-weight: bold; margin: 0; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .search-card select { padding: 8px; font-size: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 6px; }
+
+        /* GRID TWOJEJ KOLEKCJI */
         .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
         .grid-item { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 1/1; background: #1a1a1a; animation: fadeIn 0.4s ease; cursor: pointer;}
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -67,7 +74,7 @@
         .admin-only { display: none !important; }
         .loader { text-align: center; color: var(--accent); font-weight: bold; display: none; padding: 20px; }
 
-        @media (min-width: 600px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 600px) { .grid-container, #apiResults { grid-template-columns: repeat(4, 1fr); } }
     </style>
 </head>
 <body>
@@ -93,7 +100,7 @@
             <input type="text" id="query" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()">
             <button onclick="searchDiscogs()" style="width:80px">Szukaj</button>
         </div>
-        <div id="apiResults" class="grid-container" style="grid-template-columns: repeat(2, 1fr);"></div>
+        <div id="apiResults"></div>
     </div>
     
     <div id="loader" class="loader">Synchronizacja...</div>
@@ -158,6 +165,8 @@
 
 <script>
     // ==========================================
+    // ⚙️ WPISZ SWOJE DANE TUTAJ:
+    // ==========================================
     const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
     const DISCOGS_TOKEN = 'iTRtcEKKihJyGhwufBlyPncxTrMDFjVtwiFNTeAa';
     // ==========================================
@@ -187,7 +196,7 @@
             myCollection = await res.json();
             renderGrid();
             updateCounters();
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Błąd połączenia z bazą."); }
         document.getElementById('loader').style.display = 'none';
     }
 
@@ -219,27 +228,45 @@
         }).join('');
     }
 
+    // Wyszukiwarka z przywróconymi listami rozwijanymi!
     async function searchDiscogs() {
         const q = document.getElementById('query').value;
-        const res = await fetch(`https://api.discogs.com/database/search?q=${q}&token=${DISCOGS_TOKEN}&per_page=12`);
-        const data = await res.json();
-        document.getElementById('apiResults').innerHTML = data.results.map(r => `
-            <div class="grid-item" onclick="addAlbum('${r.title.replace(/'/g,"\\'")}', '${r.cover_image}', '${r.id}')">
-                <img src="${r.cover_image}">
-                <div class="grid-overlay"><div class="grid-title">${r.title}</div></div>
-            </div>`).join('');
+        if(!q) return;
+        document.getElementById('loader').style.display = 'block';
+        try {
+            const res = await fetch(`https://api.discogs.com/database/search?q=${q}&token=${DISCOGS_TOKEN}&per_page=12`);
+            const data = await res.json();
+            document.getElementById('apiResults').innerHTML = data.results.map(r => `
+                <div class="search-card">
+                    <img src="${r.cover_image || 'https://via.placeholder.com/150'}">
+                    <p>${r.title}</p>
+                    <select id="sStat-${r.id}"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
+                    <select id="sForm-${r.id}"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option></select>
+                    <button onclick="addAlbum('${r.title.replace(/'/g,"\\'")}', '${r.cover_image}', '${r.id}')" style="padding:10px; font-size:12px; margin-top: auto;">DODAJ</button>
+                </div>`).join('');
+        } catch(e) { alert("Błąd połączenia z Discogs API"); }
+        document.getElementById('loader').style.display = 'none';
     }
 
+    // Dodawanie albumów z list rozwijanych na karcie
     async function addAlbum(title, cover, id) {
-        const s = prompt("MAM czy SZUKAM?", "MAM"); if(!s) return;
-        const f = s === "MAM" ? prompt("Format?", "FLAC") : "-";
-        const res = await fetch(`https://api.discogs.com/releases/${id}?token=${DISCOGS_TOKEN}`);
-        const d = await res.json();
-        const tracks = d.tracklist ? d.tracklist.map(t => t.title).join(', ') : "";
-        const p = title.split(' - ');
-        const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: p[0], Album: p[1], Status: s, Format: f, Okładka: cover, Utwory: tracks, DiscogsID: id, Notatki: "" };
-        await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
-        setTimeout(loadFromSheets, 1500);
+        const s = document.getElementById(`sStat-${id}`).value;
+        const f = s === "MAM" ? document.getElementById(`sForm-${id}`).value : "-";
+        
+        document.getElementById('loader').style.display = 'block';
+        try {
+            const res = await fetch(`https://api.discogs.com/releases/${id}?token=${DISCOGS_TOKEN}`);
+            const d = await res.json();
+            const tracks = d.tracklist ? d.tracklist.map(t => t.title).join(', ') : "";
+            const p = title.split(' - ');
+            
+            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: p[0] || "?", Album: p[1] || "?", Status: s, Format: f, Okładka: cover, Utwory: tracks, DiscogsID: id, Notatki: "" };
+            await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
+            
+            document.getElementById('apiResults').innerHTML = '';
+            document.getElementById('query').value = '';
+            setTimeout(loadFromSheets, 1500);
+        } catch(e) { alert("Błąd dodawania. Sprawdź hasło!"); document.getElementById('loader').style.display = 'none'; }
     }
 
     function openDetails(idx) {
@@ -269,13 +296,15 @@
     async function saveEdit() {
         const idx = document.getElementById('editIndex').value; const old = myCollection[idx];
         const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: document.getElementById('editTracks').value };
-        closeEditModal(); await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        closeEditModal(); document.getElementById('loader').style.display = 'block';
+        await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         setTimeout(loadFromSheets, 1500);
     }
 
     async function deleteFromDetails() {
-        const i = myCollection[currentDetailsIndex]; if(!confirm("Usunąć?")) return;
-        closeDetailsModal(); await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({password: ADMIN_PASS, action:"DELETE", Wykonawca:i.Wykonawca, Album:i.Album}) });
+        const i = myCollection[currentDetailsIndex]; if(!confirm("Na pewno usunąć ten album?")) return;
+        closeDetailsModal(); document.getElementById('loader').style.display = 'block';
+        await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({password: ADMIN_PASS, action:"DELETE", Wykonawca:i.Wykonawca, Album:i.Album}) });
         setTimeout(loadFromSheets, 1500);
     }
 
@@ -283,7 +312,7 @@
         let csv = "\uFEFFWykonawca;Album;Status;Format;Notatki\n";
         myCollection.forEach(i => csv += `${i.Wykonawca};${i.Album};${i.Status};${i.Format};${i.Notatki}\n`);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "kolekcja.csv"; link.click();
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "walkman_kolekcja.csv"; link.click();
     }
 
     applyAdminUI(); loadFromSheets();
