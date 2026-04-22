@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Walkman">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/512px-Walkman_logo.svg.png">
     
-    <title>Walkman Cloud V23</title>
+    <title>Walkman Cloud V24</title>
     <style>
         :root { --accent: #1db954; --bg: #000000; --card: #121212; --text: #ffffff; --text-dim: #b3b3b3; --danger: #e74c3c; --hires: #9b59b6; --edit: #3498db; }
         *, *::before, *::after { box-sizing: border-box; }
@@ -44,7 +44,6 @@
         input, button, select, textarea { padding: 14px; border-radius: 8px; border: none; background: #282828; color: white; font-size: 16px; width: 100%; outline: none; }
         button { background: var(--accent); color: #000; font-weight: bold; cursor: pointer; }
 
-        /* Wyszukiwarka z X */
         .search-wrapper { position: relative; width: 100%; }
         .clear-btn { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #888; font-size: 18px; cursor: pointer; padding: 10px; display: none; }
 
@@ -155,17 +154,17 @@
             </select>
         </div>
         <div class="grid-container" id="collectionGrid"></div>
+        
+        <div id="scrollSentinel" style="height: 20px; width: 100%;"></div>
     </div>
 </div>
 
-<div id="detailsModal" class="modal">
+<div id="detailsModal" class="modal" onclick="if(event.target === this) closeDetailsModal()">
     <div class="modal-content">
         <span class="close-x" onclick="closeDetailsModal()">×</span>
         <img id="detCover" src="" class="detail-cover">
         <h2 id="detAlbum" style="text-align:center; margin:0;"></h2>
-        
         <p id="detArtist" style="text-align:center; margin-bottom:15px; font-weight:bold;"></p>
-        
         <div id="detNotes" class="detail-notes"></div>
         <div style="display:flex; gap:10px;" class="admin-only">
             <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor:pointer;">Edytuj</button>
@@ -174,7 +173,7 @@
     </div>
 </div>
 
-<div id="editModal" class="modal">
+<div id="editModal" class="modal" onclick="if(event.target === this) closeEditModal()">
     <div class="modal-content">
         <h2 style="color: var(--edit); text-align:center; margin-top:0;">Edytuj Album</h2>
         <input type="hidden" id="editIndex">
@@ -201,8 +200,6 @@
     const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
     const DISCOGS_TOKEN = 'iTRtcEKKihJyGhwufBlyPncxTrMDFjVtwiFNTeAa';
     
-    // 🛑 LISTA WYJĄTKÓW: Artyści z przecinkami, którzy nie mają być rozdzielani
-    // Dopisz w cudzysłowach kolejnych, oddzielając ich przecinkiem.
     const ARTIST_EXCEPTIONS = [
         "Tyler, The Creator",
         "Earth, Wind & Fire",
@@ -211,16 +208,18 @@
     // ==========================================
 
     let myCollection = [];
+    let currentFilteredArray = [];
+    let currentRenderIndex = 0;
+    const RENDER_CHUNK = 30; // Ile albumów ładujemy na jedno pociągnięcie w dół
+
     let currentDetailsIndex = -1;
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
 
-    // INTELIGENTNE DZIELENIE ARTYSTÓW (z pominięciem wyjątków)
     function splitArtists(artistString) {
         if (!artistString) return [];
         let tempStr = artistString;
         let placeholders = {};
         
-        // Krok 1: Zabezpieczamy wyjątki podmieniając je na specjalny kod
         ARTIST_EXCEPTIONS.forEach((exc, idx) => {
             if (tempStr.includes(exc)) {
                 let code = `@@@EXCEPTION${idx}@@@`;
@@ -229,10 +228,7 @@
             }
         });
         
-        // Krok 2: Dzielimy po przecinkach
         let arr = tempStr.split(',').map(a => a.trim()).filter(a => a.length > 0);
-        
-        // Krok 3: Przywracamy schowane wyjątki w miejsce kodów
         return arr.map(a => placeholders[a] ? placeholders[a] : a);
     }
 
@@ -286,6 +282,7 @@
         document.getElementById('countSzukam').innerText = myCollection.filter(i => i.Status === 'SZUKAM').length;
     }
 
+    // Odświeżanie logiki i resetowanie widoku (gdy wyszukujesz / zmieniasz filtr)
     function renderGrid() {
         const container = document.getElementById('collectionGrid');
         const q = document.getElementById('localSearch').value.toLowerCase();
@@ -295,7 +292,7 @@
         
         let mappedCollection = myCollection.map((item, index) => ({ ...item, originalIndex: index }));
 
-        let filtered = mappedCollection.filter(i => {
+        currentFilteredArray = mappedCollection.filter(i => {
             const artysta = (i.Wykonawca || "").toString().toLowerCase();
             const album = (i.Album || "").toString().toLowerCase();
             const pasujeTekst = artysta.includes(q) || album.includes(q);
@@ -304,13 +301,25 @@
             return pasujeTekst && pasujeStatus && pasujeFormat;
         });
 
-        filtered.sort((a, b) => {
+        currentFilteredArray.sort((a, b) => {
             if (sortMode === 'AZ') return (a.Wykonawca || "").toString().localeCompare((b.Wykonawca || "").toString());
             if (sortMode === 'ZA') return (b.Wykonawca || "").toString().localeCompare((a.Wykonawca || "").toString());
             if (sortMode === 'NEW') return b.originalIndex - a.originalIndex;
         });
 
-        container.innerHTML = filtered.map(item => {
+        container.innerHTML = ''; // Wyczyść stare kafelki
+        currentRenderIndex = 0;   // Zresetuj licznik paginacji
+        loadMoreItems();          // Załaduj pierwszą paczkę
+    }
+
+    // Funkcja dołączająca kafelki (wywoływana też przez czujnik przewijania)
+    function loadMoreItems() {
+        if (currentRenderIndex >= currentFilteredArray.length) return; // Doszliśmy do końca listy
+
+        const chunk = currentFilteredArray.slice(currentRenderIndex, currentRenderIndex + RENDER_CHUNK);
+        const container = document.getElementById('collectionGrid');
+
+        const html = chunk.map(item => {
             const idx = item.originalIndex;
             let bClass = item.Format === 'FLAC Hi-Res' ? 'hires' : (item.Status === 'SZUKAM' ? 'szukam' : '');
             
@@ -326,7 +335,20 @@
                     <div class="grid-overlay"><div class="grid-title">${item.Album || "Brak tytułu"}</div></div>
                 </div>`;
         }).join('');
+
+        container.insertAdjacentHTML('beforeend', html);
+        currentRenderIndex += RENDER_CHUNK;
     }
+
+    // Uruchamianie IntersectionObserver'a dla czujnika na dole ekranu
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+            loadMoreItems();
+        }
+    }, { rootMargin: "200px" }); // Margin 200px odpala ładowanie zanim dociągniesz do samego końca
+    
+    // Połącz obserwator z czujnikiem w HTMLu
+    observer.observe(document.getElementById('scrollSentinel'));
 
     async function addManual() {
         const artist = document.getElementById('manArtist').value.trim();
@@ -399,9 +421,8 @@
         document.getElementById('detCover').src = i.Okładka;
         document.getElementById('detAlbum').innerText = i.Album;
         
-        // NOWOŚĆ: Tworzenie osobnych linków z podziałem po przecinkach
         const detArtistEl = document.getElementById('detArtist');
-        detArtistEl.innerHTML = ''; // Czyścimy kontener
+        detArtistEl.innerHTML = ''; 
         
         const artistArray = splitArtists(i.Wykonawca);
         
@@ -412,7 +433,6 @@
             span.onclick = () => filterByArtist(artistName);
             detArtistEl.appendChild(span);
             
-            // Dodaj zwykły przecinek między artystami (żeby nie był zielonym linkiem)
             if (index < artistArray.length - 1) {
                 const comma = document.createElement('span');
                 comma.innerText = ', ';
@@ -426,13 +446,13 @@
         document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek.";
         document.getElementById('detailsModal').style.display = 'flex';
     }
+    
     function closeDetailsModal() { document.getElementById('detailsModal').style.display = 'none'; }
 
     function openEditFromDetails() {
         const i = myCollection[currentDetailsIndex];
         document.getElementById('editIndex').value = currentDetailsIndex;
-        document.getElementById('editArtist').value = i.WyWykonawca; // zabezpieczenie przed błędnym odczytem - upewniam się z property
-        document.getElementById('editArtist').value = i.Wykonawca; 
+        document.getElementById('editArtist').value = i.Wykonawca;
         document.getElementById('editAlbum').value = i.Album;
         document.getElementById('editCover').value = i.Okładka;
         document.getElementById('editStatus').value = i.Status;
@@ -440,6 +460,7 @@
         document.getElementById('editNotes').value = i.Notatki;
         closeDetailsModal(); document.getElementById('editModal').style.display = 'flex';
     }
+    
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
     async function saveEdit() {
