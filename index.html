@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 3.8</title>
+    <title>Walkman Cloud 3.8.1</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -83,11 +83,12 @@
         #detailsModal .modal-content > * { pointer-events: auto; }
         @keyframes fadeInModal { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
-        /* --- NOWOŚĆ: INTERAKTYWNA OKŁADKA (TOGGLE) --- */
+        /* --- POPRAWIONA INTERAKTYWNA OKŁADKA --- */
         .cover-tracklist-wrapper { 
             width: 70%; max-width: 280px; margin: 0 auto 20px auto; 
             aspect-ratio: 1/1; position: relative; cursor: pointer;
             border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #111; /* Zabezpieczenie tła */
         }
         
         .toggle-face {
@@ -102,12 +103,13 @@
             border: 1px solid #27272a; z-index: 1; opacity: 0; transform: scale(0.95); pointer-events: none;
         }
         
-        .cover-tracklist-wrapper.flipped .front { opacity: 0; transform: scale(0.95); pointer-events: none; }
-        .cover-tracklist-wrapper.flipped .back { opacity: 1; transform: scale(1); pointer-events: auto; }
+        /* Wymuszamy ukrycie okładki (!important nadpisuje styl onload) i wybijamy tracklistę do przodu */
+        .cover-tracklist-wrapper.flipped .front { opacity: 0 !important; transform: scale(0.95); pointer-events: none; z-index: 0; }
+        .cover-tracklist-wrapper.flipped .back { opacity: 1 !important; transform: scale(1); pointer-events: auto; z-index: 3; }
 
         .flip-hint {
-            position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7);
-            padding: 8px; border-radius: 50%; color: white; z-index: 3; display: flex;
+            position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8);
+            padding: 8px; border-radius: 50%; color: white; z-index: 4; display: flex;
             pointer-events: none; transition: opacity 0.3s;
         }
         .cover-tracklist-wrapper.flipped .flip-hint { opacity: 0; }
@@ -337,7 +339,7 @@
     const RENDER_CHUNK = 30;
     let currentDetailsIndex = -1;
     let searchTimeout; 
-    let hasTracklist = false; // Zmienna stanu dla tracklisty
+    let hasTracklist = false; 
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
 
     function showToast(message, type = 'success') {
@@ -514,7 +516,6 @@
         } catch(e) { showToast("❌ Błąd dodawania płyty!", "error"); document.getElementById('loader').style.display = 'none'; }
     }
 
-    // --- Funkcja odwracająca okładkę/tracklistę ---
     function toggleCoverTracklist() {
         if(hasTracklist) {
             document.getElementById('coverTracklistWrapper').classList.toggle('flipped');
@@ -526,20 +527,18 @@
     function openDetails(idx) {
         currentDetailsIndex = idx; const i = myCollection[idx];
         
-        // Zawsze resetuj do okładki przy otwieraniu
         document.getElementById('coverTracklistWrapper').classList.remove('flipped');
         
         const detCover = document.getElementById('detCover');
         detCover.style.opacity = '0';
         detCover.src = i.Okładka;
         
-        // Parsowanie Tracklisty
         const tracksContainer = document.getElementById('detTracks');
         const hintIcon = document.getElementById('flipHint');
         
         if (i.Utwory && i.Utwory.trim() !== '') {
             hasTracklist = true;
-            hintIcon.style.display = 'flex'; // Pokaż ikonkę
+            hintIcon.style.display = 'flex'; 
             const tracks = i.Utwory.split('\n');
             tracksContainer.innerHTML = tracks.map(track => {
                 const match = track.match(/(.*?)\s+\((\d+:\d{2})\)$/);
@@ -555,7 +554,7 @@
             }).join('');
         } else {
             hasTracklist = false;
-            hintIcon.style.display = 'none'; // Ukryj ikonkę
+            hintIcon.style.display = 'none'; 
             tracksContainer.innerHTML = '';
         }
         
