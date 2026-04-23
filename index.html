@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 4.3</title>
+    <title>Walkman Cloud 4.4</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -85,14 +85,13 @@
         .nav-item span { font-size: 10px; font-weight: 600; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; overscroll-behavior: contain;}
-        #detailsModal .modal-content { background: transparent; width: 100%; max-width: 420px; height: auto; max-height: 95vh; position: relative; display: flex; flex-direction: column; padding: 30px 20px 20px 20px; overflow-y: auto; animation: fadeInModal 0.2s forwards; scrollbar-width: none; overscroll-behavior: contain;}
+        #detailsModal .modal-content { background: transparent; width: 100%; max-width: 420px; height: auto; max-height: 95vh; position: relative; display: flex; flex-direction: column; padding: 30px 20px 20px 20px; overflow-y: auto; animation: fadeInModal 0.2s forwards; pointer-events: none; scrollbar-width: none; }
+        #detailsModal .modal-content > * { pointer-events: auto; }
         @keyframes fadeInModal { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
         .cover-tracklist-wrapper { width: 70%; max-width: 280px; margin: 0 auto 20px auto; aspect-ratio: 1/1; position: relative; cursor: pointer; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #111; }
         .toggle-face { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); border-radius: 12px; overflow: hidden; }
         .toggle-face.front { object-fit: cover; z-index: 2; }
-        
-        /* OVERFLOW-Y: AUTO dla tracklisty pozwala na jej scrollowanie */
         .toggle-face.back { background: #18181b; padding: 15px; overflow-y: auto; scrollbar-width: none; border: 1px solid #27272a; z-index: 1; opacity: 0; transform: scale(0.95); pointer-events: none; overscroll-behavior: contain;}
         
         .cover-tracklist-wrapper.flipped .front { opacity: 0 !important; transform: scale(0.95); pointer-events: none; z-index: 0; }
@@ -126,9 +125,18 @@
 
         .admin-buttons { display:flex; gap:12px; margin-bottom: 20px; width: 100%; }
 
+        /* Bottom Sheet (Add/Edit/Settings) */
         .bottom-sheet { align-items: flex-end; }
-        .bottom-sheet .modal-content { background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom)); animation: slideUpSheet 0.25s cubic-bezier(0.175, 0.885, 0.32, 1); border-top: 1px solid var(--card-border); max-height: 90vh; overflow-y: auto; pointer-events: auto;}
+        .bottom-sheet .modal-content { 
+            background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; 
+            padding: 15px 25px 25px 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom)); 
+            animation: slideUpSheet 0.25s cubic-bezier(0.175, 0.885, 0.32, 1); 
+            border-top: 1px solid var(--card-border); max-height: 90vh; overflow-y: auto; pointer-events: auto;
+        }
         @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* QoL: Uchwyt do przeciągania w dół */
+        .drag-handle { width: 40px; height: 5px; background: #3f3f46; border-radius: 4px; margin: 0 auto 20px auto; }
 
         .add-group { display: flex; gap: 10px; margin-bottom: 12px; }
         .add-input { padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: #1f1f22; color: white; font-size: 15px; width: 100%; outline: none; font-weight: 600; font-family: inherit;}
@@ -264,6 +272,7 @@
 
 <div id="addModal" class="modal bottom-sheet" onclick="if(event.target === this) closeAddModal()">
     <div class="modal-content">
+        <div class="drag-handle"></div>
         <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Dodaj Płytę</h3>
         
         <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">SZUKAJ W DISCOGS</p>
@@ -285,12 +294,16 @@
         <input type="text" id="manCover" class="add-input" placeholder="Link do okładki (opcjonalnie)" style="margin-bottom:12px;">
         <textarea id="manNotes" class="add-input" placeholder="Twoje notatki..." style="height:70px; margin-bottom:15px;"></textarea>
         
-        <button class="btn-primary" onclick="addManual()">Zapisz do bazy</button>
+        <div style="display:flex; gap:12px;">
+            <button class="btn-primary" onclick="closeAddModal()" style="background:#27272a; color:white;">Anuluj</button>
+            <button class="btn-primary" onclick="addManual()" style="background:var(--accent);">Zapisz do bazy</button>
+        </div>
     </div>
 </div>
 
 <div id="editModal" class="modal bottom-sheet" onclick="if(event.target === this) closeEditModal()">
     <div class="modal-content">
+        <div class="drag-handle"></div>
         <h3 style="margin-top:0; color:var(--edit); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Edytuj Album</h3>
         <input type="hidden" id="editIndex">
         
@@ -316,6 +329,7 @@
 
 <div id="settingsModal" class="modal bottom-sheet" onclick="if(event.target === this) closeSettingsModal()">
     <div class="modal-content">
+        <div class="drag-handle"></div>
         <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Ustawienia</h3>
 
         <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">STATUS POŁĄCZENIA</p>
@@ -382,30 +396,20 @@
         if (!isAnyOpen) unlockScroll();
     }
 
-    // --- QoL: ZAAWANSOWANE BLOKOWANIE PRZEWIJANIA TŁA (SCROLL LOCK BOUNCE FIX) ---
     const detModalEl = document.getElementById('detailsModal');
-    
     detModalEl.addEventListener('touchmove', e => {
         let el = e.target;
         let canScroll = false;
-
-        // Szukamy w górę drzewa DOM, czy element pod palcem jest scrollowalny
         while (el && el !== detModalEl) {
             const style = window.getComputedStyle(el);
             if (el.scrollHeight > el.clientHeight && (style.overflowY === 'auto' || style.overflowY === 'scroll')) {
-                canScroll = true;
-                break;
+                canScroll = true; break;
             }
             el = el.parentElement;
         }
-
-        // Jeśli dotykasz statycznego elementu (np. tła, okładki, przycisków), odcinamy domyślny scroll przeglądarki!
-        if (!canScroll) {
-            e.preventDefault();
-        }
+        if (!canScroll) { e.preventDefault(); }
     }, {passive: false});
 
-    // --- QoL: GESTY SWIPE W LEWO/PRAWO ---
     let touchstartX = 0;
     let touchstartY = 0;
     let touchendX = 0;
@@ -424,28 +428,61 @@
 
     function handleSwipe() {
         if (detModalEl.style.display !== 'flex') return;
-        
         let diffX = touchendX - touchstartX;
         let diffY = touchendY - touchstartY;
 
-        // Tolerancja: gest musi być horyzontalny (diffX > diffY) i wystarczająco długi (powyżej 60px)
         if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
             let filteredIdx = currentFilteredArray.findIndex(item => item.originalIndex === currentDetailsIndex);
             if (filteredIdx === -1) return;
-
             if (diffX < 0) { 
-                // Swipe w lewo -> Następny
-                if (filteredIdx < currentFilteredArray.length - 1) {
-                    openDetails(currentFilteredArray[filteredIdx + 1].originalIndex);
-                }
+                if (filteredIdx < currentFilteredArray.length - 1) openDetails(currentFilteredArray[filteredIdx + 1].originalIndex);
             } else { 
-                // Swipe w prawo -> Poprzedni
-                if (filteredIdx > 0) {
-                    openDetails(currentFilteredArray[filteredIdx - 1].originalIndex);
-                }
+                if (filteredIdx > 0) openDetails(currentFilteredArray[filteredIdx - 1].originalIndex);
             }
         }
     }
+
+    // --- QoL: GEST PRZECIĄGANIA W DÓŁ ABY ZAMKNĄĆ (BOTTOM SHEETS) ---
+    let sheetStartY = 0;
+    let sheetCurrentY = 0;
+    let isSheetDragging = false;
+    let activeSheetContent = null;
+
+    document.querySelectorAll('.bottom-sheet .modal-content').forEach(sheet => {
+        sheet.addEventListener('touchstart', e => {
+            if (sheet.scrollTop <= 0) {
+                isSheetDragging = true;
+                sheetStartY = e.touches[0].clientY;
+                activeSheetContent = sheet;
+                sheet.style.transition = 'none';
+            }
+        }, {passive: true});
+
+        sheet.addEventListener('touchmove', e => {
+            if (!isSheetDragging || !activeSheetContent) return;
+            sheetCurrentY = e.touches[0].clientY;
+            let diffY = sheetCurrentY - sheetStartY;
+            if (diffY > 0) { activeSheetContent.style.transform = `translateY(${diffY}px)`; }
+        }, {passive: true});
+
+        sheet.addEventListener('touchend', e => {
+            if (!isSheetDragging || !activeSheetContent) return;
+            isSheetDragging = false;
+            let diffY = sheetCurrentY - sheetStartY;
+            activeSheetContent.style.transition = 'transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1)';
+            
+            if (diffY > 120) { // Próg zamknięcia
+                let modalId = activeSheetContent.parentElement.id;
+                if (modalId === 'addModal') closeAddModal();
+                if (modalId === 'editModal') closeEditModal();
+                if (modalId === 'settingsModal') closeSettingsModal();
+                setTimeout(() => { activeSheetContent.style.transform = ''; }, 300);
+            } else {
+                activeSheetContent.style.transform = '';
+            }
+            activeSheetContent = null;
+        }, {passive: true});
+    });
 
     function showToast(message, type = 'success') {
         const container = document.getElementById('toast-container');
