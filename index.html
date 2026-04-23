@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 3.2</title>
+    <title>Walkman Cloud 3.4</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -105,10 +105,11 @@
         }
         
         #detailsModal .modal-content { 
-            background: transparent; width: 100%; max-width: 450px; height: auto; max-height: 90vh; position: relative; 
+            background: transparent; width: 100%; max-width: 450px; height: auto; max-height: 95vh; position: relative; 
             display: flex; flex-direction: column; padding: 20px; overflow-y: auto;
             animation: fadeInModal 0.3s forwards;
             pointer-events: none; 
+            scrollbar-width: none;
         }
         
         #detailsModal .modal-content > * { pointer-events: auto; }
@@ -124,12 +125,15 @@
         @keyframes fadeInModal { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .detail-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); margin-bottom: 25px; }
-        .detail-title { text-align: center; margin: 0 0 5px 0; font-weight: 900; font-size: 26px; letter-spacing: -0.5px; line-height: 1.2;}
-        .artist-link { color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 16px; transition: color 0.2s; }
+        .detail-cover { 
+            width: 70%; max-width: 300px; margin: 0 auto 20px auto; display: block;
+            aspect-ratio: 1/1; object-fit: cover; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+        }
+        .detail-title { text-align: center; margin: 0 0 5px 0; font-weight: 900; font-size: 22px; letter-spacing: -0.5px; line-height: 1.2;}
+        .artist-link { color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 15px; transition: color 0.2s; }
         .artist-link:hover { color: var(--accent); }
         
-        .listen-container { display: flex; gap: 20px; justify-content: center; margin: 25px 0; }
+        .listen-container { display: flex; gap: 20px; justify-content: center; margin: 20px 0; }
         .listen-btn { width: 56px; height: 56px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; text-decoration: none;}
         .listen-btn svg { width: 24px; height: 24px; }
         
@@ -139,11 +143,22 @@
         .listen-btn.youtube { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.3); backdrop-filter: blur(10px);}
         .listen-btn.youtube:hover { background: #ff0000; color: white; border-color: #ff0000; transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 20px rgba(255, 0, 0, 0.3); }
         
-        /* Nowy przycisk zamykania (X) */
         .listen-btn.close-action { background: rgba(255,255,255,0.08); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         .listen-btn.close-action:hover { background: rgba(255,255,255,0.15); color: white; transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
 
-        .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 14px; text-align: center; margin-bottom: 25px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);}
+        /* --- NOWE: BĄBELKI STATUSU I FORMATU --- */
+        .detail-badges { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .modal-badge { 
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; 
+            color: white; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;
+            backdrop-filter: blur(10px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .status-dot.mam { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .status-dot.szukam { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+
+        .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);}
 
         .add-group { display: flex; gap: 10px; margin-bottom: 12px; }
         .add-input { padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white; font-size: 15px; width: 100%; outline: none; font-weight: 600; font-family: inherit;}
@@ -246,14 +261,22 @@
             </a>
         </div>
 
-        <div id="detNotes" class="detail-notes"></div>
-        
-        <div style="display:flex; gap:12px; margin-bottom: 25px;" class="admin-only">
-            <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 16px; border-radius: 12px; font-weight: 800; border:none;">Edytuj</button>
-            <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 16px; border-radius: 12px; font-weight: 800; border:none;">Usuń</button>
+        <div id="detBadges" class="detail-badges">
+            <div class="modal-badge" id="detStatusBadge">
+                <span class="status-dot" id="detStatusDot"></span>
+                <span id="detStatusText"></span>
+            </div>
+            <div class="modal-badge" id="detFormatBadge"></div>
         </div>
 
-        <div style="display:flex; justify-content:center; margin-top: auto;">
+        <div id="detNotes" class="detail-notes"></div>
+        
+        <div style="display:flex; gap:12px; margin-bottom: 20px;" class="admin-only">
+            <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none;">Edytuj</button>
+            <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none;">Usuń</button>
+        </div>
+
+        <div style="display:flex; justify-content:center; margin-top: auto; padding-bottom: 10px;">
             <button onclick="closeDetailsModal()" class="listen-btn close-action" title="Zamknij">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
             </button>
@@ -508,6 +531,7 @@
         document.getElementById('modalBgBlur').src = i.Okładka;
         document.getElementById('detAlbum').innerText = i.Album;
         
+        // Prawidłowe linkowanie Spotify i YT
         const q = encodeURIComponent(`${i.Wykonawca} ${i.Album}`);
         document.getElementById('btnSpotify').href = `https://open.spotify.com/search/${q}`;
         document.getElementById('btnYoutube').href = `https://www.youtube.com/results?search_query=${q}`;
@@ -524,6 +548,30 @@
                 detArtistEl.appendChild(comma);
             }
         });
+
+        // Uzupełnianie "pigułek" z formatem i statusem
+        const statusDot = document.getElementById('detStatusDot');
+        const statusText = document.getElementById('detStatusText');
+        const formatBadge = document.getElementById('detFormatBadge');
+
+        statusText.innerText = i.Status;
+        if (i.Status === 'MAM') {
+            statusDot.className = 'status-dot mam';
+        } else {
+            statusDot.className = 'status-dot szukam';
+        }
+
+        if (i.Format && i.Format !== '-') {
+            formatBadge.innerText = i.Format;
+            formatBadge.style.display = 'flex';
+            if (i.Format === 'FLAC Hi-Res') {
+                formatBadge.style.color = 'var(--hires)';
+            } else {
+                formatBadge.style.color = 'white';
+            }
+        } else {
+            formatBadge.style.display = 'none'; // Ukryj, jeśli nie ma formatu
+        }
 
         document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek w bazie.";
         document.getElementById('detailsModal').style.display = 'flex';
