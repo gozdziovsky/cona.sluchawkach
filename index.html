@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud V25</title>
+    <title>Walkman Cloud 3.1</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -28,260 +28,275 @@
         
         *, *::before, *::after { box-sizing: border-box; }
         
-        /* Customowy Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+        ::-webkit-scrollbar { display: none; }
 
         html, body { 
             overflow-x: hidden; width: 100%; 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            /* Nowe, głębokie tło z gradientem */
             background: var(--bg); 
-            background-image: radial-gradient(circle at 50% -10%, rgba(29, 185, 84, 0.15) 0%, var(--bg) 50%);
-            background-attachment: fixed;
             color: var(--text); padding: 0; margin: 0; -webkit-tap-highlight-color: transparent;
-            padding-bottom: env(safe-area-inset-bottom);
+            padding-bottom: calc(80px + env(safe-area-inset-bottom)); 
         }
 
         .container { 
-            max-width: 800px; margin: 0 auto; width: 100%; padding: 20px 15px; 
+            max-width: 800px; margin: 0 auto; width: 100%; padding: 15px; 
             padding-top: max(20px, env(safe-area-inset-top)); 
-            display: flex; flex-direction: column; gap: 18px; 
+            display: flex; flex-direction: column; gap: 15px; 
         }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        h1 { color: var(--accent); font-size: 24px; margin: 0; font-weight: 900; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(29, 185, 84, 0.3); }
-        .nav-icons { display: flex; gap: 10px; }
-        
-        .icon-btn { 
-            background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); 
-            color: #fff; border-radius: 50%; width: 40px; height: 40px; 
-            display: flex; justify-content: center; align-items: center; cursor: pointer; 
-            transition: all 0.2s ease; backdrop-filter: blur(5px);
-        }
-        .icon-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
-        .icon-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        h1 { color: var(--text); font-size: 26px; margin: 0; font-weight: 900; letter-spacing: -1px; }
+        h1 span { color: var(--accent); }
 
         .counters { display: flex; gap: 12px; }
         .counter-box { 
-            background: var(--card); padding: 16px; border-radius: 16px; flex: 1; text-align: center; 
-            border: 1px solid var(--card-border); box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: var(--card); padding: 12px; border-radius: 16px; flex: 1; text-align: center; 
+            border: 1px solid var(--card-border);
         }
-        .counter-box small { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 600;}
-        .counter-value { font-size: 28px; font-weight: 900; color: var(--accent); display: block; margin-top: 5px; text-shadow: 0 2px 10px rgba(29, 185, 84, 0.2); }
-        .szukam .counter-value { color: #f59e0b; text-shadow: 0 2px 10px rgba(245, 158, 11, 0.2); }
+        .counter-box small { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 800;}
+        .counter-value { font-size: 24px; font-weight: 900; color: var(--text); display: block; margin-top: 2px; }
 
-        .panel { 
-            background: var(--card); padding: 20px; border-radius: 16px; 
-            border: 1px solid var(--card-border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        .search-wrapper { position: relative; width: 100%; margin-top: 5px; }
+        .search-wrapper input { 
+            padding: 16px; padding-left: 45px; border-radius: 16px; border: 1px solid var(--card-border); 
+            background: rgba(255,255,255,0.05); color: white; font-size: 16px; width: 100%; outline: none; 
+            transition: all 0.2s; font-family: inherit; font-weight: 600;
         }
-        .panel-title { font-size: 12px; text-transform: uppercase; color: var(--text-dim); margin-top: 0; margin-bottom: 16px; font-weight: 800; letter-spacing: 1.5px; text-align: center;}
-        
-        .input-group { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; justify-content: center;}
-        input, select, textarea { 
-            padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); 
-            background: rgba(0,0,0,0.3); color: white; font-size: 15px; width: 100%; outline: none; 
-            font-family: inherit; transition: border 0.2s;
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
-        button { 
-            background: var(--accent); color: #000; font-weight: 800; cursor: pointer; 
-            padding: 14px 16px; border-radius: 10px; border: none; font-size: 15px; font-family: inherit;
-            transition: all 0.2s; box-shadow: 0 4px 15px rgba(29, 185, 84, 0.2);
-        }
-        button:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(29, 185, 84, 0.3); }
+        .search-wrapper input:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; fill: var(--text-dim); }
+        .clear-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; padding: 10px; display: none; }
 
-        .search-wrapper { position: relative; width: 100%; }
-        .clear-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; box-shadow: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; padding: 10px; display: none; }
-        .clear-btn:hover { background: transparent; color: white; transform: translateY(-50%); }
+        .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .filters select { 
+            padding: 10px 14px; border-radius: 20px; border: 1px solid var(--card-border); 
+            background: rgba(255,255,255,0.05); color: white; font-size: 13px; font-weight: 600; outline: none; 
+            white-space: nowrap; appearance: none; -webkit-appearance: none;
+        }
 
-        #apiResults { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
-        .search-card { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 14px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 10px; }
-        .search-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .search-card p { font-size: 12px; font-weight: 600; margin: 0; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4; }
-        .search-card select { padding: 10px; font-size: 12px; background: rgba(255,255,255,0.05); }
-
-        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
-        
-        /* Animacje i wygląd kafelka */
-        .grid-item { 
-            position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; 
-            background: #111; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-        }
-        .grid-item:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 12px 30px rgba(0,0,0,0.5); z-index: 2; }
-        .grid-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-        .grid-item:hover img { transform: scale(1.05); }
-        
-        /* Płynny gradient na okładce */
-        .grid-overlay { 
-            position: absolute; bottom: 0; width: 100%; 
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%); 
-            padding: 20px 10px 10px 10px; 
-        }
-        .grid-title { font-size: 11px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8);}
-        
-        .format-badge { 
-            position: absolute; top: 8px; right: 8px; background: var(--accent); color: #000; 
-            font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 20px; z-index: 2; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.4); letter-spacing: 0.5px;
-        }
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
+        .grid-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 1/1; background: #111; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .grid-item:active { transform: scale(0.96); }
+        .grid-item img { width: 100%; height: 100%; object-fit: cover; }
+        .grid-overlay { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%); padding: 25px 12px 12px 12px; }
+        .grid-title { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 4px rgba(0,0,0,0.8);}
+        .format-badge { position: absolute; top: 8px; right: 8px; background: var(--accent); color: #000; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 20px; z-index: 2; box-shadow: 0 2px 10px rgba(0,0,0,0.4); letter-spacing: 0.5px;}
         .format-badge.szukam { background: #f59e0b; color: #fff;}
         .format-badge.hires { background: var(--hires); color: white; }
 
-        /* Ulepszone modale */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-        .modal-content { 
-            background: var(--card); padding: 25px; border-radius: 24px; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; position: relative; 
-            border: 1px solid var(--card-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: rgba(15, 15, 18, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border); 
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 12px 0 calc(12px + env(safe-area-inset-bottom)) 0; z-index: 9000;
         }
-        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        .close-x { position: absolute; top: 20px; right: 20px; font-size: 28px; color: var(--text-dim); cursor: pointer; z-index: 10; line-height: 1; transition: color 0.2s;}
-        .close-x:hover { color: white; }
-        
-        .detail-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .detail-notes { font-style: italic; color: var(--text-dim); font-size: 13px; text-align: center; margin-bottom: 25px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);}
-        
-        .artist-link { color: var(--accent); cursor: pointer; font-weight: 800; transition: opacity 0.2s; }
-        .artist-link:hover { text-decoration: underline; text-decoration-color: var(--accent); }
-        .artist-link:active { opacity: 0.6; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); cursor: pointer; transition: color 0.2s; width: 60px;}
+        .nav-item.active { color: var(--text); }
+        .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
+        .nav-item span { font-size: 10px; font-weight: 600; }
 
-        .loader { text-align: center; color: var(--accent); font-weight: 800; display: none; padding: 20px; text-transform: uppercase; letter-spacing: 2px; font-size: 12px;}
+        /* --- System Modali (Zamykanie tłem) --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; }
+        
+        .modal-bg-blur { 
+            position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; 
+            object-fit: cover; filter: blur(80px) brightness(0.3); z-index: -1; transition: opacity 0.3s;
+            pointer-events: none; /* Pozwala klikać przez rozmyte tło */
+        }
+        
+        #detailsModal .modal-content { 
+            background: transparent; width: 100%; max-width: 450px; height: auto; max-height: 90vh; position: relative; 
+            display: flex; flex-direction: column; padding: 20px; overflow-y: auto;
+            animation: fadeInModal 0.3s forwards;
+            pointer-events: none; /* Magia! Przepuszcza kliknięcia w pustą przestrzeń */
+        }
+        
+        #detailsModal .modal-content > * {
+            pointer-events: auto; /* Aktywuje ponownie kliknięcia dla okładki, tekstu i guzików */
+        }
+
+        .bottom-sheet { align-items: flex-end; }
+        .bottom-sheet .modal-content { 
+            background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; 
+            padding: 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom));
+            animation: slideUpSheet 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
+            border-top: 1px solid var(--card-border); max-height: 90vh; overflow-y: auto;
+        }
+        
+        @keyframes fadeInModal { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .detail-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); margin-bottom: 25px; }
+        .detail-title { text-align: center; margin: 0 0 5px 0; font-weight: 900; font-size: 26px; letter-spacing: -0.5px; line-height: 1.2;}
+        .artist-link { color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 16px; transition: color 0.2s; }
+        .artist-link:hover { color: var(--accent); }
+        
+        .listen-container { display: flex; gap: 20px; justify-content: center; margin: 25px 0; }
+        .listen-btn { width: 56px; height: 56px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .listen-btn svg { width: 24px; height: 24px; }
+        .listen-btn.spotify { background: #1db954; color: #000; box-shadow: 0 6px 20px rgba(29, 185, 84, 0.3); }
+        .listen-btn.spotify:hover { background: #1ed760; transform: translateY(-4px) scale(1.05); }
+        .listen-btn.youtube { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.3); backdrop-filter: blur(10px);}
+        .listen-btn.youtube:hover { background: #ff0000; color: white; border-color: #ff0000; transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 20px rgba(255, 0, 0, 0.3); }
+
+        .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 14px; text-align: center; margin-bottom: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);}
+
+        .add-group { display: flex; gap: 10px; margin-bottom: 12px; }
+        .add-input { padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white; font-size: 15px; width: 100%; outline: none; font-weight: 600; font-family: inherit;}
+        .add-input:focus { border-color: var(--accent); }
+        .btn-primary { background: var(--text); color: var(--bg); font-weight: 900; padding: 16px; border-radius: 12px; border: none; font-size: 15px; width: 100%; cursor: pointer; transition: transform 0.2s;}
+        .btn-primary:active { transform: scale(0.97); }
+
+        #apiResults { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; scrollbar-width: none; margin-bottom: 20px;}
+        .search-card { min-width: 140px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 8px; }
+        .search-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; }
+        .search-card p { font-size: 11px; font-weight: 800; margin: 0; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4; }
+        .search-card select { padding: 8px; font-size: 11px; border-radius: 6px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: white;}
+
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 350px;}
+        .toast { background: rgba(24, 24, 27, 0.95); color: white; padding: 16px 20px; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--card-border); animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; backdrop-filter: blur(10px); text-align: center;}
+        .toast.success { color: var(--accent); }
+        .toast.error { color: var(--danger); }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOutToast { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+
+        .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 99999; justify-content: center; align-items: center; color: var(--accent); font-weight: 900; letter-spacing: 2px;}
+
         body:not(.is-admin) .admin-only { display: none !important; }
-
-        @media (min-width: 600px) { .grid-container, #apiResults { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 600px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div id="toast-container"></div>
+<div id="loader" class="loader-overlay">SYNCHRONIZACJA...</div>
+
+<nav class="bottom-nav">
+    <div class="nav-item active" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Kolekcja</span>
+    </div>
+    <div class="nav-item" onclick="focusSearch()">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <span>Szukaj</span>
+    </div>
+    <div class="nav-item" onclick="openAddModal()">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        <span>Dodaj</span>
+    </div>
+    <div class="nav-item" onclick="toggleAdmin()" id="navAdminBtn">
+        <svg id="lockIcon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H5v14h14V8h-1zm-4 0H10V6a2 2 0 0 1 4 0v2z"/></svg>
+        <span>Admin</span>
+    </div>
+</nav>
+
+<div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman Cloud</h1>
-        <div class="nav-icons">
-            <button class="icon-btn" onclick="toggleAdmin()" id="lockBtn" title="Tryb Admina">
-                <svg id="lockIcon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H5v14h14V8h-1zm-4 0H10V6a2 2 0 0 1 4 0v2z"/></svg>
-            </button>
-            <button class="icon-btn" onclick="loadFromSheets()" title="Odśwież bazę">
-                <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-            </button>
-            <button class="icon-btn admin-only" onclick="exportToCSV()" title="Eksportuj CSV">
-                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            </button>
+        <h1>Walkman <span>Cloud</span></h1>
+        <div style="display:flex; gap:8px;">
+            <div class="icon-btn" onclick="loadFromSheets()"><svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
+            <div class="icon-btn admin-only" onclick="exportToCSV()"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></div>
         </div>
     </div>
 
     <div class="counters">
         <div class="counter-box"><small>KOLEKCJA</small><span class="counter-value" id="countMam">0</span></div>
-        <div class="counter-box szukam"><small>SZUKAM</small><span class="counter-value" id="countSzukam">0</span></div>
+        <div class="counter-box"><small style="color:#f59e0b">SZUKAM</small><span class="counter-value" id="countSzukam" style="color:#f59e0b">0</span></div>
     </div>
 
-    <div class="panel admin-only" id="addPanel">
-        <h3 class="panel-title">Szukaj w Discogs</h3>
-        <div class="input-group">
-            <input type="text" id="query" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()" style="flex: 1;">
-            <button onclick="searchDiscogs()" style="width:100px">Szukaj</button>
-        </div>
-        <div id="apiResults"></div>
+    <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="localSearch" placeholder="Filtruj kolekcję..." oninput="toggleClearBtn(); renderGrid()">
+        <button id="clearSearchBtn" class="clear-btn" onclick="clearSearch()">✕</button>
     </div>
 
-    <div class="panel admin-only">
-        <h3 class="panel-title">Ręczne wprowadzanie</h3>
-        <div class="input-group">
-            <input type="text" id="manArtist" placeholder="Wykonawca" style="flex:1">
-            <input type="text" id="manAlbum" placeholder="Tytuł albumu" style="flex:1">
-        </div>
-        <div class="input-group" style="margin-top:10px;">
-            <select id="manStatus" style="flex:1"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
-            <select id="manFormat" style="flex:1"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
-        </div>
-        <div class="input-group" style="margin-top:10px;">
-            <input type="text" id="manCover" placeholder="Link do okładki (opcjonalnie)">
-        </div>
-        <div class="input-group" style="margin-top:10px;">
-            <textarea id="manNotes" placeholder="Twoje notatki..." style="height:70px;"></textarea>
-        </div>
-        <button onclick="addManual()" style="width:100%; margin-top:15px;">Dodaj do bazy</button>
+    <div class="filters">
+        <select id="sortOrder" onchange="renderGrid()">
+            <option value="AZ">A-Z</option><option value="ZA">Z-A</option><option value="NEW">Najnowsze</option>
+        </select>
+        <select id="statusFilter" onchange="renderGrid()">
+            <option value="ALL">Wszystkie</option><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option>
+        </select>
+        <select id="formatFilter" onchange="renderGrid()">
+            <option value="ALL">Formaty</option><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option>
+        </select>
     </div>
-    
-    <div id="loader" class="loader">Synchronizacja...</div>
 
-    <div class="panel">
-        <h3 class="panel-title" style="color: var(--accent);">Moja Kolekcja</h3>
-        
-        <div class="search-wrapper" style="margin-bottom:15px">
-            <input type="text" id="localSearch" placeholder="Filtruj wg artysty lub albumu..." oninput="toggleClearBtn(); renderGrid()" style="padding-right: 40px; border-radius: 12px; background: rgba(255,255,255,0.05);">
-            <button id="clearSearchBtn" class="clear-btn" onclick="clearSearch()">✕</button>
-        </div>
-
-        <div class="input-group">
-            <select id="sortOrder" onchange="renderGrid()" style="flex:1">
-                <option value="AZ">A-Z</option>
-                <option value="ZA">Z-A</option>
-                <option value="NEW">Najnowsze</option>
-            </select>
-            <select id="statusFilter" onchange="renderGrid()" style="flex:1">
-                <option value="ALL">Wszystkie statusy</option>
-                <option value="MAM">MAM</option>
-                <option value="SZUKAM">SZUKAM</option>
-            </select>
-            <select id="formatFilter" onchange="renderGrid()" style="flex:1">
-                <option value="ALL">Formaty</option>
-                <option value="FLAC">FLAC</option>
-                <option value="FLAC Hi-Res">Hi-Res</option>
-                <option value="MP3">MP3</option>
-            </select>
-        </div>
-        <div class="grid-container" id="collectionGrid"></div>
-        
-        <div id="scrollSentinel" style="height: 20px; width: 100%;"></div>
-    </div>
+    <div class="grid-container" id="collectionGrid"></div>
+    <div id="scrollSentinel" style="height: 20px; width: 100%;"></div>
 </div>
 
 <div id="detailsModal" class="modal" onclick="if(event.target === this) closeDetailsModal()">
+    <img id="modalBgBlur" src="" class="modal-bg-blur"> 
     <div class="modal-content">
-        <span class="close-x" onclick="closeDetailsModal()">×</span>
         <img id="detCover" src="" class="detail-cover">
-        <h2 id="detAlbum" style="text-align:center; margin:0 0 5px 0; font-weight: 900; font-size: 22px; letter-spacing: -0.5px;"></h2>
-        <p id="detArtist" style="text-align:center; margin-bottom:20px; font-size: 14px; color: var(--text-dim);"></p>
+        <h2 id="detAlbum" class="detail-title"></h2>
+        <p id="detArtist" style="text-align:center; margin-bottom:10px;"></p>
+        
+        <div class="listen-container">
+            <a id="btnSpotify" href="#" target="_blank" class="listen-btn spotify" title="Otwórz w Spotify">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.563.387-.857.207-2.35-1.434-5.305-1.76-8.786-.963-.335.077-.67-.133-.746-.467-.077-.334.132-.67.466-.745 3.822-.876 7.086-.496 9.712 1.106.296.18.39.563.21.862zm1.268-2.833c-.227.367-.7.488-1.066.26-2.68-1.644-6.786-2.13-9.743-1.166-.412.136-.847-.09-.982-.5-.136-.412.09-.847.5-.983 3.42-1.116 7.973-.574 11.03 1.304.368.226.49.697.26 1.085zm.106-2.95c-3.21-1.905-8.5-2.08-11.56-1.15-.497.15-1.015-.13-1.166-.626-.15-.497.13-1.015.626-1.166 3.52-.94 9.38-.74 13.106 1.472.446.265.592.836.327 1.282-.266.446-.836.592-1.282.328z"/></svg>
+            </a>
+            <a id="btnYoutube" href="#" target="_blank" class="listen-btn youtube" title="Szukaj na YouTube">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.582 6.186a2.665 2.665 0 0 0-1.875-1.884C18.053 3.86 12 3.86 12 3.86s-6.053 0-7.707.442a2.665 2.665 0 0 0-1.875 1.884C2 7.854 2 12 2 12s0 4.146.418 5.814a2.665 2.665 0 0 0 1.875 1.884C5.947 20.14 12 20.14 12 20.14s6.053 0 7.707-.442a2.665 2.665 0 0 0 1.875-1.884C22 16.146 22 12 22 12s0-4.146-.418-5.814zM9.8 15.54V8.46l6.3 3.54-6.3 3.54z"/></svg>
+            </a>
+        </div>
+
         <div id="detNotes" class="detail-notes"></div>
-        <div style="display:flex; gap:12px;" class="admin-only">
-            <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 16px; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);">Edytuj</button>
-            <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 16px; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">Usuń</button>
+        
+        <div style="display:flex; gap:12px; margin-top:auto;" class="admin-only">
+            <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 16px; border-radius: 12px; font-weight: 800; border:none;">Edytuj</button>
+            <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 16px; border-radius: 12px; font-weight: 800; border:none;">Usuń</button>
         </div>
     </div>
 </div>
 
-<div id="editModal" class="modal" onclick="if(event.target === this) closeEditModal()">
+<div id="addModal" class="modal bottom-sheet" onclick="if(event.target === this) closeAddModal()">
     <div class="modal-content">
-        <h2 style="color: var(--edit); text-align:center; margin-top:0; font-weight: 900;">Edytuj Album</h2>
+        <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Dodaj Płytę</h3>
+        
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">SZUKAJ W DISCOGS</p>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="query" class="add-input" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()">
+            <button class="btn-primary" onclick="searchDiscogs()" style="width:auto; padding:0 20px;">Szukaj</button>
+        </div>
+        <div id="apiResults"></div>
+        
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px; margin-top:20px;">RĘCZNE WPROWADZANIE</p>
+        <div class="add-group">
+            <input type="text" id="manArtist" class="add-input" placeholder="Wykonawca">
+            <input type="text" id="manAlbum" class="add-input" placeholder="Tytuł albumu">
+        </div>
+        <div class="add-group">
+            <select id="manStatus" class="add-input"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
+            <select id="manFormat" class="add-input"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
+        </div>
+        <input type="text" id="manCover" class="add-input" placeholder="Link do okładki (opcjonalnie)" style="margin-bottom:12px;">
+        <textarea id="manNotes" class="add-input" placeholder="Twoje notatki..." style="height:70px; margin-bottom:15px;"></textarea>
+        
+        <button class="btn-primary" onclick="addManual()">Zapisz do bazy</button>
+    </div>
+</div>
+
+<div id="editModal" class="modal bottom-sheet" onclick="if(event.target === this) closeEditModal()">
+    <div class="modal-content">
+        <h3 style="margin-top:0; color:var(--edit); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Edytuj Album</h3>
         <input type="hidden" id="editIndex">
         
-        <label style="font-size:10px; font-weight: 800; letter-spacing: 1px; color:var(--text-dim)">WYKONAWCA</label>
-        <input type="text" id="editArtist" style="margin-bottom: 12px; margin-top: 4px;">
+        <input type="text" id="editArtist" class="add-input" style="margin-bottom:10px;">
+        <input type="text" id="editAlbum" class="add-input" style="margin-bottom:10px;">
+        <input type="text" id="editCover" class="add-input" style="margin-bottom:10px;">
         
-        <label style="font-size:10px; font-weight: 800; letter-spacing: 1px; color:var(--text-dim)">ALBUM</label>
-        <input type="text" id="editAlbum" style="margin-bottom: 12px; margin-top: 4px;">
-        
-        <label style="font-size:10px; font-weight: 800; letter-spacing: 1px; color:var(--text-dim)">LINK DO OKŁADKI</label>
-        <input type="text" id="editCover" style="margin-top: 4px;">
-        
-        <div style="display:flex; gap:10px; margin-top:12px;">
-            <select id="editStatus"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
-            <select id="editFormat"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
+        <div class="add-group">
+            <select id="editStatus" class="add-input"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
+            <select id="editFormat" class="add-input"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
         </div>
         
-        <textarea id="editNotes" placeholder="Twoje notatki..." style="margin-top:12px; height:80px;"></textarea>
+        <textarea id="editNotes" class="add-input" style="height:70px; margin-bottom:20px;"></textarea>
         
-        <div style="display:flex; gap:12px; margin-top:20px;">
-            <button onclick="closeEditModal()" style="background:rgba(255,255,255,0.1); flex:1; padding: 16px; border-radius: 12px; color:white; font-weight:800; box-shadow: none;">Anuluj</button>
-            <button onclick="saveEdit()" style="background:var(--accent); flex:1; padding: 16px; border-radius: 12px; color:black; font-weight:800;">Zapisz</button>
+        <div style="display:flex; gap:12px;">
+            <button onclick="closeEditModal()" class="btn-primary" style="background:rgba(255,255,255,0.1); color:white;">Anuluj</button>
+            <button onclick="saveEdit()" class="btn-primary" style="background:var(--accent);">Zapisz</button>
         </div>
     </div>
 </div>
@@ -291,29 +306,35 @@
     const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
     const DISCOGS_TOKEN = 'iTRtcEKKihJyGhwufBlyPncxTrMDFjVtwiFNTeAa';
     
-    const ARTIST_EXCEPTIONS = [
-        "Tyler, The Creator",
-        "Earth, Wind & Fire",
-        "Crosby, Stills, Nash & Young"
-    ];
+    const ARTIST_EXCEPTIONS = ["Tyler, The Creator", "Earth, Wind & Fire", "Crosby, Stills, Nash & Young"];
     // ==========================================
 
     let myCollection = [];
     let currentFilteredArray = [];
     let currentRenderIndex = 0;
     const RENDER_CHUNK = 30;
-
     let currentDetailsIndex = -1;
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
 
-    // Zmiana ikony kłódki dla admina (Otwarta/Zamknięta)
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'fadeOutToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
+    }
+
     function applyAdminUI() {
         const iconSvg = document.getElementById('lockIcon');
         if (ADMIN_PASS) { 
-            iconSvg.innerHTML = '<path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H4v14h16V8h-2zm-4 0H10V6a2 2 0 0 1 4 0v2z"/>'; // Otwarta
+            iconSvg.innerHTML = '<path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H4v14h16V8h-2zm-4 0H10V6a2 2 0 0 1 4 0v2z"/>';
             document.body.classList.add('is-admin'); 
         } else { 
-            iconSvg.innerHTML = '<path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H5v14h14V8h-1zm-4 0H10V6a2 2 0 0 1 4 0v2z"/>'; // Zamknięta
+            iconSvg.innerHTML = '<path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H5v14h14V8h-1zm-4 0H10V6a2 2 0 0 1 4 0v2z"/>';
             document.body.classList.remove('is-admin'); 
         }
     }
@@ -321,56 +342,61 @@
     function toggleAdmin() {
         if (ADMIN_PASS) { 
             ADMIN_PASS = ''; localStorage.removeItem('admin_pass'); 
+            showToast("🔒 Wylogowano", "success");
         } else { 
-            const p = prompt("Podaj hasło administratora:"); 
-            if (p) { ADMIN_PASS = p; localStorage.setItem('admin_pass', p); } 
+            const p = prompt("Hasło administratora:"); 
+            if (p) { ADMIN_PASS = p; localStorage.setItem('admin_pass', p); showToast("🔓 Zalogowano", "success"); } 
         }
         applyAdminUI();
     }
 
+    /* Nawigacja Dolna */
+    function setActiveNav(index) {
+        document.querySelectorAll('.nav-item').forEach((el, i) => {
+            el.classList.toggle('active', i === index);
+        });
+    }
+
+    function goHome() {
+        setActiveNav(0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function focusSearch() {
+        setActiveNav(1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.getElementById('localSearch').focus();
+    }
+
+    function openAddModal() {
+        setActiveNav(2);
+        if(!ADMIN_PASS) { showToast("Musisz być adminem, żeby dodawać płyty!", "error"); return; }
+        document.getElementById('addModal').style.display = 'flex';
+    }
+    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; setActiveNav(0); }
+
     function splitArtists(artistString) {
         if (!artistString) return [];
-        let tempStr = artistString;
-        let placeholders = {};
-        
+        let tempStr = artistString; let placeholders = {};
         ARTIST_EXCEPTIONS.forEach((exc, idx) => {
-            if (tempStr.includes(exc)) {
-                let code = `@@@EXCEPTION${idx}@@@`;
-                tempStr = tempStr.replace(exc, code);
-                placeholders[code] = exc;
-            }
+            if (tempStr.includes(exc)) { let code = `@@@EXCEPTION${idx}@@@`; tempStr = tempStr.replace(exc, code); placeholders[code] = exc; }
         });
-        
         let arr = tempStr.split(',').map(a => a.trim()).filter(a => a.length > 0);
         return arr.map(a => placeholders[a] ? placeholders[a] : a);
     }
 
-    function toggleClearBtn() {
-        const val = document.getElementById('localSearch').value;
-        document.getElementById('clearSearchBtn').style.display = val.length > 0 ? 'block' : 'none';
-    }
-    function clearSearch() {
-        document.getElementById('localSearch').value = '';
-        toggleClearBtn();
-        renderGrid();
-    }
-    function filterByArtist(artist) {
-        closeDetailsModal();
-        document.getElementById('localSearch').value = artist;
-        toggleClearBtn();
-        renderGrid();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    function toggleClearBtn() { document.getElementById('clearSearchBtn').style.display = document.getElementById('localSearch').value.length > 0 ? 'block' : 'none'; }
+    function clearSearch() { document.getElementById('localSearch').value = ''; toggleClearBtn(); renderGrid(); }
+    function filterByArtist(artist) { closeDetailsModal(); document.getElementById('localSearch').value = artist; toggleClearBtn(); renderGrid(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
     async function loadFromSheets() {
         if(!GOOGLE_URL || GOOGLE_URL.includes('TWOJ_URL')) return;
-        document.getElementById('loader').style.display = 'block';
+        document.getElementById('loader').style.display = 'flex';
         try {
             const res = await fetch(GOOGLE_URL, { redirect: 'follow' });
             myCollection = await res.json();
-            renderGrid();
-            updateCounters();
-        } catch (e) { alert("Błąd połączenia z bazą Google Sheets."); }
+            renderGrid(); updateCounters();
+        } catch (e) { showToast("Błąd połączenia z serwerem", "error"); }
         document.getElementById('loader').style.display = 'none';
     }
 
@@ -387,14 +413,9 @@
         const sortMode = document.getElementById('sortOrder').value;
         
         let mappedCollection = myCollection.map((item, index) => ({ ...item, originalIndex: index }));
-
         currentFilteredArray = mappedCollection.filter(i => {
-            const artysta = (i.Wykonawca || "").toString().toLowerCase();
-            const album = (i.Album || "").toString().toLowerCase();
-            const pasujeTekst = artysta.includes(q) || album.includes(q);
-            const pasujeStatus = (sF === "ALL" || i.Status === sF);
-            const pasujeFormat = (fF === "ALL" || i.Format === fF);
-            return pasujeTekst && pasujeStatus && pasujeFormat;
+            const artysta = (i.Wykonawca || "").toString().toLowerCase(); const album = (i.Album || "").toString().toLowerCase();
+            return (artysta.includes(q) || album.includes(q)) && (sF === "ALL" || i.Status === sF) && (fF === "ALL" || i.Format === fF);
         });
 
         currentFilteredArray.sort((a, b) => {
@@ -403,28 +424,20 @@
             if (sortMode === 'NEW') return b.originalIndex - a.originalIndex;
         });
 
-        container.innerHTML = ''; 
-        currentRenderIndex = 0;   
-        loadMoreItems();          
+        container.innerHTML = ''; currentRenderIndex = 0; loadMoreItems();          
     }
 
     function loadMoreItems() {
         if (currentRenderIndex >= currentFilteredArray.length) return;
-
         const chunk = currentFilteredArray.slice(currentRenderIndex, currentRenderIndex + RENDER_CHUNK);
         const container = document.getElementById('collectionGrid');
 
         const html = chunk.map(item => {
             const idx = item.originalIndex;
             let bClass = item.Format === 'FLAC Hi-Res' ? 'hires' : (item.Status === 'SZUKAM' ? 'szukam' : '');
-            
-            let szybkaOkladka = item.Okładka;
-            if(item.Okładka && item.Okładka.startsWith('http')) {
-                szybkaOkladka = `https://wsrv.nl/?url=${encodeURIComponent(item.Okładka)}&w=200&h=200&fit=cover&output=webp`;
-            }
+            let szybkaOkladka = (item.Okładka && item.Okładka.startsWith('http')) ? `https://wsrv.nl/?url=${encodeURIComponent(item.Okładka)}&w=200&h=200&fit=cover&output=webp` : item.Okładka;
 
-            return `
-                <div class="grid-item" onclick="openDetails(${idx})">
+            return `<div class="grid-item" onclick="openDetails(${idx})">
                     <img src="${szybkaOkladka}" loading="lazy">
                     <div class="format-badge ${bClass}">${item.Status === 'SZUKAM' ? 'SZUKAM' : item.Format}</div>
                     <div class="grid-overlay"><div class="grid-title">${item.Album || "Brak tytułu"}</div></div>
@@ -435,40 +448,28 @@
         currentRenderIndex += RENDER_CHUNK;
     }
 
-    const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) { loadMoreItems(); }
-    }, { rootMargin: "200px" }); 
+    const observer = new IntersectionObserver((entries) => { if (entries[0].isIntersecting) loadMoreItems(); }, { rootMargin: "200px" }); 
     observer.observe(document.getElementById('scrollSentinel'));
 
     async function addManual() {
-        const artist = document.getElementById('manArtist').value.trim();
-        const album = document.getElementById('manAlbum').value.trim();
-        
-        if (!artist || !album) { alert("Podaj Wykonawcę i Tytuł!"); return; }
+        const artist = document.getElementById('manArtist').value.trim(); const album = document.getElementById('manAlbum').value.trim();
+        if (!artist || !album) { showToast("Podaj Wykonawcę i Tytuł!", "error"); return; }
 
         const exists = myCollection.some(i => (i.Wykonawca || "").toLowerCase() === artist.toLowerCase() && (i.Album || "").toLowerCase() === album.toLowerCase());
-        if (exists) { if (!confirm(`Ten album (${artist} - ${album}) jest już w bazie!\n\nNa pewno chcesz dodać duplikat?`)) return; }
+        if (exists) { if (!confirm(`Ten album jest już w bazie! Dodać duplikat?`)) return; }
 
-        const s = document.getElementById('manStatus').value;
-        const f = document.getElementById('manFormat').value;
-        const cover = document.getElementById('manCover').value.trim();
-        const notes = document.getElementById('manNotes').value.trim();
-
-        document.getElementById('loader').style.display = 'block';
+        document.getElementById('loader').style.display = 'flex';
         try {
-            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: artist, Album: album, Status: s, Format: f, Okładka: cover, Utwory: "", DiscogsID: "", Notatki: notes };
+            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: artist, Album: album, Status: document.getElementById('manStatus').value, Format: document.getElementById('manFormat').value, Okładka: document.getElementById('manCover').value.trim(), Utwory: "", DiscogsID: "", Notatki: document.getElementById('manNotes').value.trim() };
             await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
-            
-            document.getElementById('manArtist').value = ''; document.getElementById('manAlbum').value = '';
-            document.getElementById('manCover').value = ''; document.getElementById('manNotes').value = '';
-            setTimeout(loadFromSheets, 1500);
-        } catch(e) { alert("Błąd!"); document.getElementById('loader').style.display = 'none'; }
+            ['manArtist', 'manAlbum', 'manCover', 'manNotes'].forEach(id => document.getElementById(id).value = '');
+            showToast("✅ Dodano do kolekcji!", "success"); closeAddModal(); setTimeout(loadFromSheets, 1500);
+        } catch(e) { showToast("❌ Błąd dodawania. Złe hasło?", "error"); document.getElementById('loader').style.display = 'none'; }
     }
 
     async function searchDiscogs() {
-        const q = document.getElementById('query').value;
-        if(!q) return;
-        document.getElementById('loader').style.display = 'block';
+        const q = document.getElementById('query').value; if(!q) return;
+        document.getElementById('loader').style.display = 'flex';
         try {
             const res = await fetch(`https://api.discogs.com/database/search?q=${q}&token=${DISCOGS_TOKEN}&per_page=12`);
             const data = await res.json();
@@ -478,57 +479,49 @@
                     <p>${r.title}</p>
                     <select id="sStat-${r.id}"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
                     <select id="sForm-${r.id}"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option></select>
-                    <button onclick="addAlbum('${r.title.replace(/'/g,"\\'")}', '${r.cover_image}', '${r.id}')" style="padding:10px; font-size:12px; margin-top: auto; border:none; border-radius:8px; cursor:pointer; font-weight:800;">DODAJ</button>
+                    <button class="btn-primary" onclick="addAlbum('${r.title.replace(/'/g,"\\'")}', '${r.cover_image}', '${r.id}')" style="padding:10px; font-size:12px;">DODAJ</button>
                 </div>`).join('');
-        } catch(e) { alert("Błąd Discogs API"); }
+        } catch(e) { showToast("Błąd Discogs API", "error"); }
         document.getElementById('loader').style.display = 'none';
     }
 
     async function addAlbum(title, cover, id) {
-        let p = title.split(' - ');
-        let rawArtist = p.shift() || "?";
-        let rawAlbum = p.join(' - ') || "?";
+        let p = title.split(' - '); let rawArtist = p.shift() || "?"; let rawAlbum = p.join(' - ') || "?";
         let cleanArtist = rawArtist.replace(/\s*\(\d+\)\s*/g, '').trim();
 
-        const exists = myCollection.some(i => (i.Wykonawca || "").toLowerCase() === cleanArtist.toLowerCase() && (i.Album || "").toLowerCase() === rawAlbum.toLowerCase());
-        if (exists) { if (!confirm(`Ten album (${cleanArtist} - ${rawAlbum}) jest już w bazie!\n\nNa pewno chcesz dodać duplikat?`)) return; }
+        if (myCollection.some(i => (i.Wykonawca || "").toLowerCase() === cleanArtist.toLowerCase() && (i.Album || "").toLowerCase() === rawAlbum.toLowerCase())) { 
+            if (!confirm(`Ten album jest już w bazie! Dodać duplikat?`)) return; 
+        }
 
         const s = document.getElementById(`sStat-${id}`).value;
-        const f = s === "MAM" ? document.getElementById(`sForm-${id}`).value : "-";
-        
-        document.getElementById('loader').style.display = 'block';
+        document.getElementById('loader').style.display = 'flex';
         try {
-            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: f, Okładka: cover, Utwory: "", DiscogsID: id, Notatki: "" };
+            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: s === "MAM" ? document.getElementById(`sForm-${id}`).value : "-", Okładka: cover, Utwory: "", DiscogsID: id, Notatki: "" };
             await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
-            
             document.getElementById('apiResults').innerHTML = ''; document.getElementById('query').value = '';
-            setTimeout(loadFromSheets, 1500);
-        } catch(e) { alert("Błąd dodawania!"); document.getElementById('loader').style.display = 'none'; }
+            showToast("✅ Pobrano z Discogs!", "success"); closeAddModal(); setTimeout(loadFromSheets, 1500);
+        } catch(e) { showToast("❌ Błąd dodawania płyty!", "error"); document.getElementById('loader').style.display = 'none'; }
     }
 
     function openDetails(idx) {
         currentDetailsIndex = idx; const i = myCollection[idx];
         document.getElementById('detCover').src = i.Okładka;
+        document.getElementById('modalBgBlur').src = i.Okładka;
         document.getElementById('detAlbum').innerText = i.Album;
         
-        const detArtistEl = document.getElementById('detArtist');
-        detArtistEl.innerHTML = ''; 
+        const q = encodeURIComponent(`${i.Wykonawca} ${i.Album}`);
+        document.getElementById('btnSpotify').href = `https://open.spotify.com/search/${q}`;
+        document.getElementById('btnYoutube').href = `https://www.youtube.com/results?search_query=${q}`;
         
+        const detArtistEl = document.getElementById('detArtist'); detArtistEl.innerHTML = ''; 
         const artistArray = splitArtists(i.Wykonawca);
         
         artistArray.forEach((artistName, index) => {
-            const span = document.createElement('span');
-            span.className = 'artist-link';
-            span.innerText = artistName;
+            const span = document.createElement('span'); span.className = 'artist-link'; span.innerText = artistName;
             span.onclick = () => filterByArtist(artistName);
             detArtistEl.appendChild(span);
-            
             if (index < artistArray.length - 1) {
-                const comma = document.createElement('span');
-                comma.innerText = ', ';
-                comma.style.color = 'var(--text-dim)';
-                comma.style.cursor = 'default';
-                comma.style.textDecoration = 'none';
+                const comma = document.createElement('span'); comma.innerText = ', '; comma.style.color = 'var(--text-dim)';
                 detArtistEl.appendChild(comma);
             }
         });
@@ -550,22 +543,21 @@
         document.getElementById('editNotes').value = i.Notatki;
         closeDetailsModal(); document.getElementById('editModal').style.display = 'flex';
     }
-    
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
     async function saveEdit() {
         const idx = document.getElementById('editIndex').value; const old = myCollection[idx];
         const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Okładka: document.getElementById('editCover').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: "" };
-        closeEditModal(); document.getElementById('loader').style.display = 'block';
+        closeEditModal(); document.getElementById('loader').style.display = 'flex';
         await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-        setTimeout(loadFromSheets, 1500);
+        showToast("💾 Zapisano zmiany", "success"); setTimeout(loadFromSheets, 1500);
     }
 
     async function deleteFromDetails() {
-        const i = myCollection[currentDetailsIndex]; if(!confirm("Na pewno usunąć ten album z bazy?")) return;
-        closeDetailsModal(); document.getElementById('loader').style.display = 'block';
+        const i = myCollection[currentDetailsIndex]; if(!confirm("Na pewno usunąć ten album?")) return;
+        closeDetailsModal(); document.getElementById('loader').style.display = 'flex';
         await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({password: ADMIN_PASS, action:"DELETE", Wykonawca:i.Wykonawca, Album:i.Album}) });
-        setTimeout(loadFromSheets, 1500);
+        showToast("🗑️ Usunięto z bazy", "success"); setTimeout(loadFromSheets, 1500);
     }
 
     function exportToCSV() {
@@ -573,6 +565,7 @@
         myCollection.forEach(i => csv += `${i.Wykonawca};${i.Album};${i.Status};${i.Format};${i.Notatki}\n`);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "walkman_kolekcja.csv"; link.click();
+        showToast("💾 Pobrano plik CSV", "success");
     }
 
     applyAdminUI(); loadFromSheets();
