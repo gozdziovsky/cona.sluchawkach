@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 3.8.1</title>
+    <title>Walkman Cloud 3.9</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -30,6 +30,9 @@
         
         ::-webkit-scrollbar { display: none; }
 
+        /* QoL: Blokada przewijania tła gdy modal jest otwarty */
+        body.modal-open { overflow: hidden; height: 100vh; touch-action: none; }
+
         html, body { 
             overflow-x: hidden; width: 100%; 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
@@ -44,8 +47,8 @@
             display: flex; flex-direction: column; gap: 15px; 
         }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        h1 { color: var(--text); font-size: 26px; margin: 0; font-weight: 900; letter-spacing: -1px; }
+        .header { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+        h1 { color: var(--text); font-size: 26px; margin: 0; font-weight: 900; letter-spacing: -1px; text-align: center;}
         h1 span { color: var(--accent); }
 
         .counters { display: flex; gap: 12px; }
@@ -68,9 +71,14 @@
         .grid-item img { width: 100%; height: 100%; object-fit: cover; }
         .grid-overlay { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%); padding: 25px 12px 12px 12px; }
         .grid-title { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.9);}
+        
         .format-badge { position: absolute; top: 8px; right: 8px; background: var(--accent); color: #000; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 20px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.3); letter-spacing: 0.5px;}
         .format-badge.szukam { background: #f59e0b; color: #fff;}
         .format-badge.hires { background: var(--hires); color: white; }
+        
+        /* QoL: Ikonka Tracklisty w siatce */
+        .tracklist-icon { position: absolute; top: 32px; right: 8px; background: rgba(0,0,0,0.6); color: white; padding: 4px; border-radius: 50%; width: 22px; height: 22px; display: flex; justify-content: center; align-items: center; z-index: 2; backdrop-filter: blur(5px); }
+        .tracklist-icon svg { width: 12px; height: 12px; fill: currentColor; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0f0f12; border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)) 0; z-index: 9000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); cursor: pointer; transition: color 0.15s; width: 60px;}
@@ -78,43 +86,22 @@
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
         .nav-item span { font-size: 10px; font-weight: 600; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; overscroll-behavior: contain;}
         #detailsModal .modal-content { background: transparent; width: 100%; max-width: 420px; height: auto; max-height: 95vh; position: relative; display: flex; flex-direction: column; padding: 30px 20px 20px 20px; overflow-y: auto; animation: fadeInModal 0.2s forwards; pointer-events: none; scrollbar-width: none; }
         #detailsModal .modal-content > * { pointer-events: auto; }
         @keyframes fadeInModal { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
-        /* --- POPRAWIONA INTERAKTYWNA OKŁADKA --- */
-        .cover-tracklist-wrapper { 
-            width: 70%; max-width: 280px; margin: 0 auto 20px auto; 
-            aspect-ratio: 1/1; position: relative; cursor: pointer;
-            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            background: #111; /* Zabezpieczenie tła */
-        }
-        
-        .toggle-face {
-            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
-            transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
-            border-radius: 12px; overflow: hidden;
-        }
-        
+        .cover-tracklist-wrapper { width: 70%; max-width: 280px; margin: 0 auto 20px auto; aspect-ratio: 1/1; position: relative; cursor: pointer; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #111; }
+        .toggle-face { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); border-radius: 12px; overflow: hidden; }
         .toggle-face.front { object-fit: cover; z-index: 2; }
-        .toggle-face.back {
-            background: #18181b; padding: 15px; overflow-y: auto; scrollbar-width: none;
-            border: 1px solid #27272a; z-index: 1; opacity: 0; transform: scale(0.95); pointer-events: none;
-        }
+        .toggle-face.back { background: #18181b; padding: 15px; overflow-y: auto; scrollbar-width: none; border: 1px solid #27272a; z-index: 1; opacity: 0; transform: scale(0.95); pointer-events: none; }
         
-        /* Wymuszamy ukrycie okładki (!important nadpisuje styl onload) i wybijamy tracklistę do przodu */
         .cover-tracklist-wrapper.flipped .front { opacity: 0 !important; transform: scale(0.95); pointer-events: none; z-index: 0; }
         .cover-tracklist-wrapper.flipped .back { opacity: 1 !important; transform: scale(1); pointer-events: auto; z-index: 3; }
 
-        .flip-hint {
-            position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8);
-            padding: 8px; border-radius: 50%; color: white; z-index: 4; display: flex;
-            pointer-events: none; transition: opacity 0.3s;
-        }
+        .flip-hint { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 50%; color: white; z-index: 4; display: flex; pointer-events: none; transition: opacity 0.3s; }
         .cover-tracklist-wrapper.flipped .flip-hint { opacity: 0; }
         
-        /* Wygląd pojedynczego utworu w trackliście */
         .tracklist-item { display: flex; justify-content: space-between; align-items: flex-start; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85); padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .tracklist-item:last-child { border-bottom: none; padding-bottom: 0; }
         .track-num { color: var(--text-dim); width: 22px; display: inline-block; font-weight: 800;}
@@ -140,7 +127,6 @@
 
         .admin-buttons { display:flex; gap:12px; margin-bottom: 20px; width: 100%; }
 
-        /* Bottom Sheet */
         .bottom-sheet { align-items: flex-end; }
         .bottom-sheet .modal-content { background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom)); animation: slideUpSheet 0.25s cubic-bezier(0.175, 0.885, 0.32, 1); border-top: 1px solid var(--card-border); max-height: 90vh; overflow-y: auto; pointer-events: auto;}
         @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -150,6 +136,13 @@
         .add-input:focus { border-color: var(--accent); }
         .btn-primary { background: var(--text); color: var(--bg); font-weight: 900; padding: 16px; border-radius: 12px; border: none; font-size: 15px; width: 100%; cursor: pointer; transition: transform 0.15s;}
         .btn-primary:active { transform: scale(0.97); }
+
+        /* QoL: Style Statusu w Ustawieniach */
+        .status-row { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #1f1f22; border-radius: 12px; margin-bottom: 10px; font-size: 14px; font-weight: 600; border: 1px solid var(--card-border); }
+        .status-indicator { display: flex; align-items: center; gap: 8px; }
+        .status-dot-small { width: 10px; height: 10px; border-radius: 50%; }
+        .bg-green { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .bg-red { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
 
         #apiResults { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; scrollbar-width: none; margin-bottom: 20px;}
         .search-card { min-width: 140px; background: #18181b; padding: 10px; border-radius: 12px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 8px; }
@@ -188,19 +181,15 @@
         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
         <span>Dodaj</span>
     </div>
-    <div class="nav-item" onclick="toggleAdmin()" id="navAdminBtn">
-        <svg id="lockIcon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H5v14h14V8h-1zm-4 0H10V6a2 2 0 0 1 4 0v2z"/></svg>
-        <span>Admin</span>
+    <div class="nav-item" onclick="openSettingsModal()">
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.73 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <span>Ustaw.</span>
     </div>
 </nav>
 
 <div class="container" id="mainContainer">
     <div class="header">
         <h1>Walkman <span>Cloud</span></h1>
-        <div style="display:flex; gap:8px;">
-            <div class="icon-btn" onclick="loadFromSheets()"><svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
-            <div class="icon-btn admin-only" onclick="exportToCSV()"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></div>
-        </div>
     </div>
 
     <div class="counters">
@@ -275,6 +264,31 @@
     </div>
 </div>
 
+<div id="editModal" class="modal bottom-sheet" onclick="if(event.target === this) closeEditModal()">
+    <div class="modal-content">
+        <h3 style="margin-top:0; color:var(--edit); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Edytuj Album</h3>
+        <input type="hidden" id="editIndex">
+        
+        <input type="text" id="editArtist" class="add-input" style="margin-bottom:10px;">
+        <input type="text" id="editAlbum" class="add-input" style="margin-bottom:10px;">
+        <input type="text" id="editCover" class="add-input" style="margin-bottom:10px;">
+        
+        <div class="add-group">
+            <select id="editStatus" class="add-input"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
+            <select id="editFormat" class="add-input"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
+        </div>
+        
+        <textarea id="editNotes" class="add-input" style="height:70px; margin-bottom:15px;"></textarea>
+        
+        <button onclick="clearTracklistInEdit()" class="btn-primary" style="background: rgba(239, 68, 68, 0.15); color: var(--danger); font-size: 13px; padding: 12px; margin-bottom: 20px;">🗑️ Wyczyść zapisaną tracklistę</button>
+        
+        <div style="display:flex; gap:12px;">
+            <button onclick="closeEditModal()" class="btn-primary" style="background:#27272a; color:white;">Anuluj</button>
+            <button onclick="saveEdit()" class="btn-primary" style="background:var(--accent);">Zapisz</button>
+        </div>
+    </div>
+</div>
+
 <div id="addModal" class="modal bottom-sheet" onclick="if(event.target === this) closeAddModal()">
     <div class="modal-content">
         <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Dodaj Płytę</h3>
@@ -302,26 +316,32 @@
     </div>
 </div>
 
-<div id="editModal" class="modal bottom-sheet" onclick="if(event.target === this) closeEditModal()">
+<div id="settingsModal" class="modal bottom-sheet" onclick="if(event.target === this) closeSettingsModal()">
     <div class="modal-content">
-        <h3 style="margin-top:0; color:var(--edit); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Edytuj Album</h3>
-        <input type="hidden" id="editIndex">
-        
-        <input type="text" id="editArtist" class="add-input" style="margin-bottom:10px;">
-        <input type="text" id="editAlbum" class="add-input" style="margin-bottom:10px;">
-        <input type="text" id="editCover" class="add-input" style="margin-bottom:10px;">
-        
-        <div class="add-group">
-            <select id="editStatus" class="add-input"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
-            <select id="editFormat" class="add-input"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
+        <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Ustawienia</h3>
+
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">STATUS POŁĄCZENIA</p>
+        <div class="status-row">
+            <span>Baza danych (Google)</span>
+            <div class="status-indicator"><span class="status-dot-small bg-red" id="statusSheets"></span></div>
+        </div>
+        <div class="status-row">
+            <span>Szukajka (Discogs)</span>
+            <div class="status-indicator"><span class="status-dot-small bg-red" id="statusDiscogs"></span></div>
+        </div>
+
+        <button class="btn-primary" onclick="syncDataFromSettings()" style="margin-top: 10px; background: rgba(255,255,255,0.1); color: white; display: flex; align-items:center; justify-content: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> 
+            Wymuś synchronizację
+        </button>
+
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px; margin-top:25px;">KONTO ADMINISTRATORA</p>
+        <div style="display:flex; gap:10px; margin-bottom: 15px;">
+            <input type="password" id="adminPasswordInput" class="add-input" placeholder="Wpisz hasło..." style="margin-bottom:0;">
+            <button class="btn-primary" id="adminLoginBtn" onclick="handleAdminLogin()" style="width:auto; padding:0 20px;">Zaloguj</button>
         </div>
         
-        <textarea id="editNotes" class="add-input" style="height:70px; margin-bottom:20px;"></textarea>
-        
-        <div style="display:flex; gap:12px;">
-            <button onclick="closeEditModal()" class="btn-primary" style="background:#27272a; color:white;">Anuluj</button>
-            <button onclick="saveEdit()" class="btn-primary" style="background:var(--accent);">Zapisz</button>
-        </div>
+        <button class="btn-primary admin-only" onclick="exportToCSV()" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--card-border);">💾 Eksportuj bazę do CSV</button>
     </div>
 </div>
 
@@ -340,6 +360,7 @@
     let currentDetailsIndex = -1;
     let searchTimeout; 
     let hasTracklist = false; 
+    let editTempTracklist = ""; // Zmienna dla edycji tracklisty
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
 
     function showToast(message, type = 'success') {
@@ -355,25 +376,70 @@
     }
 
     function applyAdminUI() {
-        const iconSvg = document.getElementById('lockIcon');
-        if (ADMIN_PASS) { 
-            iconSvg.innerHTML = '<path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H4v14h16V8h-2zm-4 0H10V6a2 2 0 0 1 4 0v2z"/>';
-            document.body.classList.add('is-admin'); 
-        } else { 
-            iconSvg.innerHTML = '<path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6-9V6a6 6 0 1 0-12 0v2H5v14h14V8h-1zm-4 0H10V6a2 2 0 0 1 4 0v2z"/>';
-            document.body.classList.remove('is-admin'); 
-        }
+        if (ADMIN_PASS) { document.body.classList.add('is-admin'); } 
+        else { document.body.classList.remove('is-admin'); }
+        updateSettingsUI();
     }
 
-    function toggleAdmin() {
-        if (ADMIN_PASS) { 
-            ADMIN_PASS = ''; localStorage.removeItem('admin_pass'); 
-            showToast("🔒 Wylogowano", "success");
-        } else { 
-            const p = prompt("Hasło administratora:"); 
-            if (p) { ADMIN_PASS = p; localStorage.setItem('admin_pass', p); showToast("🔓 Zalogowano", "success"); } 
+    // --- USTAWIENIA I LOGOWANIE ---
+    function openSettingsModal() {
+        setActiveNav(3);
+        document.body.classList.add('modal-open');
+        updateSettingsUI();
+        document.getElementById('settingsModal').style.display = 'flex';
+    }
+    
+    function closeSettingsModal() { 
+        document.getElementById('settingsModal').style.display = 'none'; 
+        document.body.classList.remove('modal-open');
+        setActiveNav(0); 
+    }
+
+    function updateSettingsUI() {
+        // Kontrolki logowania
+        const passInput = document.getElementById('adminPasswordInput');
+        const loginBtn = document.getElementById('adminLoginBtn');
+        if (ADMIN_PASS) {
+            passInput.style.display = 'none';
+            loginBtn.innerText = 'Wyloguj (' + '*'.repeat(ADMIN_PASS.length) + ')';
+            loginBtn.style.background = 'var(--danger)';
+        } else {
+            passInput.style.display = 'block';
+            passInput.value = '';
+            loginBtn.innerText = 'Zaloguj';
+            loginBtn.style.background = 'var(--text)';
+        }
+
+        // Kropki połączenia
+        const sheetsDot = document.getElementById('statusSheets');
+        const discogsDot = document.getElementById('statusDiscogs');
+        
+        if (GOOGLE_URL && !GOOGLE_URL.includes('TWOJ_URL') && myCollection.length > 0) {
+            sheetsDot.className = 'status-dot-small bg-green';
+        } else { sheetsDot.className = 'status-dot-small bg-red'; }
+
+        if (DISCOGS_TOKEN && !DISCOGS_TOKEN.includes('TWOJ_TOKEN')) {
+            discogsDot.className = 'status-dot-small bg-green';
+        } else { discogsDot.className = 'status-dot-small bg-red'; }
+    }
+
+    function handleAdminLogin() {
+        if (ADMIN_PASS) {
+            ADMIN_PASS = ''; localStorage.removeItem('admin_pass');
+            showToast("🔒 Pomyślnie wylogowano", "success");
+        } else {
+            const p = document.getElementById('adminPasswordInput').value.trim();
+            if (p) {
+                ADMIN_PASS = p; localStorage.setItem('admin_pass', p);
+                showToast("🔓 Zalogowano (Zapisano hasło)", "success");
+            } else { showToast("Wpisz hasło!", "error"); return; }
         }
         applyAdminUI();
+    }
+
+    function syncDataFromSettings() {
+        closeSettingsModal();
+        loadFromSheets();
     }
 
     function setActiveNav(index) { document.querySelectorAll('.nav-item').forEach((el, i) => { el.classList.toggle('active', i === index); }); }
@@ -382,10 +448,11 @@
 
     function openAddModal() {
         setActiveNav(2);
-        if(!ADMIN_PASS) { showToast("Musisz być adminem, żeby dodawać płyty!", "error"); return; }
+        if(!ADMIN_PASS) { showToast("Zaloguj się w Ustawieniach, żeby dodawać!", "error"); return; }
+        document.body.classList.add('modal-open');
         document.getElementById('addModal').style.display = 'flex';
     }
-    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; setActiveNav(0); }
+    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; document.body.classList.remove('modal-open'); setActiveNav(0); }
 
     function splitArtists(artistString) {
         if (!artistString) return [];
@@ -408,8 +475,8 @@
         try {
             const res = await fetch(GOOGLE_URL, { redirect: 'follow' });
             myCollection = await res.json();
-            renderGrid(); updateCounters();
-        } catch (e) { showToast("Błąd połączenia z serwerem", "error"); }
+            renderGrid(); updateCounters(); updateSettingsUI();
+        } catch (e) { showToast("Błąd połączenia z serwerem", "error"); updateSettingsUI();}
         document.getElementById('loader').style.display = 'none';
     }
 
@@ -449,10 +516,17 @@
             const idx = item.originalIndex;
             let bClass = item.Format === 'FLAC Hi-Res' ? 'hires' : (item.Status === 'SZUKAM' ? 'szukam' : '');
             let szybkaOkladka = (item.Okładka && item.Okładka.startsWith('http')) ? `https://wsrv.nl/?url=${encodeURIComponent(item.Okładka)}&w=200&h=200&fit=cover&output=webp` : item.Okładka;
+            
+            // QoL: Ikonka nutki, jeśli płyta ma zapisaną tracklistę
+            let tracklistIndicator = '';
+            if (item.Utwory && item.Utwory.trim() !== '') {
+                tracklistIndicator = `<div class="tracklist-icon"><svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div>`;
+            }
 
             return `<div class="grid-item" onclick="openDetails(${idx})">
                     <img src="${szybkaOkladka}" loading="lazy" style="opacity:0; transition: opacity 0.3s;" onload="this.style.opacity=1">
                     <div class="format-badge ${bClass}">${item.Status === 'SZUKAM' ? 'SZUKAM' : item.Format}</div>
+                    ${tracklistIndicator}
                     <div class="grid-overlay"><div class="grid-title">${item.Album || "Brak tytułu"}</div></div>
                 </div>`;
         }).join('');
@@ -525,6 +599,7 @@
     }
 
     function openDetails(idx) {
+        document.body.classList.add('modal-open');
         currentDetailsIndex = idx; const i = myCollection[idx];
         
         document.getElementById('coverTracklistWrapper').classList.remove('flipped');
@@ -582,24 +657,21 @@
         const formatBadge = document.getElementById('detFormatBadge');
 
         statusText.innerText = i.Status;
-        if (i.Status === 'MAM') {
-            statusDot.className = 'status-dot mam';
-        } else {
-            statusDot.className = 'status-dot szukam';
-        }
+        if (i.Status === 'MAM') { statusDot.className = 'status-dot mam'; } else { statusDot.className = 'status-dot szukam'; }
 
         if (i.Format && i.Format !== '-') {
             formatBadge.innerText = i.Format; formatBadge.style.display = 'flex';
             if (i.Format === 'FLAC Hi-Res') { formatBadge.style.color = 'var(--hires)'; } else { formatBadge.style.color = 'white'; }
-        } else {
-            formatBadge.style.display = 'none'; 
-        }
+        } else { formatBadge.style.display = 'none'; }
 
         document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek w bazie.";
         document.getElementById('detailsModal').style.display = 'flex';
     }
     
-    function closeDetailsModal() { document.getElementById('detailsModal').style.display = 'none'; }
+    function closeDetailsModal() { 
+        document.getElementById('detailsModal').style.display = 'none'; 
+        document.body.classList.remove('modal-open'); 
+    }
 
     function openEditFromDetails() {
         const i = myCollection[currentDetailsIndex];
@@ -610,13 +682,22 @@
         document.getElementById('editStatus').value = i.Status;
         document.getElementById('editFormat').value = i.Format;
         document.getElementById('editNotes').value = i.Notatki;
-        closeDetailsModal(); document.getElementById('editModal').style.display = 'flex';
+        editTempTracklist = i.Utwory; // Kopiujemy tracklistę do zmiennej pomocniczej
+        closeDetailsModal(); 
+        document.body.classList.add('modal-open');
+        document.getElementById('editModal').style.display = 'flex';
     }
-    function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+    function closeEditModal() { document.getElementById('editModal').style.display = 'none'; document.body.classList.remove('modal-open'); }
+
+    // QoL: Czyszczenie tracklisty na żądanie
+    function clearTracklistInEdit() {
+        editTempTracklist = "";
+        showToast("Tracklista usunięta! (Zapisz album)", "success");
+    }
 
     async function saveEdit() {
         const idx = document.getElementById('editIndex').value; const old = myCollection[idx];
-        const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Okładka: document.getElementById('editCover').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: old.Utwory };
+        const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Okładka: document.getElementById('editCover').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: editTempTracklist };
         closeEditModal(); document.getElementById('loader').style.display = 'flex';
         await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         showToast("💾 Zapisano zmiany", "success"); setTimeout(loadFromSheets, 1500);
@@ -630,6 +711,7 @@
     }
 
     function exportToCSV() {
+        closeSettingsModal();
         let csv = "\uFEFFWykonawca;Album;Status;Format;Notatki\n";
         myCollection.forEach(i => csv += `${i.Wykonawca};${i.Album};${i.Status};${i.Format};${i.Notatki}\n`);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
