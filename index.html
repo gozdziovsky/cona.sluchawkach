@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 3.4</title>
+    <title>Walkman Cloud 3.5</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -104,9 +104,10 @@
             pointer-events: none; 
         }
         
+        /* Zoptymalizowane marginesy wewnątrz modala */
         #detailsModal .modal-content { 
-            background: transparent; width: 100%; max-width: 450px; height: auto; max-height: 95vh; position: relative; 
-            display: flex; flex-direction: column; padding: 20px; overflow-y: auto;
+            background: transparent; width: 100%; max-width: 420px; height: auto; max-height: 95vh; position: relative; 
+            display: flex; flex-direction: column; padding: 30px 20px 20px 20px; overflow-y: auto;
             animation: fadeInModal 0.3s forwards;
             pointer-events: none; 
             scrollbar-width: none;
@@ -126,7 +127,7 @@
         @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
         .detail-cover { 
-            width: 70%; max-width: 300px; margin: 0 auto 20px auto; display: block;
+            width: 70%; max-width: 280px; margin: 0 auto 20px auto; display: block;
             aspect-ratio: 1/1; object-fit: cover; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
         }
         .detail-title { text-align: center; margin: 0 0 5px 0; font-weight: 900; font-size: 22px; letter-spacing: -0.5px; line-height: 1.2;}
@@ -146,8 +147,7 @@
         .listen-btn.close-action { background: rgba(255,255,255,0.08); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         .listen-btn.close-action:hover { background: rgba(255,255,255,0.15); color: white; transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
 
-        /* --- NOWE: BĄBELKI STATUSU I FORMATU --- */
-        .detail-badges { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .detail-badges { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
         .modal-badge { 
             background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); 
             padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; 
@@ -158,7 +158,9 @@
         .status-dot.mam { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
         .status-dot.szukam { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
 
-        .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);}
+        .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); width: 100%;}
+
+        .admin-buttons { display:flex; gap:12px; margin-bottom: 20px; width: 100%; }
 
         .add-group { display: flex; gap: 10px; margin-bottom: 12px; }
         .add-input { padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white; font-size: 15px; width: 100%; outline: none; font-weight: 600; font-family: inherit;}
@@ -271,9 +273,9 @@
 
         <div id="detNotes" class="detail-notes"></div>
         
-        <div style="display:flex; gap:12px; margin-bottom: 20px;" class="admin-only">
-            <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none;">Edytuj</button>
-            <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none;">Usuń</button>
+        <div class="admin-buttons admin-only">
+            <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none; cursor: pointer;">Edytuj</button>
+            <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none; cursor: pointer;">Usuń</button>
         </div>
 
         <div style="display:flex; justify-content:center; margin-top: auto; padding-bottom: 10px;">
@@ -531,7 +533,6 @@
         document.getElementById('modalBgBlur').src = i.Okładka;
         document.getElementById('detAlbum').innerText = i.Album;
         
-        // Prawidłowe linkowanie Spotify i YT
         const q = encodeURIComponent(`${i.Wykonawca} ${i.Album}`);
         document.getElementById('btnSpotify').href = `https://open.spotify.com/search/${q}`;
         document.getElementById('btnYoutube').href = `https://www.youtube.com/results?search_query=${q}`;
@@ -549,7 +550,6 @@
             }
         });
 
-        // Uzupełnianie "pigułek" z formatem i statusem
         const statusDot = document.getElementById('detStatusDot');
         const statusText = document.getElementById('detStatusText');
         const formatBadge = document.getElementById('detFormatBadge');
@@ -570,7 +570,7 @@
                 formatBadge.style.color = 'white';
             }
         } else {
-            formatBadge.style.display = 'none'; // Ukryj, jeśli nie ma formatu
+            formatBadge.style.display = 'none'; 
         }
 
         document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek w bazie.";
