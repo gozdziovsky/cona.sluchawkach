@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 4.1</title>
+    <title>Walkman Cloud 4.2</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -302,7 +302,7 @@
             <select id="editFormat" class="add-input"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
         </div>
         
-        <textarea id="editNotes" class="add-input" style="height:70px; margin-bottom:15px;"></textarea>
+        <textarea id="editNotes" class="add-input" style="height:70px; margin-bottom:20px;"></textarea>
         
         <button type="button" onclick="clearTracklistInEdit()" class="btn-primary" style="background: rgba(239, 68, 68, 0.15); color: var(--danger); font-size: 13px; padding: 12px; margin-bottom: 20px;">🗑️ Wyczyść zapisaną tracklistę</button>
         
@@ -567,7 +567,8 @@
             let szybkaOkladka = (item.Okładka && item.Okładka.startsWith('http')) ? `https://wsrv.nl/?url=${encodeURIComponent(item.Okładka)}&w=200&h=200&fit=cover&output=webp` : item.Okładka;
             
             let tracklistIndicator = '';
-            if (item.Utwory && item.Utwory.trim() !== '') {
+            // Gwarancja niewyświetlania znaczka dla "-"
+            if (item.Utwory && item.Utwory.trim() !== '' && item.Utwory.trim() !== '-') {
                 tracklistIndicator = `<div class="tracklist-icon"><svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div>`;
             }
 
@@ -595,7 +596,7 @@
 
         document.getElementById('loader').style.display = 'flex';
         try {
-            const entry = { password: ADMIN_PASS, action: "ADD", WyWykonawca: artist, Album: album, Status: document.getElementById('manStatus').value, Format: document.getElementById('manFormat').value, Okładka: document.getElementById('manCover').value.trim(), Utwory: "", DiscogsID: "", Notatki: document.getElementById('manNotes').value.trim() };
+            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: artist, Album: album, Status: document.getElementById('manStatus').value, Format: document.getElementById('manFormat').value, Okładka: document.getElementById('manCover').value.trim(), Utwory: "", DiscogsID: "", Notatki: document.getElementById('manNotes').value.trim() };
             await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
             ['manArtist', 'manAlbum', 'manCover', 'manNotes'].forEach(id => document.getElementById(id).value = '');
             showToast("✅ Dodano do kolekcji!", "success"); closeAddModal(); setTimeout(loadFromSheets, 1500);
@@ -657,7 +658,8 @@
         const tracksContainer = document.getElementById('detTracks');
         const hintIcon = document.getElementById('flipHint');
         
-        if (i.Utwory && i.Utwory.trim() !== '') {
+        // Zabezpieczenie dla wyświetlania w detalu
+        if (i.Utwory && i.Utwory.trim() !== '' && i.Utwory.trim() !== '-') {
             hasTracklist = true;
             hintIcon.style.display = 'flex'; 
             const tracks = i.Utwory.split('\n');
@@ -734,9 +736,9 @@
     }
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; checkModalsAndUnlock(); }
 
-    // WŁAŚCIWA FUNKCJA CZYSZCZENIA TRACKLISTY (SPACJA ZAMIAST "")
+    // WYSYŁAMY MYŚLNIK, ŻEBY WYMUSIĆ NADPISANIE W GOOGLE
     function clearTracklistInEdit() {
-        editTempTracklist = " "; // Magiczna spacja ratująca aktualizację w Google Apps Script
+        editTempTracklist = "-"; 
         showToast("Tracklista usunięta! (Zapisz album)", "success");
     }
 
