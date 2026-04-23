@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 4.6</title>
+    <title>Walkman Cloud 4.7</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -122,7 +122,7 @@
         .status-dot.mam { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
         .status-dot.szukam { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
 
-        .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; padding: 15px; background: #18181b; border-radius: 12px; border: 1px solid #27272a; width: 100%;}
+        .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; padding: 15px; background: #18181b; border-radius: 12px; border: 1px solid #27272a; width: 100%; display: none; /* Domyślnie ukryte */}
 
         .admin-buttons { display:flex; gap:12px; margin-bottom: 20px; width: 100%; }
 
@@ -133,7 +133,7 @@
             padding: 15px 25px 25px 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom)); 
             animation: slideUpSheet 0.25s cubic-bezier(0.175, 0.885, 0.32, 1); 
             border-top: 1px solid var(--card-border); max-height: 90vh; overflow-y: auto; pointer-events: auto;
-            overscroll-behavior: none; /* KLUCZOWE! Blokada natywnej sprężyny Safari */
+            overscroll-behavior: none;
         }
         @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
@@ -394,7 +394,6 @@
         if (!isAnyOpen) unlockScroll();
     }
 
-    // Blokada Scroll Bounce na głównym oknie detali
     const detModalEl = document.getElementById('detailsModal');
     detModalEl.addEventListener('touchmove', e => {
         let el = e.target;
@@ -434,22 +433,17 @@
         }
     }
 
-    // --- PANCERNY GEST SWIPE-TO-DISMISS (BOTTOM SHEETS) ---
-    let sheetStartY = 0; 
-    let sheetCurrentY = 0; 
-    let isSheetDragging = false; 
-    let activeSheetContent = null;
+    let sheetStartY = 0; let sheetCurrentY = 0; let isSheetDragging = false; let activeSheetContent = null;
 
     document.querySelectorAll('.bottom-sheet .modal-content').forEach(sheet => {
         sheet.addEventListener('touchstart', e => {
-            // Ignorujemy jeśli klikamy w pola systemowe, żeby zapobiec błędom
             const tag = e.target.tagName.toLowerCase();
             if (['input', 'textarea', 'select', 'button'].includes(tag)) return;
 
             if (sheet.scrollTop <= 0) {
                 isSheetDragging = true;
                 sheetStartY = e.touches[0].clientY;
-                sheetCurrentY = sheetStartY; // Resetowanie na start
+                sheetCurrentY = sheetStartY; 
                 activeSheetContent = sheet;
                 sheet.style.transition = 'none';
             }
@@ -461,12 +455,12 @@
             let diffY = sheetCurrentY - sheetStartY;
             
             if (diffY > 0) { 
-                if(e.cancelable) e.preventDefault(); // KLUCZ - TWARDY LOCK PRZEGLĄDARKI
+                if(e.cancelable) e.preventDefault(); 
                 activeSheetContent.style.transform = `translateY(${diffY}px)`; 
             } else { 
                 activeSheetContent.style.transform = `translateY(0px)`; 
             }
-        }, {passive: false}); // Musi być false, żeby działał preventDefault!
+        }, {passive: false});
 
         sheet.addEventListener('touchend', e => {
             if (!isSheetDragging || !activeSheetContent) return;
@@ -777,7 +771,15 @@
             if (i.Format === 'FLAC Hi-Res') { formatBadge.style.color = 'var(--hires)'; } else { formatBadge.style.color = 'white'; }
         } else { formatBadge.style.display = 'none'; }
 
-        document.getElementById('detNotes').innerText = i.Notatki || "Brak notatek w bazie.";
+        // --- QoL: ZWIJANIE PUSTYCH NOTATEK ---
+        const detNotesEl = document.getElementById('detNotes');
+        if (i.Notatki && i.Notatki.trim() !== '') {
+            detNotesEl.innerText = i.Notatki;
+            detNotesEl.style.display = 'block';
+        } else {
+            detNotesEl.style.display = 'none';
+        }
+
         document.getElementById('detailsModal').style.display = 'flex';
     }
     
@@ -802,7 +804,7 @@
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; checkModalsAndUnlock(); }
 
     function clearTracklistInEdit() {
-        editTempTracklist = "-"; 
+        editTempTracklist = ""; 
         showToast("Tracklista usunięta! (Zapisz album)", "success");
     }
 
