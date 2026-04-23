@@ -12,13 +12,13 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 3.6</title>
+    <title>Walkman Cloud 3.7</title>
     <style>
         :root { 
             --accent: #1db954; 
             --bg: #09090b; 
-            --card: rgba(24, 24, 27, 0.65); 
-            --card-border: rgba(255, 255, 255, 0.08);
+            --card: #18181b; 
+            --card-border: #27272a;
             --text: #ffffff; 
             --text-dim: #a1a1aa; 
             --danger: #ef4444; 
@@ -59,55 +59,49 @@
         .search-wrapper { position: relative; width: 100%; margin-top: 5px; }
         .search-wrapper input { 
             padding: 16px; padding-left: 45px; border-radius: 16px; border: 1px solid var(--card-border); 
-            background: rgba(255,255,255,0.05); color: white; font-size: 16px; width: 100%; outline: none; 
+            background: #1f1f22; color: white; font-size: 16px; width: 100%; outline: none; 
             transition: all 0.2s; font-family: inherit; font-weight: 600;
         }
-        .search-wrapper input:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
+        .search-wrapper input:focus { border-color: var(--accent); background: #27272a; }
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; fill: var(--text-dim); }
         .clear-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; padding: 10px; display: none; }
 
         .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .filters select { 
             padding: 10px 14px; border-radius: 20px; border: 1px solid var(--card-border); 
-            background: rgba(255,255,255,0.05); color: white; font-size: 13px; font-weight: 600; outline: none; 
+            background: #1f1f22; color: white; font-size: 13px; font-weight: 600; outline: none; 
             white-space: nowrap; appearance: none; -webkit-appearance: none;
         }
 
         .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
-        .grid-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 1/1; background: #111; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
-        .grid-item:active { transform: scale(0.96); }
+        .grid-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 1/1; background: #111; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.15s; }
+        .grid-item:active { transform: scale(0.95); }
         .grid-item img { width: 100%; height: 100%; object-fit: cover; }
         .grid-overlay { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%); padding: 25px 12px 12px 12px; }
-        .grid-title { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 4px rgba(0,0,0,0.8);}
-        .format-badge { position: absolute; top: 8px; right: 8px; background: var(--accent); color: #000; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 20px; z-index: 2; box-shadow: 0 2px 10px rgba(0,0,0,0.4); letter-spacing: 0.5px;}
+        .grid-title { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.9);}
+        .format-badge { position: absolute; top: 8px; right: 8px; background: var(--accent); color: #000; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 20px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.3); letter-spacing: 0.5px;}
         .format-badge.szukam { background: #f59e0b; color: #fff;}
         .format-badge.hires { background: var(--hires); color: white; }
 
+        /* UPROSZCZONY DOLNY PASEK BEZ ROZMYCIA */
         .bottom-nav { 
             position: fixed; bottom: 0; left: 0; width: 100%; 
-            background: rgba(15, 15, 18, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--card-border); 
+            background: #0f0f12; border-top: 1px solid var(--card-border); 
             display: flex; justify-content: space-around; align-items: center;
             padding: 12px 0 calc(12px + env(safe-area-inset-bottom)) 0; z-index: 9000;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); cursor: pointer; transition: color 0.2s; width: 60px;}
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); cursor: pointer; transition: color 0.15s; width: 60px;}
         .nav-item.active { color: var(--text); }
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
         .nav-item span { font-size: 10px; font-weight: 600; }
 
-        /* --- System Modali --- */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; }
-        
-        .modal-bg-blur { 
-            position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; 
-            object-fit: cover; filter: blur(80px) brightness(0.3); z-index: -1; transition: opacity 0.3s;
-            pointer-events: none; 
-        }
+        /* UPROSZCZONE MODALE (Solidne tła, płynne działanie) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
         
         #detailsModal .modal-content { 
             background: transparent; width: 100%; max-width: 420px; height: auto; max-height: 95vh; position: relative; 
             display: flex; flex-direction: column; padding: 30px 20px 20px 20px; overflow-y: auto;
-            animation: fadeInModal 0.3s forwards;
+            animation: fadeInModal 0.2s forwards;
             pointer-events: none; 
             scrollbar-width: none;
         }
@@ -118,73 +112,60 @@
         .bottom-sheet .modal-content { 
             background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; 
             padding: 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom));
-            animation: slideUpSheet 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
+            animation: slideUpSheet 0.25s cubic-bezier(0.175, 0.885, 0.32, 1);
             border-top: 1px solid var(--card-border); max-height: 90vh; overflow-y: auto;
         }
         
-        @keyframes fadeInModal { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeInModal { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
         @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
         .detail-cover { 
             width: 70%; max-width: 280px; margin: 0 auto 20px auto; display: block;
-            aspect-ratio: 1/1; object-fit: cover; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
         }
         .detail-title { text-align: center; margin: 0 0 5px 0; font-weight: 900; font-size: 22px; letter-spacing: -0.5px; line-height: 1.2;}
-        .artist-link { color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 15px; transition: color 0.2s; display: inline-block; padding-bottom: 5px; }
+        .artist-link { color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 15px; transition: color 0.15s; display: inline-block; padding-bottom: 5px; }
         .artist-link:hover { color: var(--accent); }
         
-        /* --- NOWY PANEL STEROWANIA (Control Bar) --- */
-        .listen-container { 
-            display: flex; gap: 12px; justify-content: center; align-items: center; margin: 20px 0; 
-            flex-wrap: wrap; /* Zabezpieczenie dla bardzo małych ekranów */
-        }
-        
-        .listen-btn { 
-            width: 52px; height: 52px; border-radius: 50%; display: flex; justify-content: center; align-items: center; 
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; text-decoration: none; flex-shrink: 0;
-        }
+        .listen-container { display: flex; gap: 12px; justify-content: center; align-items: center; margin: 20px 0; flex-wrap: wrap;}
+        .listen-btn { width: 52px; height: 52px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: transform 0.15s; cursor: pointer; text-decoration: none; flex-shrink: 0;}
         .listen-btn svg { width: 22px; height: 22px; }
+        .listen-btn:active { transform: scale(0.92); }
         
-        .listen-btn.spotify { background: #1db954; color: #000; box-shadow: 0 6px 20px rgba(29, 185, 84, 0.3); }
-        .listen-btn.spotify:hover { background: #1ed760; transform: translateY(-4px) scale(1.05); }
+        .listen-btn.spotify { background: #1db954; color: #000; box-shadow: 0 4px 15px rgba(29, 185, 84, 0.2); }
+        .listen-btn.youtube { background: #27272a; color: #fff; border: 1px solid #3f3f46; }
+        .listen-btn.close-action { background: #18181b; color: var(--text-dim); border: 1px solid #27272a; margin: 0 auto;}
         
-        .listen-btn.youtube { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.3); backdrop-filter: blur(10px);}
-        .listen-btn.youtube:hover { background: #ff0000; color: white; border-color: #ff0000; transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 20px rgba(255, 0, 0, 0.3); }
-        
-        .listen-btn.close-action { background: rgba(255,255,255,0.08); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin: 0 auto;}
-        .listen-btn.close-action:hover { background: rgba(255,255,255,0.15); color: white; transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
-
         .modal-badge { 
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); 
+            background: #1f1f22; border: 1px solid #27272a; 
             padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; 
-            color: white; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;
-            backdrop-filter: blur(10px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); flex-shrink: 0;
+            color: white; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; flex-shrink: 0;
         }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .status-dot.mam { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
         .status-dot.szukam { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
 
-        .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); width: 100%;}
+        .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; padding: 15px; background: #18181b; border-radius: 12px; border: 1px solid #27272a; width: 100%;}
 
         .admin-buttons { display:flex; gap:12px; margin-bottom: 20px; width: 100%; }
 
         .add-group { display: flex; gap: 10px; margin-bottom: 12px; }
-        .add-input { padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white; font-size: 15px; width: 100%; outline: none; font-weight: 600; font-family: inherit;}
+        .add-input { padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: #1f1f22; color: white; font-size: 15px; width: 100%; outline: none; font-weight: 600; font-family: inherit;}
         .add-input:focus { border-color: var(--accent); }
-        .btn-primary { background: var(--text); color: var(--bg); font-weight: 900; padding: 16px; border-radius: 12px; border: none; font-size: 15px; width: 100%; cursor: pointer; transition: transform 0.2s;}
+        .btn-primary { background: var(--text); color: var(--bg); font-weight: 900; padding: 16px; border-radius: 12px; border: none; font-size: 15px; width: 100%; cursor: pointer; transition: transform 0.15s;}
         .btn-primary:active { transform: scale(0.97); }
 
         #apiResults { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; scrollbar-width: none; margin-bottom: 20px;}
-        .search-card { min-width: 140px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 8px; }
+        .search-card { min-width: 140px; background: #18181b; padding: 10px; border-radius: 12px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 8px; }
         .search-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; }
         .search-card p { font-size: 11px; font-weight: 800; margin: 0; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4; }
-        .search-card select { padding: 8px; font-size: 11px; border-radius: 6px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: white;}
+        .search-card select { padding: 8px; font-size: 11px; border-radius: 6px; background: #27272a; border: 1px solid #3f3f46; color: white;}
 
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 350px;}
-        .toast { background: rgba(24, 24, 27, 0.95); color: white; padding: 16px 20px; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--card-border); animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; backdrop-filter: blur(10px); text-align: center;}
+        .toast { background: #18181b; color: white; padding: 16px 20px; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--card-border); animation: slideDown 0.3s forwards; text-align: center;}
         .toast.success { color: var(--accent); }
         .toast.error { color: var(--danger); }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOutToast { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
 
         .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 99999; justify-content: center; align-items: center; color: var(--accent); font-weight: 900; letter-spacing: 2px;}
@@ -233,7 +214,7 @@
 
     <div class="search-wrapper">
         <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" id="localSearch" placeholder="Filtruj kolekcję..." oninput="toggleClearBtn(); renderGrid()">
+        <input type="text" id="localSearch" placeholder="Filtruj kolekcję..." oninput="onSearchInput()">
         <button id="clearSearchBtn" class="clear-btn" onclick="clearSearch()">✕</button>
     </div>
 
@@ -254,9 +235,8 @@
 </div>
 
 <div id="detailsModal" class="modal" onclick="if(event.target === this) closeDetailsModal()">
-    <img id="modalBgBlur" src="" class="modal-bg-blur"> 
     <div class="modal-content">
-        <img id="detCover" src="" class="detail-cover">
+        <img id="detCover" src="" class="detail-cover" style="opacity:0; transition: opacity 0.3s;" onload="this.style.opacity=1">
         <h2 id="detAlbum" class="detail-title"></h2>
         <div id="detArtist" style="text-align:center; margin-bottom:5px;"></div>
         
@@ -335,7 +315,7 @@
         <textarea id="editNotes" class="add-input" style="height:70px; margin-bottom:20px;"></textarea>
         
         <div style="display:flex; gap:12px;">
-            <button onclick="closeEditModal()" class="btn-primary" style="background:rgba(255,255,255,0.1); color:white;">Anuluj</button>
+            <button onclick="closeEditModal()" class="btn-primary" style="background:#27272a; color:white;">Anuluj</button>
             <button onclick="saveEdit()" class="btn-primary" style="background:var(--accent);">Zapisz</button>
         </div>
     </div>
@@ -354,6 +334,7 @@
     let currentRenderIndex = 0;
     const RENDER_CHUNK = 30;
     let currentDetailsIndex = -1;
+    let searchTimeout; // Timer do opóźnionego szukania
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
 
     function showToast(message, type = 'success') {
@@ -363,9 +344,9 @@
         toast.innerText = message;
         container.appendChild(toast);
         setTimeout(() => {
-            toast.style.animation = 'fadeOutToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
-            setTimeout(() => toast.remove(), 400);
-        }, 3000);
+            toast.style.animation = 'fadeOutToast 0.3s forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
     }
 
     function applyAdminUI() {
@@ -394,8 +375,17 @@
         document.querySelectorAll('.nav-item').forEach((el, i) => { el.classList.toggle('active', i === index); });
     }
 
-    function goHome() { setActiveNav(0); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    function focusSearch() { setActiveNav(1); window.scrollTo({ top: 0, behavior: 'smooth' }); document.getElementById('localSearch').focus(); }
+    // QoL: Automatyczny powrót na samą górę aplikacji
+    function goHome() { 
+        setActiveNav(0); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    }
+    
+    function focusSearch() { 
+        setActiveNav(1); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        document.getElementById('localSearch').focus(); 
+    }
 
     function openAddModal() {
         setActiveNav(2);
@@ -415,6 +405,16 @@
     }
 
     function toggleClearBtn() { document.getElementById('clearSearchBtn').style.display = document.getElementById('localSearch').value.length > 0 ? 'block' : 'none'; }
+    
+    // QoL: Debounce wyszukiwarki (znaczne ułatwienie dla wydajności przy szybkim pisaniu na telefonie)
+    function onSearchInput() {
+        toggleClearBtn();
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            renderGrid();
+        }, 200);
+    }
+    
     function clearSearch() { document.getElementById('localSearch').value = ''; toggleClearBtn(); renderGrid(); }
     function filterByArtist(artist) { closeDetailsModal(); document.getElementById('localSearch').value = artist; toggleClearBtn(); renderGrid(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
@@ -466,8 +466,9 @@
             let bClass = item.Format === 'FLAC Hi-Res' ? 'hires' : (item.Status === 'SZUKAM' ? 'szukam' : '');
             let szybkaOkladka = (item.Okładka && item.Okładka.startsWith('http')) ? `https://wsrv.nl/?url=${encodeURIComponent(item.Okładka)}&w=200&h=200&fit=cover&output=webp` : item.Okładka;
 
+            // QoL: Płynne ładowanie obrazków w kafelkach z fade-in
             return `<div class="grid-item" onclick="openDetails(${idx})">
-                    <img src="${szybkaOkladka}" loading="lazy">
+                    <img src="${szybkaOkladka}" loading="lazy" style="opacity:0; transition: opacity 0.3s;" onload="this.style.opacity=1">
                     <div class="format-badge ${bClass}">${item.Status === 'SZUKAM' ? 'SZUKAM' : item.Format}</div>
                     <div class="grid-overlay"><div class="grid-title">${item.Album || "Brak tytułu"}</div></div>
                 </div>`;
@@ -534,8 +535,10 @@
 
     function openDetails(idx) {
         currentDetailsIndex = idx; const i = myCollection[idx];
-        document.getElementById('detCover').src = i.Okładka;
-        document.getElementById('modalBgBlur').src = i.Okładka;
+        const detCover = document.getElementById('detCover');
+        detCover.style.opacity = '0';
+        detCover.src = i.Okładka;
+        
         document.getElementById('detAlbum').innerText = i.Album;
         
         const q = encodeURIComponent(`${i.Wykonawca} ${i.Album}`);
