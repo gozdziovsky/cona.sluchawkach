@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 3.7</title>
+    <title>Walkman Cloud 3.8</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -49,29 +49,18 @@
         h1 span { color: var(--accent); }
 
         .counters { display: flex; gap: 12px; }
-        .counter-box { 
-            background: var(--card); padding: 12px; border-radius: 16px; flex: 1; text-align: center; 
-            border: 1px solid var(--card-border);
-        }
+        .counter-box { background: var(--card); padding: 12px; border-radius: 16px; flex: 1; text-align: center; border: 1px solid var(--card-border); }
         .counter-box small { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 800;}
         .counter-value { font-size: 24px; font-weight: 900; color: var(--text); display: block; margin-top: 2px; }
 
         .search-wrapper { position: relative; width: 100%; margin-top: 5px; }
-        .search-wrapper input { 
-            padding: 16px; padding-left: 45px; border-radius: 16px; border: 1px solid var(--card-border); 
-            background: #1f1f22; color: white; font-size: 16px; width: 100%; outline: none; 
-            transition: all 0.2s; font-family: inherit; font-weight: 600;
-        }
+        .search-wrapper input { padding: 16px; padding-left: 45px; border-radius: 16px; border: 1px solid var(--card-border); background: #1f1f22; color: white; font-size: 16px; width: 100%; outline: none; transition: all 0.2s; font-family: inherit; font-weight: 600; }
         .search-wrapper input:focus { border-color: var(--accent); background: #27272a; }
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; fill: var(--text-dim); }
         .clear-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; padding: 10px; display: none; }
 
         .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .filters select { 
-            padding: 10px 14px; border-radius: 20px; border: 1px solid var(--card-border); 
-            background: #1f1f22; color: white; font-size: 13px; font-weight: 600; outline: none; 
-            white-space: nowrap; appearance: none; -webkit-appearance: none;
-        }
+        .filters select { padding: 10px 14px; border-radius: 20px; border: 1px solid var(--card-border); background: #1f1f22; color: white; font-size: 13px; font-weight: 600; outline: none; white-space: nowrap; appearance: none; -webkit-appearance: none; }
 
         .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
         .grid-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 1/1; background: #111; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.15s; }
@@ -83,46 +72,51 @@
         .format-badge.szukam { background: #f59e0b; color: #fff;}
         .format-badge.hires { background: var(--hires); color: white; }
 
-        /* UPROSZCZONY DOLNY PASEK BEZ ROZMYCIA */
-        .bottom-nav { 
-            position: fixed; bottom: 0; left: 0; width: 100%; 
-            background: #0f0f12; border-top: 1px solid var(--card-border); 
-            display: flex; justify-content: space-around; align-items: center;
-            padding: 12px 0 calc(12px + env(safe-area-inset-bottom)) 0; z-index: 9000;
-        }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0f0f12; border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)) 0; z-index: 9000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); cursor: pointer; transition: color 0.15s; width: 60px;}
         .nav-item.active { color: var(--text); }
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
         .nav-item span { font-size: 10px; font-weight: 600; }
 
-        /* UPROSZCZONE MODALE (Solidne tła, płynne działanie) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
-        
-        #detailsModal .modal-content { 
-            background: transparent; width: 100%; max-width: 420px; height: auto; max-height: 95vh; position: relative; 
-            display: flex; flex-direction: column; padding: 30px 20px 20px 20px; overflow-y: auto;
-            animation: fadeInModal 0.2s forwards;
-            pointer-events: none; 
-            scrollbar-width: none;
-        }
-        
+        #detailsModal .modal-content { background: transparent; width: 100%; max-width: 420px; height: auto; max-height: 95vh; position: relative; display: flex; flex-direction: column; padding: 30px 20px 20px 20px; overflow-y: auto; animation: fadeInModal 0.2s forwards; pointer-events: none; scrollbar-width: none; }
         #detailsModal .modal-content > * { pointer-events: auto; }
+        @keyframes fadeInModal { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
-        .bottom-sheet { align-items: flex-end; }
-        .bottom-sheet .modal-content { 
-            background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; 
-            padding: 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom));
-            animation: slideUpSheet 0.25s cubic-bezier(0.175, 0.885, 0.32, 1);
-            border-top: 1px solid var(--card-border); max-height: 90vh; overflow-y: auto;
+        /* --- NOWOŚĆ: INTERAKTYWNA OKŁADKA (TOGGLE) --- */
+        .cover-tracklist-wrapper { 
+            width: 70%; max-width: 280px; margin: 0 auto 20px auto; 
+            aspect-ratio: 1/1; position: relative; cursor: pointer;
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         
-        @keyframes fadeInModal { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
-        @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .detail-cover { 
-            width: 70%; max-width: 280px; margin: 0 auto 20px auto; display: block;
-            aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        .toggle-face {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+            transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
+            border-radius: 12px; overflow: hidden;
         }
+        
+        .toggle-face.front { object-fit: cover; z-index: 2; }
+        .toggle-face.back {
+            background: #18181b; padding: 15px; overflow-y: auto; scrollbar-width: none;
+            border: 1px solid #27272a; z-index: 1; opacity: 0; transform: scale(0.95); pointer-events: none;
+        }
+        
+        .cover-tracklist-wrapper.flipped .front { opacity: 0; transform: scale(0.95); pointer-events: none; }
+        .cover-tracklist-wrapper.flipped .back { opacity: 1; transform: scale(1); pointer-events: auto; }
+
+        .flip-hint {
+            position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7);
+            padding: 8px; border-radius: 50%; color: white; z-index: 3; display: flex;
+            pointer-events: none; transition: opacity 0.3s;
+        }
+        .cover-tracklist-wrapper.flipped .flip-hint { opacity: 0; }
+        
+        /* Wygląd pojedynczego utworu w trackliście */
+        .tracklist-item { display: flex; justify-content: space-between; align-items: flex-start; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85); padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .tracklist-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .track-num { color: var(--text-dim); width: 22px; display: inline-block; font-weight: 800;}
+
         .detail-title { text-align: center; margin: 0 0 5px 0; font-weight: 900; font-size: 22px; letter-spacing: -0.5px; line-height: 1.2;}
         .artist-link { color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 15px; transition: color 0.15s; display: inline-block; padding-bottom: 5px; }
         .artist-link:hover { color: var(--accent); }
@@ -131,16 +125,11 @@
         .listen-btn { width: 52px; height: 52px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: transform 0.15s; cursor: pointer; text-decoration: none; flex-shrink: 0;}
         .listen-btn svg { width: 22px; height: 22px; }
         .listen-btn:active { transform: scale(0.92); }
-        
         .listen-btn.spotify { background: #1db954; color: #000; box-shadow: 0 4px 15px rgba(29, 185, 84, 0.2); }
         .listen-btn.youtube { background: #27272a; color: #fff; border: 1px solid #3f3f46; }
         .listen-btn.close-action { background: #18181b; color: var(--text-dim); border: 1px solid #27272a; margin: 0 auto;}
         
-        .modal-badge { 
-            background: #1f1f22; border: 1px solid #27272a; 
-            padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; 
-            color: white; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; flex-shrink: 0;
-        }
+        .modal-badge { background: #1f1f22; border: 1px solid #27272a; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; flex-shrink: 0; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .status-dot.mam { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
         .status-dot.szukam { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
@@ -148,6 +137,11 @@
         .detail-notes { font-style: italic; color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; padding: 15px; background: #18181b; border-radius: 12px; border: 1px solid #27272a; width: 100%;}
 
         .admin-buttons { display:flex; gap:12px; margin-bottom: 20px; width: 100%; }
+
+        /* Bottom Sheet */
+        .bottom-sheet { align-items: flex-end; }
+        .bottom-sheet .modal-content { background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom)); animation: slideUpSheet 0.25s cubic-bezier(0.175, 0.885, 0.32, 1); border-top: 1px solid var(--card-border); max-height: 90vh; overflow-y: auto; pointer-events: auto;}
+        @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
         .add-group { display: flex; gap: 10px; margin-bottom: 12px; }
         .add-input { padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: #1f1f22; color: white; font-size: 15px; width: 100%; outline: none; font-weight: 600; font-family: inherit;}
@@ -236,7 +230,15 @@
 
 <div id="detailsModal" class="modal" onclick="if(event.target === this) closeDetailsModal()">
     <div class="modal-content">
-        <img id="detCover" src="" class="detail-cover" style="opacity:0; transition: opacity 0.3s;" onload="this.style.opacity=1">
+        
+        <div id="coverTracklistWrapper" class="cover-tracklist-wrapper" onclick="toggleCoverTracklist()">
+            <img id="detCover" src="" class="toggle-face front" style="opacity:0;" onload="this.style.opacity=1">
+            <div id="detTracks" class="toggle-face back"></div>
+            <div class="flip-hint" id="flipHint">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            </div>
+        </div>
+
         <h2 id="detAlbum" class="detail-title"></h2>
         <div id="detArtist" style="text-align:center; margin-bottom:5px;"></div>
         
@@ -334,7 +336,8 @@
     let currentRenderIndex = 0;
     const RENDER_CHUNK = 30;
     let currentDetailsIndex = -1;
-    let searchTimeout; // Timer do opóźnionego szukania
+    let searchTimeout; 
+    let hasTracklist = false; // Zmienna stanu dla tracklisty
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
 
     function showToast(message, type = 'success') {
@@ -371,21 +374,9 @@
         applyAdminUI();
     }
 
-    function setActiveNav(index) {
-        document.querySelectorAll('.nav-item').forEach((el, i) => { el.classList.toggle('active', i === index); });
-    }
-
-    // QoL: Automatyczny powrót na samą górę aplikacji
-    function goHome() { 
-        setActiveNav(0); 
-        window.scrollTo({ top: 0, behavior: 'smooth' }); 
-    }
-    
-    function focusSearch() { 
-        setActiveNav(1); 
-        window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        document.getElementById('localSearch').focus(); 
-    }
+    function setActiveNav(index) { document.querySelectorAll('.nav-item').forEach((el, i) => { el.classList.toggle('active', i === index); }); }
+    function goHome() { setActiveNav(0); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function focusSearch() { setActiveNav(1); window.scrollTo({ top: 0, behavior: 'smooth' }); document.getElementById('localSearch').focus(); }
 
     function openAddModal() {
         setActiveNav(2);
@@ -405,16 +396,7 @@
     }
 
     function toggleClearBtn() { document.getElementById('clearSearchBtn').style.display = document.getElementById('localSearch').value.length > 0 ? 'block' : 'none'; }
-    
-    // QoL: Debounce wyszukiwarki (znaczne ułatwienie dla wydajności przy szybkim pisaniu na telefonie)
-    function onSearchInput() {
-        toggleClearBtn();
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            renderGrid();
-        }, 200);
-    }
-    
+    function onSearchInput() { toggleClearBtn(); clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { renderGrid(); }, 200); }
     function clearSearch() { document.getElementById('localSearch').value = ''; toggleClearBtn(); renderGrid(); }
     function filterByArtist(artist) { closeDetailsModal(); document.getElementById('localSearch').value = artist; toggleClearBtn(); renderGrid(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
@@ -466,7 +448,6 @@
             let bClass = item.Format === 'FLAC Hi-Res' ? 'hires' : (item.Status === 'SZUKAM' ? 'szukam' : '');
             let szybkaOkladka = (item.Okładka && item.Okładka.startsWith('http')) ? `https://wsrv.nl/?url=${encodeURIComponent(item.Okładka)}&w=200&h=200&fit=cover&output=webp` : item.Okładka;
 
-            // QoL: Płynne ładowanie obrazków w kafelkach z fade-in
             return `<div class="grid-item" onclick="openDetails(${idx})">
                     <img src="${szybkaOkladka}" loading="lazy" style="opacity:0; transition: opacity 0.3s;" onload="this.style.opacity=1">
                     <div class="format-badge ${bClass}">${item.Status === 'SZUKAM' ? 'SZUKAM' : item.Format}</div>
@@ -533,11 +514,50 @@
         } catch(e) { showToast("❌ Błąd dodawania płyty!", "error"); document.getElementById('loader').style.display = 'none'; }
     }
 
+    // --- Funkcja odwracająca okładkę/tracklistę ---
+    function toggleCoverTracklist() {
+        if(hasTracklist) {
+            document.getElementById('coverTracklistWrapper').classList.toggle('flipped');
+        } else {
+            showToast("Brak tracklisty. Pobierz skryptem Google", "error");
+        }
+    }
+
     function openDetails(idx) {
         currentDetailsIndex = idx; const i = myCollection[idx];
+        
+        // Zawsze resetuj do okładki przy otwieraniu
+        document.getElementById('coverTracklistWrapper').classList.remove('flipped');
+        
         const detCover = document.getElementById('detCover');
         detCover.style.opacity = '0';
         detCover.src = i.Okładka;
+        
+        // Parsowanie Tracklisty
+        const tracksContainer = document.getElementById('detTracks');
+        const hintIcon = document.getElementById('flipHint');
+        
+        if (i.Utwory && i.Utwory.trim() !== '') {
+            hasTracklist = true;
+            hintIcon.style.display = 'flex'; // Pokaż ikonkę
+            const tracks = i.Utwory.split('\n');
+            tracksContainer.innerHTML = tracks.map(track => {
+                const match = track.match(/(.*?)\s+\((\d+:\d{2})\)$/);
+                if(match) {
+                    const title = match[1]; const time = match[2];
+                    const dotIndex = title.indexOf('.');
+                    let num = title.substring(0, dotIndex + 1);
+                    let name = title.substring(dotIndex + 1).trim();
+                    if(dotIndex === -1) { num = '-'; name = title; }
+                    return `<div class="tracklist-item"><span style="flex:1"><span class="track-num">${num}</span> ${name}</span> <span style="color:var(--text-dim);">${time}</span></div>`;
+                }
+                return `<div class="tracklist-item">${track}</div>`;
+            }).join('');
+        } else {
+            hasTracklist = false;
+            hintIcon.style.display = 'none'; // Ukryj ikonkę
+            tracksContainer.innerHTML = '';
+        }
         
         document.getElementById('detAlbum').innerText = i.Album;
         
@@ -570,13 +590,8 @@
         }
 
         if (i.Format && i.Format !== '-') {
-            formatBadge.innerText = i.Format;
-            formatBadge.style.display = 'flex';
-            if (i.Format === 'FLAC Hi-Res') {
-                formatBadge.style.color = 'var(--hires)';
-            } else {
-                formatBadge.style.color = 'white';
-            }
+            formatBadge.innerText = i.Format; formatBadge.style.display = 'flex';
+            if (i.Format === 'FLAC Hi-Res') { formatBadge.style.color = 'var(--hires)'; } else { formatBadge.style.color = 'white'; }
         } else {
             formatBadge.style.display = 'none'; 
         }
@@ -602,7 +617,7 @@
 
     async function saveEdit() {
         const idx = document.getElementById('editIndex').value; const old = myCollection[idx];
-        const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Okładka: document.getElementById('editCover').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: "" };
+        const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Okładka: document.getElementById('editCover').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: old.Utwory };
         closeEditModal(); document.getElementById('loader').style.display = 'flex';
         await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         showToast("💾 Zapisano zmiany", "success"); setTimeout(loadFromSheets, 1500);
