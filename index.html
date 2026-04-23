@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 3.5</title>
+    <title>Walkman Cloud 3.6</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -104,7 +104,6 @@
             pointer-events: none; 
         }
         
-        /* Zoptymalizowane marginesy wewnątrz modala */
         #detailsModal .modal-content { 
             background: transparent; width: 100%; max-width: 420px; height: auto; max-height: 95vh; position: relative; 
             display: flex; flex-direction: column; padding: 30px 20px 20px 20px; overflow-y: auto;
@@ -131,12 +130,20 @@
             aspect-ratio: 1/1; object-fit: cover; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
         }
         .detail-title { text-align: center; margin: 0 0 5px 0; font-weight: 900; font-size: 22px; letter-spacing: -0.5px; line-height: 1.2;}
-        .artist-link { color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 15px; transition: color 0.2s; }
+        .artist-link { color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 15px; transition: color 0.2s; display: inline-block; padding-bottom: 5px; }
         .artist-link:hover { color: var(--accent); }
         
-        .listen-container { display: flex; gap: 20px; justify-content: center; margin: 20px 0; }
-        .listen-btn { width: 56px; height: 56px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; text-decoration: none;}
-        .listen-btn svg { width: 24px; height: 24px; }
+        /* --- NOWY PANEL STEROWANIA (Control Bar) --- */
+        .listen-container { 
+            display: flex; gap: 12px; justify-content: center; align-items: center; margin: 20px 0; 
+            flex-wrap: wrap; /* Zabezpieczenie dla bardzo małych ekranów */
+        }
+        
+        .listen-btn { 
+            width: 52px; height: 52px; border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; text-decoration: none; flex-shrink: 0;
+        }
+        .listen-btn svg { width: 22px; height: 22px; }
         
         .listen-btn.spotify { background: #1db954; color: #000; box-shadow: 0 6px 20px rgba(29, 185, 84, 0.3); }
         .listen-btn.spotify:hover { background: #1ed760; transform: translateY(-4px) scale(1.05); }
@@ -144,15 +151,14 @@
         .listen-btn.youtube { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.3); backdrop-filter: blur(10px);}
         .listen-btn.youtube:hover { background: #ff0000; color: white; border-color: #ff0000; transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 20px rgba(255, 0, 0, 0.3); }
         
-        .listen-btn.close-action { background: rgba(255,255,255,0.08); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        .listen-btn.close-action { background: rgba(255,255,255,0.08); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin: 0 auto;}
         .listen-btn.close-action:hover { background: rgba(255,255,255,0.15); color: white; transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
 
-        .detail-badges { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
         .modal-badge { 
             background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); 
-            padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; 
+            padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; 
             color: white; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;
-            backdrop-filter: blur(10px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); flex-shrink: 0;
         }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .status-dot.mam { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
@@ -252,22 +258,21 @@
     <div class="modal-content">
         <img id="detCover" src="" class="detail-cover">
         <h2 id="detAlbum" class="detail-title"></h2>
-        <p id="detArtist" style="text-align:center; margin-bottom:10px;"></p>
+        <div id="detArtist" style="text-align:center; margin-bottom:5px;"></div>
         
         <div class="listen-container">
+            <div class="modal-badge" id="detStatusBadge">
+                <span class="status-dot" id="detStatusDot"></span>
+                <span id="detStatusText"></span>
+            </div>
+
             <a id="btnSpotify" href="#" target="_blank" class="listen-btn spotify" title="Otwórz w Spotify">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.563.387-.857.207-2.35-1.434-5.305-1.76-8.786-.963-.335.077-.67-.133-.746-.467-.077-.334.132-.67.466-.745 3.822-.876 7.086-.496 9.712 1.106.296.18.39.563.21.862zm1.268-2.833c-.227.367-.7.488-1.066.26-2.68-1.644-6.786-2.13-9.743-1.166-.412.136-.847-.09-.982-.5-.136-.412.09-.847.5-.983 3.42-1.116 7.973-.574 11.03 1.304.368.226.49.697.26 1.085zm.106-2.95c-3.21-1.905-8.5-2.08-11.56-1.15-.497.15-1.015-.13-1.166-.626-.15-.497.13-1.015.626-1.166 3.52-.94 9.38-.74 13.106 1.472.446.265.592.836.327 1.282-.266.446-.836.592-1.282.328z"/></svg>
             </a>
             <a id="btnYoutube" href="#" target="_blank" class="listen-btn youtube" title="Szukaj na YouTube">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.582 6.186a2.665 2.665 0 0 0-1.875-1.884C18.053 3.86 12 3.86 12 3.86s-6.053 0-7.707.442a2.665 2.665 0 0 0-1.875 1.884C2 7.854 2 12 2 12s0 4.146.418 5.814a2.665 2.665 0 0 0 1.875 1.884C5.947 20.14 12 20.14 12 20.14s6.053 0 7.707-.442a2.665 2.665 0 0 0 1.875-1.884C22 16.146 22 12 22 12s0-4.146-.418-5.814zM9.8 15.54V8.46l6.3 3.54-6.3 3.54z"/></svg>
             </a>
-        </div>
-
-        <div id="detBadges" class="detail-badges">
-            <div class="modal-badge" id="detStatusBadge">
-                <span class="status-dot" id="detStatusDot"></span>
-                <span id="detStatusText"></span>
-            </div>
+            
             <div class="modal-badge" id="detFormatBadge"></div>
         </div>
 
