@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 5.4</title>
+    <title>Walkman Cloud 5.5</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -197,7 +197,7 @@
 
 <div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman <span>Cloud</span><sup>5.4</sup></h1>
+        <h1>Walkman <span>Cloud</span><sup>5.5</sup></h1>
     </div>
 
     <div class="counters">
@@ -366,7 +366,6 @@
 
 <script>
     // ==========================================
-    // KLUCZE ŁADOWANE DYNAMICZNIE Z PAMIĘCI TELEFONU
     let GOOGLE_URL = localStorage.getItem('walkman_google_url');
     if (GOOGLE_URL === null) GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
 
@@ -452,8 +451,8 @@
 
     document.querySelectorAll('.bottom-sheet .modal-content').forEach(sheet => {
         sheet.addEventListener('touchstart', e => {
-            const tag = e.target.tagName.toLowerCase();
-            if (['input', 'textarea', 'select', 'button'].includes(tag)) return;
+            // FIX: Zabezpieczenie przed porywaniem dotyku na przyciskach i inputach
+            if (e.target.closest('button, input, textarea, select')) return;
 
             if (sheet.scrollTop <= 0) {
                 isSheetDragging = true;
@@ -505,13 +504,6 @@
             activeSheetContent = null;
         }, {passive: true});
     });
-
-    // NOWA BEZPIECZNA FUNKCJA (Zastępuje zepsute escapeHtml)
-    function cleanHTML(text) {
-        if (!text) return '';
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
-    }
 
     function showToast(message, type = 'success') {
         const container = document.getElementById('toast-container');
@@ -721,6 +713,7 @@
         } catch(e) { showToast("❌ Błąd dodawania. Złe hasło?", "error"); document.getElementById('loader').style.display = 'none'; }
     }
 
+    // --- NAPRAWIONE WYSZUKIWANIE DISCOGS ---
     async function searchDiscogs() {
         if(!DISCOGS_TOKEN) { showToast("Skonfiguruj token Discogs w ustawieniach!", "error"); return; }
         const q = document.getElementById('query').value; if(!q) return;
@@ -731,14 +724,19 @@
             
             currentDiscogsResults = data.results; 
             
-            document.getElementById('apiResults').innerHTML = currentDiscogsResults.map((r, index) => `
-                <div class="search-card">
-                    <img src="${r.cover_image || 'https://via.placeholder.com/150'}">
-                    <p>${cleanHTML(r.title)}</p>
+            document.getElementById('apiResults').innerHTML = currentDiscogsResults.map((r, index) => {
+                // Bezpieczna podmiana znaków bezpośrednio w HTML bez używania zewnętrznych funkcji z błędami
+                let safeTitle = r.title ? r.title.replace(/"/g, '&quot;').replace(/'/g, '&#39;') : 'Brak tytułu';
+                let safeCover = r.cover_image || 'https://via.placeholder.com/150';
+                
+                return `<div class="search-card">
+                    <img src="${safeCover}">
+                    <p>${safeTitle}</p>
                     <select id="sStat-${index}"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
                     <select id="sForm-${index}"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option></select>
                     <button type="button" class="btn-primary" onclick="addAlbumFromDiscogs(${index})" style="padding:10px; font-size:12px;">DODAJ</button>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         } catch(e) { showToast("Błąd Discogs API", "error"); }
         document.getElementById('loader').style.display = 'none';
     }
@@ -804,7 +802,7 @@
                     if(dotIndex === -1) { num = '-'; name = title; }
                     return `<div class="tracklist-item"><span style="flex:1"><span class="track-num">${num}</span> ${name}</span> <span style="color:var(--text-dim);">${time}</span></div>`;
                 }
-                return `<div class="tracklist-item">${cleanHTML(track)}</div>`;
+                return `<div class="tracklist-item">${track}</div>`;
             }).join('');
         } else {
             hasTracklist = false;
@@ -875,7 +873,7 @@
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; checkModalsAndUnlock(); }
 
     function clearTracklistInEdit() {
-        editTempTracklist = ""; 
+        editTempTracklist = "-"; 
         showToast("Tracklista usunięta! (Zapisz album)", "success");
     }
 
