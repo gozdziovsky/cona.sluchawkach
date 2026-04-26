@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 5.0</title>
+    <title>Walkman Cloud 4.8</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -86,23 +86,11 @@
 
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; overscroll-behavior: none;}
         
-        /* STANDARYZACJA WYSOKOŚCI MODALA DETALI */
-        #detailsModal .modal-content { 
-            background: transparent; width: 100%; max-width: 420px; 
-            height: 85vh; /* SZTYWNA WYSOKOŚĆ - zapobiega skakaniu interfejsu */
-            position: relative; display: flex; flex-direction: column; 
-            padding: 25px 20px 20px 20px; overflow-y: auto; 
-            animation: fadeInModal 0.2s forwards; pointer-events: none; scrollbar-width: none; 
-        }
+        #detailsModal .modal-content { background: transparent; width: 100%; max-width: 420px; height: 85vh; position: relative; display: flex; flex-direction: column; padding: 25px 20px 20px 20px; overflow-y: auto; animation: fadeInModal 0.2s forwards; pointer-events: none; scrollbar-width: none; }
         #detailsModal .modal-content > * { pointer-events: auto; }
         @keyframes fadeInModal { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
-        /* POWIĘKSZONA OKŁADKA */
-        .cover-tracklist-wrapper { 
-            width: 80%; max-width: 320px; /* Zwiększony rozmiar */
-            margin: 0 auto 20px auto; aspect-ratio: 1/1; position: relative; cursor: pointer; 
-            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #111; flex-shrink: 0;
-        }
+        .cover-tracklist-wrapper { width: 80%; max-width: 320px; margin: 0 auto 20px auto; aspect-ratio: 1/1; position: relative; cursor: pointer; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #111; flex-shrink: 0;}
         .toggle-face { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); border-radius: 12px; overflow: hidden; }
         .toggle-face.front { object-fit: cover; z-index: 2; }
         .toggle-face.back { background: #18181b; padding: 15px; overflow-y: auto; scrollbar-width: none; border: 1px solid #27272a; z-index: 1; opacity: 0; transform: scale(0.95); pointer-events: none; overscroll-behavior: contain;}
@@ -117,17 +105,8 @@
         .tracklist-item:last-child { border-bottom: none; padding-bottom: 0; }
         .track-num { color: var(--text-dim); width: 22px; display: inline-block; font-weight: 800;}
 
-        /* REZERWACJA MIEJSCA DLA TYTUŁU I ARTYSTY */
-        .detail-title { 
-            text-align: center; margin: 0 0 5px 0; font-weight: 900; font-size: 22px; 
-            letter-spacing: -0.5px; line-height: 1.2; 
-            min-height: 54px; /* Równo na 2 linijki */
-            display: flex; align-items: center; justify-content: center; flex-direction: column;
-        }
-        #detArtist { 
-            min-height: 22px; display: flex; justify-content: center; align-items: center; 
-            flex-wrap: wrap; margin-bottom: 5px;
-        }
+        .detail-title { text-align: center; margin: 0 0 5px 0; font-weight: 900; font-size: 22px; letter-spacing: -0.5px; line-height: 1.2; min-height: 54px; display: flex; align-items: center; justify-content: center; flex-direction: column;}
+        #detArtist { min-height: 22px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 5px;}
         .artist-link { color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 15px; transition: color 0.15s; display: inline-block; padding-bottom: 5px; margin: 0 2px;}
         .artist-link:hover { color: var(--accent); }
         
@@ -148,7 +127,6 @@
 
         .admin-buttons { display:flex; gap:12px; margin-bottom: 15px; width: 100%; flex-shrink: 0; }
 
-        /* PANCERNE BOTTOM SHEETS */
         .bottom-sheet { align-items: flex-end; }
         .bottom-sheet .modal-content { 
             background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; 
@@ -218,7 +196,7 @@
 
 <div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman <span>Database</span></h1>
+        <h1>Walkman <span>Cloud</span></h1>
     </div>
 
     <div class="counters">
@@ -301,7 +279,7 @@
         <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">SZUKAJ W DISCOGS</p>
         <div style="display:flex; gap:10px;">
             <input type="text" id="query" class="add-input" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()">
-            <button class="btn-primary" onclick="searchDiscogs()" style="width:auto; padding:0 20px;">Szukaj</button>
+            <button type="button" class="btn-primary" onclick="searchDiscogs()" style="width:auto; padding:0 20px;">Szukaj</button>
         </div>
         <div id="apiResults"></div>
         
@@ -317,7 +295,10 @@
         <input type="text" id="manCover" class="add-input" placeholder="Link do okładki (opcjonalnie)" style="margin-bottom:12px;">
         <textarea id="manNotes" class="add-input" placeholder="Twoje notatki..." style="height:70px; margin-bottom:15px;"></textarea>
         
-        <button class="btn-primary" onclick="addManual()">Zapisz do bazy</button>
+        <div style="display:flex; gap:12px;">
+            <button type="button" class="btn-primary" onclick="closeAddModal()" style="background:#27272a; color:white;">Anuluj</button>
+            <button type="button" class="btn-primary" onclick="addManual()" style="background:var(--accent);">Zapisz do bazy</button>
+        </div>
     </div>
 </div>
 
@@ -378,10 +359,10 @@
 </div>
 
 <script>
-    // ==========================================
+    // =========================================
     const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
     const DISCOGS_TOKEN = 'iTRtcEKKihJyGhwufBlyPncxTrMDFjVtwiFNTeAa';
-    
+
     const ARTIST_EXCEPTIONS = ["Tyler, The Creator", "Earth, Wind & Fire", "Crosby, Stills, Nash & Young"];
     // ==========================================
 
@@ -455,7 +436,12 @@
         }
     }
 
-    let sheetStartY = 0; let sheetCurrentY = 0; let isSheetDragging = false; let activeSheetContent = null;
+    // --- FIX GESTÓW SWIPE-TO-DISMISS (ODBLOKOWANE PRZEWIJANIE W POZIOMIE) ---
+    let sheetStartY = 0; 
+    let sheetStartX = 0; // Nowa zmienna badająca ruch boczny
+    let sheetCurrentY = 0; 
+    let isSheetDragging = false; 
+    let activeSheetContent = null;
 
     document.querySelectorAll('.bottom-sheet .modal-content').forEach(sheet => {
         sheet.addEventListener('touchstart', e => {
@@ -465,6 +451,7 @@
             if (sheet.scrollTop <= 0) {
                 isSheetDragging = true;
                 sheetStartY = e.touches[0].clientY;
+                sheetStartX = e.touches[0].clientX; // Pobieramy punkt startu w osi X
                 sheetCurrentY = sheetStartY; 
                 activeSheetContent = sheet;
                 sheet.style.transition = 'none';
@@ -474,7 +461,17 @@
         sheet.addEventListener('touchmove', e => {
             if (!isSheetDragging || !activeSheetContent) return;
             sheetCurrentY = e.touches[0].clientY;
+            let currentX = e.touches[0].clientX;
+            
             let diffY = sheetCurrentY - sheetStartY;
+            let diffX = Math.abs(currentX - sheetStartX);
+
+            // Jeśli palec ucieka bardziej w bok niż w dół (np. przewijamy karuzele z albumami Discogs) -> Puszczamy panel
+            if (diffX > 10 && diffX > Math.abs(diffY)) {
+                isSheetDragging = false;
+                activeSheetContent.style.transform = '';
+                return;
+            }
             
             if (diffY > 0) { 
                 if(e.cancelable) e.preventDefault(); 
@@ -691,14 +688,19 @@
         try {
             const res = await fetch(`https://api.discogs.com/database/search?q=${q}&token=${DISCOGS_TOKEN}&per_page=12`);
             const data = await res.json();
-            document.getElementById('apiResults').innerHTML = data.results.map(r => `
+            
+            // FIX CUDZYSŁOWÓW W TYTULE Z DISCOGS
+            document.getElementById('apiResults').innerHTML = data.results.map(r => {
+                const safeTitle = r.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                return `
                 <div class="search-card">
                     <img src="${r.cover_image || 'https://via.placeholder.com/150'}">
                     <p>${r.title}</p>
                     <select id="sStat-${r.id}"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
                     <select id="sForm-${r.id}"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option></select>
-                    <button class="btn-primary" onclick="addAlbum('${r.title.replace(/'/g,"\\'")}', '${r.cover_image}', '${r.id}')" style="padding:10px; font-size:12px;">DODAJ</button>
-                </div>`).join('');
+                    <button type="button" class="btn-primary" onclick="addAlbum('${safeTitle}', '${r.cover_image}', '${r.id}')" style="padding:10px; font-size:12px;">DODAJ</button>
+                </div>`;
+            }).join('');
         } catch(e) { showToast("Błąd Discogs API", "error"); }
         document.getElementById('loader').style.display = 'none';
     }
@@ -724,7 +726,7 @@
     function toggleCoverTracklist() {
         if(hasTracklist) {
             document.getElementById('coverTracklistWrapper').classList.toggle('flipped');
-        } else { showToast("Brak tracklisty.", "error"); }
+        } else { showToast("Brak tracklisty. Użyj skryptu iTunes API", "error"); }
     }
 
     function openDetails(idx) {
