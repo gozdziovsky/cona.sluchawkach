@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 5.0</title>
+    <title>Walkman Cloud 5.1</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -197,7 +197,7 @@
 
 <div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman <span>Cloud</span><sup>5.0</sup></h1>
+        <h1>Walkman <span>Cloud</span><sup>5.1</sup></h1>
     </div>
 
     <div class="counters">
@@ -334,6 +334,11 @@
         <div class="drag-handle"></div>
         <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Ustawienia</h3>
 
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">KONFIGURACJA API</p>
+        <input type="text" id="settingGoogleUrl" class="add-input" placeholder="Google Sheets Web App URL" style="margin-bottom:10px; font-size:12px;">
+        <input type="text" id="settingDiscogsToken" class="add-input" placeholder="Discogs Personal Access Token" style="margin-bottom:10px; font-size:12px;">
+        <button type="button" class="btn-primary" onclick="saveApiSettings()" style="margin-bottom:25px;">Zapisz konfigurację</button>
+
         <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">STATUS POŁĄCZENIA</p>
         <div class="status-row">
             <span>Baza danych (Google)</span>
@@ -361,8 +366,13 @@
 
 <script>
     // ==========================================
-    const GOOGLE_URL = 'TWOJ_URL_WDROZENIA_Z_GOOGLE_APPS_SCRIPT_TUTAJ';
-    const DISCOGS_TOKEN = 'TWOJ_TOKEN_Z_DISCOGS_TUTAJ';
+    // KLUCZE ŁADOWANE DYNAMICZNIE Z PAMIĘCI TELEFONU
+    let GOOGLE_URL = localStorage.getItem('walkman_google_url');
+    // Jeśli pamięć jest pusta, ładujemy Twoje domyślne linki (jako fallback)
+    if (GOOGLE_URL === null) GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
+
+    let DISCOGS_TOKEN = localStorage.getItem('walkman_discogs_token');
+    if (DISCOGS_TOKEN === null) DISCOGS_TOKEN = 'iTRtcEKKihJyGhwufBlyPncxTrMDFjVtwiFNTeAa';
     
     const ARTIST_EXCEPTIONS = ["Tyler, The Creator", "Earth, Wind & Fire", "Crosby, Stills, Nash & Young"];
     // ==========================================
@@ -519,13 +529,37 @@
         updateSettingsUI();
         document.getElementById('settingsModal').style.display = 'flex';
     }
+    
     function closeSettingsModal() { 
         document.getElementById('settingsModal').style.display = 'none'; 
         checkModalsAndUnlock();
         setActiveNav(0); 
     }
 
+    // --- NOWA FUNKCJA DO ZAPISU API ---
+    function saveApiSettings() {
+        const url = document.getElementById('settingGoogleUrl').value.trim();
+        const token = document.getElementById('settingDiscogsToken').value.trim();
+        
+        GOOGLE_URL = url;
+        DISCOGS_TOKEN = token;
+        
+        localStorage.setItem('walkman_google_url', url);
+        localStorage.setItem('walkman_discogs_token', token);
+        
+        showToast("Zapisano konfigurację!", "success");
+        updateSettingsUI();
+        
+        if(GOOGLE_URL && !GOOGLE_URL.includes('TWOJ_URL')) {
+            loadFromSheets();
+        }
+    }
+
     function updateSettingsUI() {
+        // Wypełnienie pól input aktualnymi kluczami
+        document.getElementById('settingGoogleUrl').value = GOOGLE_URL || '';
+        document.getElementById('settingDiscogsToken').value = DISCOGS_TOKEN || '';
+
         const passInput = document.getElementById('adminPasswordInput');
         const loginBtn = document.getElementById('adminLoginBtn');
         if (ADMIN_PASS) {
@@ -541,11 +575,13 @@
 
         const sheetsDot = document.getElementById('statusSheets');
         const discogsDot = document.getElementById('statusDiscogs');
-        if (GOOGLE_URL && !GOOGLE_URL.includes('TWOJ_URL') && myCollection.length > 0) {
+        
+        // Zaktualizowana walidacja połączenia
+        if (GOOGLE_URL && GOOGLE_URL.startsWith('http')) {
             sheetsDot.className = 'status-dot-small bg-green';
         } else { sheetsDot.className = 'status-dot-small bg-red'; }
 
-        if (DISCOGS_TOKEN && !DISCOGS_TOKEN.includes('TWOJ_TOKEN')) {
+        if (DISCOGS_TOKEN && DISCOGS_TOKEN.length > 5) {
             discogsDot.className = 'status-dot-small bg-green';
         } else { discogsDot.className = 'status-dot-small bg-red'; }
     }
@@ -594,7 +630,10 @@
     function filterByArtist(artist) { closeDetailsModal(); document.getElementById('localSearch').value = artist; toggleClearBtn(); renderGrid(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
     async function loadFromSheets() {
-        if(!GOOGLE_URL || GOOGLE_URL.includes('TWOJ_URL')) return;
+        if(!GOOGLE_URL || !GOOGLE_URL.startsWith('http')) {
+            updateSettingsUI();
+            return;
+        }
         document.getElementById('loader').style.display = 'flex';
         try {
             const res = await fetch(GOOGLE_URL, { redirect: 'follow' });
@@ -677,8 +716,8 @@
         } catch(e) { showToast("❌ Błąd dodawania. Złe hasło?", "error"); document.getElementById('loader').style.display = 'none'; }
     }
 
-    // FIX GŁÓWNY: KODOWANIE TYTUŁÓW Z DISCOGS (Tym razem PANCERNE)
     async function searchDiscogs() {
+        if(!DISCOGS_TOKEN) { showToast("Skonfiguruj token Discogs w ustawieniach!", "error"); return; }
         const q = document.getElementById('query').value; if(!q) return;
         document.getElementById('loader').style.display = 'flex';
         try {
@@ -686,7 +725,6 @@
             const data = await res.json();
             
             document.getElementById('apiResults').innerHTML = data.results.map(r => {
-                // Szyfrujemy wszystko i RĘCZNIE zamieniamy apostrofy na kod %27, bo encodeURIComponent ich nie łapie!
                 const encTitle = encodeURIComponent(r.title).replace(/'/g, "%27");
                 const encCover = encodeURIComponent(r.cover_image || '').replace(/'/g, "%27");
                 
@@ -704,7 +742,6 @@
     }
 
     async function addAlbum(encTitle, encCover, id) {
-        // Odszyfrowanie ciągów przysłanych z przycisku
         let title = decodeURIComponent(encTitle);
         let cover = decodeURIComponent(encCover);
         
