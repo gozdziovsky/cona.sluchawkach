@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 4.8</title>
+    <title>Walkman Cloud 4.9</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -49,6 +49,8 @@
         .header { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
         h1 { color: var(--text); font-size: 26px; margin: 0; font-weight: 900; letter-spacing: -1px; text-align: center;}
         h1 span { color: var(--accent); }
+        /* Styl dla numeru wersji */
+        h1 sup { font-size: 10px; color: var(--text-dim); font-weight: 800; letter-spacing: 0; margin-left: 3px; vertical-align: super; }
 
         .counters { display: flex; gap: 12px; }
         .counter-box { background: var(--card); padding: 12px; border-radius: 16px; flex: 1; text-align: center; border: 1px solid var(--card-border); }
@@ -196,7 +198,7 @@
 
 <div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman <span>Cloud</span></h1>
+        <h1>Walkman <span>Cloud</span><sup>4.9</sup></h1>
     </div>
 
     <div class="counters">
@@ -359,10 +361,10 @@
 </div>
 
 <script>
-    // =========================================
+    // ==========================================
     const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
     const DISCOGS_TOKEN = 'iTRtcEKKihJyGhwufBlyPncxTrMDFjVtwiFNTeAa';
-
+    
     const ARTIST_EXCEPTIONS = ["Tyler, The Creator", "Earth, Wind & Fire", "Crosby, Stills, Nash & Young"];
     // ==========================================
 
@@ -436,12 +438,7 @@
         }
     }
 
-    // --- FIX GESTÓW SWIPE-TO-DISMISS (ODBLOKOWANE PRZEWIJANIE W POZIOMIE) ---
-    let sheetStartY = 0; 
-    let sheetStartX = 0; // Nowa zmienna badająca ruch boczny
-    let sheetCurrentY = 0; 
-    let isSheetDragging = false; 
-    let activeSheetContent = null;
+    let sheetStartY = 0; let sheetStartX = 0; let sheetCurrentY = 0; let isSheetDragging = false; let activeSheetContent = null;
 
     document.querySelectorAll('.bottom-sheet .modal-content').forEach(sheet => {
         sheet.addEventListener('touchstart', e => {
@@ -451,7 +448,7 @@
             if (sheet.scrollTop <= 0) {
                 isSheetDragging = true;
                 sheetStartY = e.touches[0].clientY;
-                sheetStartX = e.touches[0].clientX; // Pobieramy punkt startu w osi X
+                sheetStartX = e.touches[0].clientX; 
                 sheetCurrentY = sheetStartY; 
                 activeSheetContent = sheet;
                 sheet.style.transition = 'none';
@@ -466,7 +463,6 @@
             let diffY = sheetCurrentY - sheetStartY;
             let diffX = Math.abs(currentX - sheetStartX);
 
-            // Jeśli palec ucieka bardziej w bok niż w dół (np. przewijamy karuzele z albumami Discogs) -> Puszczamy panel
             if (diffX > 10 && diffX > Math.abs(diffY)) {
                 isSheetDragging = false;
                 activeSheetContent.style.transform = '';
@@ -682,6 +678,7 @@
         } catch(e) { showToast("❌ Błąd dodawania. Złe hasło?", "error"); document.getElementById('loader').style.display = 'none'; }
     }
 
+    // --- FIX GŁÓWNY: KODOWANIE TYTUŁÓW Z DISCOGS ---
     async function searchDiscogs() {
         const q = document.getElementById('query').value; if(!q) return;
         document.getElementById('loader').style.display = 'flex';
@@ -689,23 +686,29 @@
             const res = await fetch(`https://api.discogs.com/database/search?q=${q}&token=${DISCOGS_TOKEN}&per_page=12`);
             const data = await res.json();
             
-            // FIX CUDZYSŁOWÓW W TYTULE Z DISCOGS
             document.getElementById('apiResults').innerHTML = data.results.map(r => {
-                const safeTitle = r.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                // Całkowite zaszyfrowanie ciągów, aby nie psuły kodu HTML
+                const encTitle = encodeURIComponent(r.title);
+                const encCover = encodeURIComponent(r.cover_image || '');
+                
                 return `
                 <div class="search-card">
                     <img src="${r.cover_image || 'https://via.placeholder.com/150'}">
                     <p>${r.title}</p>
                     <select id="sStat-${r.id}"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
                     <select id="sForm-${r.id}"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option></select>
-                    <button type="button" class="btn-primary" onclick="addAlbum('${safeTitle}', '${r.cover_image}', '${r.id}')" style="padding:10px; font-size:12px;">DODAJ</button>
+                    <button type="button" class="btn-primary" onclick="addAlbum('${encTitle}', '${encCover}', '${r.id}')" style="padding:10px; font-size:12px;">DODAJ</button>
                 </div>`;
             }).join('');
         } catch(e) { showToast("Błąd Discogs API", "error"); }
         document.getElementById('loader').style.display = 'none';
     }
 
-    async function addAlbum(title, cover, id) {
+    async function addAlbum(encTitle, encCover, id) {
+        // Odszyfrowanie ciągów przysłanych z przycisku
+        let title = decodeURIComponent(encTitle);
+        let cover = decodeURIComponent(encCover);
+        
         let p = title.split(' - '); let rawArtist = p.shift() || "?"; let rawAlbum = p.join(' - ') || "?";
         let cleanArtist = rawArtist.replace(/\s*\(\d+\)\s*/g, '').trim();
 
@@ -827,7 +830,7 @@
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; checkModalsAndUnlock(); }
 
     function clearTracklistInEdit() {
-        editTempTracklist = "-"; 
+        editTempTracklist = ""; 
         showToast("Tracklista usunięta! (Zapisz album)", "success");
     }
 
