@@ -12,7 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 5.1</title>
+    <title>Walkman Cloud 5.2</title>
     <style>
         :root { 
             --accent: #1db954; 
@@ -197,7 +197,7 @@
 
 <div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman <span>Cloud</span><sup>5.1</sup></h1>
+        <h1>Walkman <span>Cloud</span><sup>5.2</sup></h1>
     </div>
 
     <div class="counters">
@@ -368,7 +368,6 @@
     // ==========================================
     // KLUCZE ŁADOWANE DYNAMICZNIE Z PAMIĘCI TELEFONU
     let GOOGLE_URL = localStorage.getItem('walkman_google_url');
-    // Jeśli pamięć jest pusta, ładujemy Twoje domyślne linki (jako fallback)
     if (GOOGLE_URL === null) GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
 
     let DISCOGS_TOKEN = localStorage.getItem('walkman_discogs_token');
@@ -386,6 +385,9 @@
     let hasTracklist = false; 
     let editTempTracklist = ""; 
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
+    
+    // Zmienna przechowująca pobrane dane z API Discogs do natywnego przesyłania
+    let currentDiscogsResults = []; 
 
     let scrollPosition = 0;
     function lockScroll() {
@@ -505,6 +507,16 @@
         }, {passive: true});
     });
 
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
     function showToast(message, type = 'success') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -536,7 +548,6 @@
         setActiveNav(0); 
     }
 
-    // --- NOWA FUNKCJA DO ZAPISU API ---
     function saveApiSettings() {
         const url = document.getElementById('settingGoogleUrl').value.trim();
         const token = document.getElementById('settingDiscogsToken').value.trim();
@@ -556,7 +567,6 @@
     }
 
     function updateSettingsUI() {
-        // Wypełnienie pól input aktualnymi kluczami
         document.getElementById('settingGoogleUrl').value = GOOGLE_URL || '';
         document.getElementById('settingDiscogsToken').value = DISCOGS_TOKEN || '';
 
@@ -576,7 +586,6 @@
         const sheetsDot = document.getElementById('statusSheets');
         const discogsDot = document.getElementById('statusDiscogs');
         
-        // Zaktualizowana walidacja połączenia
         if (GOOGLE_URL && GOOGLE_URL.startsWith('http')) {
             sheetsDot.className = 'status-dot-small bg-green';
         } else { sheetsDot.className = 'status-dot-small bg-red'; }
@@ -716,6 +725,7 @@
         } catch(e) { showToast("❌ Błąd dodawania. Złe hasło?", "error"); document.getElementById('loader').style.display = 'none'; }
     }
 
+    // PANCERNY ZAPIS DO ZMIENNEJ I WYWOŁANIE PRZEZ ID
     async function searchDiscogs() {
         if(!DISCOGS_TOKEN) { showToast("Skonfiguruj token Discogs w ustawieniach!", "error"); return; }
         const q = document.getElementById('query').value; if(!q) return;
@@ -724,26 +734,27 @@
             const res = await fetch(`https://api.discogs.com/database/search?q=${q}&token=${DISCOGS_TOKEN}&per_page=12`);
             const data = await res.json();
             
-            document.getElementById('apiResults').innerHTML = data.results.map(r => {
-                const encTitle = encodeURIComponent(r.title).replace(/'/g, "%27");
-                const encCover = encodeURIComponent(r.cover_image || '').replace(/'/g, "%27");
-                
-                return `
+            currentDiscogsResults = data.results; // Zapisujemy całe dane do pamięci!
+            
+            document.getElementById('apiResults').innerHTML = currentDiscogsResults.map(r => `
                 <div class="search-card">
                     <img src="${r.cover_image || 'https://via.placeholder.com/150'}">
-                    <p>${r.title}</p>
+                    <p>${escapeHtml(r.title)}</p>
                     <select id="sStat-${r.id}"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
                     <select id="sForm-${r.id}"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option></select>
-                    <button type="button" class="btn-primary" onclick="addAlbum('${encTitle}', '${encCover}', '${r.id}')" style="padding:10px; font-size:12px;">DODAJ</button>
-                </div>`;
-            }).join('');
+                    <button type="button" class="btn-primary" onclick="addAlbumFromDiscogs(${r.id})" style="padding:10px; font-size:12px;">DODAJ</button>
+                </div>`).join('');
         } catch(e) { showToast("Błąd Discogs API", "error"); }
         document.getElementById('loader').style.display = 'none';
     }
 
-    async function addAlbum(encTitle, encCover, id) {
-        let title = decodeURIComponent(encTitle);
-        let cover = decodeURIComponent(encCover);
+    // PANCERNE ODCZYTANIE Z PAMIĘCI
+    async function addAlbumFromDiscogs(id) {
+        const item = currentDiscogsResults.find(r => r.id == id);
+        if (!item) { showToast("Błąd: Nie znaleziono danych albumu", "error"); return; }
+
+        let title = item.title;
+        let cover = item.cover_image || '';
         
         let p = title.split(' - '); let rawArtist = p.shift() || "?"; let rawAlbum = p.join(' - ') || "?";
         let cleanArtist = rawArtist.replace(/\s*\(\d+\)\s*/g, '').trim();
@@ -753,9 +764,12 @@
         }
 
         const s = document.getElementById(`sStat-${id}`).value;
+        const f = document.getElementById(`sForm-${id}`).value;
+        const finalFormat = s === "MAM" ? f : "-";
+
         document.getElementById('loader').style.display = 'flex';
         try {
-            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: s === "MAM" ? document.getElementById(`sForm-${id}`).value : "-", Okładka: cover, Utwory: "", DiscogsID: id, Notatki: "" };
+            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: finalFormat, Okładka: cover, Utwory: "", DiscogsID: id, Notatki: "" };
             await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
             document.getElementById('apiResults').innerHTML = ''; document.getElementById('query').value = '';
             showToast("✅ Pobrano z Discogs!", "success"); closeAddModal(); setTimeout(loadFromSheets, 1500);
