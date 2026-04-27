@@ -14,9 +14,8 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 7.0</title>
+    <title>Walkman Cloud 7.1</title>
     <style>
-        /* DOMYŚLNY MOTYW: Spotify Dark */
         :root { 
             --accent: #1db954; 
             --bg: #09090b; 
@@ -97,7 +96,6 @@
 
         .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
         
-        /* 3-KOLUMNOWA SIATKA Opcjonalna */
         .grid-3-cols { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
         .grid-3-cols .grid-title { font-size: 10px !important; }
         .grid-3-cols .format-badge { font-size: 8px !important; padding: 3px 6px !important; }
@@ -197,7 +195,6 @@
         .search-card p { font-size: 11px; font-weight: 800; margin: 0; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4; }
         .search-card select { padding: 8px; font-size: 11px; border-radius: 6px; background: var(--bg); border: 1px solid var(--card-border); color: var(--text);}
 
-        /* POWIADOMIENIA I COFNIJ */
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 350px;}
         .toast { pointer-events: auto; background: var(--card); color: var(--text); padding: 16px 20px; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--card-border); animation: slideDown 0.3s forwards; text-align: center; transform: translateZ(0); display: flex; align-items: center; justify-content: center;}
         .toast.success { color: var(--accent); }
@@ -209,7 +206,6 @@
 
         .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 99999; justify-content: center; align-items: center; color: var(--accent); font-weight: 900; letter-spacing: 2px; transform: translateZ(0);}
 
-        /* POWRÓT NA GÓRĘ */
         .back-to-top { position: fixed; bottom: calc(85px + env(safe-area-inset-bottom)); right: 20px; width: 48px; height: 48px; background: var(--accent); color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 8900; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: none; transform: translateY(20px) translateZ(0); }
         .back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0) translateZ(0); }
         .back-to-top:active { transform: scale(0.9) translateZ(0); }
@@ -230,7 +226,7 @@
 <body>
 
 <div id="toast-container"></div>
-<div id="loader" class="loader-overlay">SYNCHRONIZACJA...</div>
+<div id="loader" class="loader-overlay" data-i18n="lblSync">SYNCHRONIZACJA...</div>
 
 <button id="backToTop" class="back-to-top" onclick="window.scrollTo({top:0, behavior:'smooth'})">
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
@@ -239,47 +235,47 @@
 <nav class="bottom-nav">
     <div class="nav-item active" onclick="goHome()">
         <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        <span>Kolekcja</span>
+        <span data-i18n="navCollection">Kolekcja</span>
     </div>
     <div class="nav-item" onclick="focusSearch()">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <span>Szukaj</span>
+        <span data-i18n="navSearch">Szukaj</span>
     </div>
     <div class="nav-item" onclick="openAddModal()">
         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-        <span>Dodaj</span>
+        <span data-i18n="navAdd">Dodaj</span>
     </div>
     <div class="nav-item" onclick="openSettingsModal()">
         <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.73 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-        <span>Ustaw.</span>
+        <span data-i18n="navSettings">Ustaw.</span>
     </div>
 </nav>
 
 <div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman <span>Cloud</span><sup>7.0</sup></h1>
+        <h1>Walkman <span>Cloud</span><sup>7.1</sup></h1>
     </div>
 
     <div class="counters">
-        <div class="counter-box"><small>KOLEKCJA</small><span class="counter-value" id="countMam">0</span></div>
-        <div class="counter-box"><small style="color:#f59e0b">SZUKAM</small><span class="counter-value" id="countSzukam" style="color:#f59e0b">0</span></div>
+        <div class="counter-box"><small data-i18n="lblOwned">KOLEKCJA</small><span class="counter-value" id="countMam">0</span></div>
+        <div class="counter-box"><small style="color:#f59e0b" data-i18n="lblWishlist">SZUKAM</small><span class="counter-value" id="countSzukam" style="color:#f59e0b">0</span></div>
     </div>
 
     <div class="search-wrapper">
         <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" id="localSearch" placeholder="Filtruj kolekcję..." oninput="onSearchInput()">
+        <input type="text" id="localSearch" data-i18n-ph="phFilter" placeholder="Filtruj kolekcję..." oninput="onSearchInput()">
         <button id="clearSearchBtn" class="clear-btn" onclick="clearSearch()">✕</button>
     </div>
 
     <div class="filters">
         <select id="sortOrder" onchange="renderGrid()">
-            <option value="AZ">A-Z</option><option value="ZA">Z-A</option><option value="NEW">Najnowsze</option>
+            <option value="AZ">A-Z</option><option value="ZA">Z-A</option><option value="NEW" data-i18n="optNewest">Najnowsze</option>
         </select>
         <select id="statusFilter" onchange="renderGrid()">
-            <option value="ALL">Wszystkie</option><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option>
+            <option value="ALL" data-i18n="optAll">Wszystkie</option><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option>
         </select>
         <select id="formatFilter" onchange="renderGrid()">
-            <option value="ALL">Formaty</option><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option>
+            <option value="ALL" data-i18n="optFormats">Formaty</option><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option>
         </select>
     </div>
 
@@ -308,10 +304,10 @@
                 <span id="detStatusText"></span>
             </div>
 
-            <a id="btnSpotify" href="#" target="_blank" class="listen-btn spotify" title="Otwórz w Spotify">
+            <a id="btnSpotify" href="#" target="_blank" class="listen-btn spotify" title="Spotify">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.563.387-.857.207-2.35-1.434-5.305-1.76-8.786-.963-.335.077-.67-.133-.746-.467-.077-.334.132-.67.466-.745 3.822-.876 7.086-.496 9.712 1.106.296.18.39.563.21.862zm1.268-2.833c-.227.367-.7.488-1.066.26-2.68-1.644-6.786-2.13-9.743-1.166-.412.136-.847-.09-.982-.5-.136-.412.09-.847.5-.983 3.42-1.116 7.973-.574 11.03 1.304.368.226.49.697.26 1.085zm.106-2.95c-3.21-1.905-8.5-2.08-11.56-1.15-.497.15-1.015-.13-1.166-.626-.15-.497.13-1.015.626-1.166 3.52-.94 9.38-.74 13.106 1.472.446.265.592.836.327 1.282-.266.446-.836.592-1.282.328z"/></svg>
             </a>
-            <a id="btnYoutube" href="#" target="_blank" class="listen-btn youtube" title="Szukaj na YouTube">
+            <a id="btnYoutube" href="#" target="_blank" class="listen-btn youtube" title="YouTube">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.582 6.186a2.665 2.665 0 0 0-1.875-1.884C18.053 3.86 12 3.86 12 3.86s-6.053 0-7.707.442a2.665 2.665 0 0 0-1.875 1.884C2 7.854 2 12 2 12s0 4.146.418 5.814a2.665 2.665 0 0 0 1.875 1.884C5.947 20.14 12 20.14 12 20.14s6.053 0 7.707-.442a2.665 2.665 0 0 0 1.875-1.884C22 16.146 22 12 22 12s0-4.146-.418-5.814zM9.8 15.54V8.46l6.3 3.54-6.3 3.54z"/></svg>
             </a>
             
@@ -321,8 +317,8 @@
         <div id="detNotes" class="detail-notes"></div>
         
         <div class="admin-buttons admin-only">
-            <button onclick="openEditFromDetails()" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none; cursor: pointer;">Edytuj</button>
-            <button onclick="deleteFromDetails()" style="background:var(--danger); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none; cursor: pointer;">Usuń</button>
+            <button onclick="openEditFromDetails()" data-i18n="btnEdit" style="background:var(--edit); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none; cursor: pointer;">Edytuj</button>
+            <button onclick="deleteFromDetails()" data-i18n="btnDelete" style="background:var(--danger); color:white; flex:1; padding: 14px; border-radius: 12px; font-weight: 800; border:none; cursor: pointer;">Usuń</button>
         </div>
 
         <div style="display:flex; justify-content:center; margin-top: auto; padding-bottom: 10px;">
@@ -336,30 +332,30 @@
 <div id="addModal" class="modal bottom-sheet" onclick="if(event.target === this) closeAddModal()">
     <div class="modal-content">
         <div class="drag-handle"></div>
-        <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Dodaj Płytę</h3>
+        <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;" data-i18n="titleAddAlbum">Dodaj Płytę</h3>
         
-        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">SZUKAJ W DISCOGS</p>
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;" data-i18n="lblSearchDiscogs">SZUKAJ W DISCOGS</p>
         <div style="display:flex; gap:10px;">
-            <input type="text" id="query" class="add-input" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()">
-            <button type="button" class="btn-primary" onclick="searchDiscogs()" style="width:auto; padding:0 20px;">Szukaj</button>
+            <input type="text" id="query" class="add-input" data-i18n-ph="phArtistAlbum" placeholder="Artysta lub album..." onkeypress="if(event.key === 'Enter') searchDiscogs()">
+            <button type="button" class="btn-primary" onclick="searchDiscogs()" style="width:auto; padding:0 20px;" data-i18n="btnSearch">Szukaj</button>
         </div>
         <div id="apiResults"></div>
         
-        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px; margin-top:20px;">RĘCZNE WPROWADZANIE</p>
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px; margin-top:20px;" data-i18n="lblManualEntry">RĘCZNE WPROWADZANIE</p>
         <div class="add-group">
-            <input type="text" id="manArtist" class="add-input" placeholder="Wykonawca">
-            <input type="text" id="manAlbum" class="add-input" placeholder="Tytuł albumu">
+            <input type="text" id="manArtist" class="add-input" data-i18n-ph="phArtist" placeholder="Wykonawca">
+            <input type="text" id="manAlbum" class="add-input" data-i18n-ph="phAlbumTitle" placeholder="Tytuł albumu">
         </div>
         <div class="add-group">
             <select id="manStatus" class="add-input"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
             <select id="manFormat" class="add-input"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option><option value="-">-</option></select>
         </div>
-        <input type="text" id="manCover" class="add-input" placeholder="Link do okładki (opcjonalnie)" style="margin-bottom:12px;">
-        <textarea id="manNotes" class="add-input" placeholder="Twoje notatki..." style="height:70px; margin-bottom:15px;"></textarea>
+        <input type="text" id="manCover" class="add-input" data-i18n-ph="phCoverUrl" placeholder="Link do okładki (opcjonalnie)" style="margin-bottom:12px;">
+        <textarea id="manNotes" class="add-input" data-i18n-ph="phNotes" placeholder="Twoje notatki..." style="height:70px; margin-bottom:15px;"></textarea>
         
         <div style="display:flex; gap:12px;">
-            <button type="button" class="btn-primary" onclick="closeAddModal()" style="background:var(--card-border); color:var(--text);">Anuluj</button>
-            <button type="button" class="btn-primary" onclick="addManual()" style="background:var(--accent);">Zapisz do bazy</button>
+            <button type="button" class="btn-primary" onclick="closeAddModal()" style="background:var(--card-border); color:var(--text);" data-i18n="btnCancel">Anuluj</button>
+            <button type="button" class="btn-primary" onclick="addManual()" style="background:var(--accent);" data-i18n="btnSaveDb">Zapisz do bazy</button>
         </div>
     </div>
 </div>
@@ -367,7 +363,7 @@
 <div id="editModal" class="modal bottom-sheet" onclick="if(event.target === this) closeEditModal()">
     <div class="modal-content">
         <div class="drag-handle"></div>
-        <h3 style="margin-top:0; color:var(--edit); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Edytuj Album</h3>
+        <h3 style="margin-top:0; color:var(--edit); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;" data-i18n="titleEditAlbum">Edytuj Album</h3>
         <input type="hidden" id="editIndex">
         
         <input type="text" id="editArtist" class="add-input" style="margin-bottom:10px;">
@@ -381,11 +377,11 @@
         
         <textarea id="editNotes" class="add-input" style="height:70px; margin-bottom:20px;"></textarea>
         
-        <button type="button" onclick="clearTracklistInEdit()" class="btn-primary" style="background: rgba(239, 68, 68, 0.15); color: var(--danger); font-size: 13px; padding: 12px; margin-bottom: 20px;">🗑️ Wyczyść zapisaną tracklistę</button>
+        <button type="button" onclick="clearTracklistInEdit()" class="btn-primary" style="background: rgba(239, 68, 68, 0.15); color: var(--danger); font-size: 13px; padding: 12px; margin-bottom: 20px;" data-i18n="btnClearTracklist">🗑️ Wyczyść zapisaną tracklistę</button>
         
         <div style="display:flex; gap:12px;">
-            <button type="button" onclick="closeEditModal()" class="btn-primary" style="background:var(--card-border); color:var(--text);">Anuluj</button>
-            <button type="button" onclick="saveEdit()" class="btn-primary" style="background:var(--accent);">Zapisz</button>
+            <button type="button" onclick="closeEditModal()" class="btn-primary" style="background:var(--card-border); color:var(--text);" data-i18n="btnCancel">Anuluj</button>
+            <button type="button" onclick="saveEdit()" class="btn-primary" style="background:var(--accent);" data-i18n="btnSave">Zapisz</button>
         </div>
     </div>
 </div>
@@ -393,56 +389,149 @@
 <div id="settingsModal" class="modal bottom-sheet" onclick="if(event.target === this) closeSettingsModal()">
     <div class="modal-content">
         <div class="drag-handle"></div>
-        <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Ustawienia</h3>
+        <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;" data-i18n="titleSettings">Ustawienia</h3>
 
-        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">WYGLĄD / MOTYW</p>
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;" data-i18n="lblLanguage">JĘZYK / LANGUAGE</p>
+        <select id="langSelect" class="add-input" onchange="changeLanguage()" style="margin-bottom:25px;">
+            <option value="pl">Polski</option>
+            <option value="en">English</option>
+        </select>
+
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;" data-i18n="lblTheme">WYGLĄD / MOTYW</p>
         <select id="themeSelect" class="add-input" onchange="changeTheme()" style="margin-bottom:15px;">
-            <option value="dark">Spotify Dark (Domyślny)</option>
-            <option value="sports">Sony Sports (Żółty Retro)</option>
-            <option value="classic">Classic 1979 (Srebrno-Niebieski)</option>
+            <option value="dark" data-i18n="optThemeDark">Spotify Dark (Domyślny)</option>
+            <option value="sports" data-i18n="optThemeSports">Sony Sports (Żółty Retro)</option>
+            <option value="classic" data-i18n="optThemeClassic">Classic 1979 (Srebrno-Niebieski)</option>
         </select>
         
-        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">UKŁAD SIATKI</p>
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;" data-i18n="lblGrid">UKŁAD SIATKI</p>
         <select id="gridSelect" class="add-input" onchange="changeGrid()" style="margin-bottom:25px;">
-            <option value="2">2 kolumny (Domyślny)</option>
-            <option value="3">3 kolumny (Gęsty)</option>
+            <option value="2" data-i18n="optGrid2">2 kolumny (Domyślny)</option>
+            <option value="3" data-i18n="optGrid3">3 kolumny (Gęsty)</option>
         </select>
 
-        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">KONFIGURACJA API</p>
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;" data-i18n="lblApiConfig">KONFIGURACJA API</p>
         <input type="text" id="settingGoogleUrl" class="add-input" placeholder="Google Sheets Web App URL" style="margin-bottom:10px; font-size:12px;">
         <input type="text" id="settingDiscogsToken" class="add-input" placeholder="Discogs Personal Access Token" style="margin-bottom:10px; font-size:12px;">
-        <button type="button" class="btn-primary" onclick="saveApiSettings()" style="margin-bottom:25px; border: 1px solid var(--card-border); background: var(--card); color: var(--text);">Zapisz konfigurację</button>
+        <button type="button" class="btn-primary" onclick="saveApiSettings()" style="margin-bottom:25px; border: 1px solid var(--card-border); background: var(--card); color: var(--text);" data-i18n="btnSaveConfig">Zapisz konfigurację</button>
 
-        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">STATUS POŁĄCZENIA</p>
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;" data-i18n="lblConnection">STATUS POŁĄCZENIA</p>
         <div class="status-row">
-            <span>Baza danych (Google) <span id="statusSheetsText" style="font-size:11px; color:var(--text-dim); margin-left:5px;"></span></span>
+            <span><span data-i18n="lblDbGoogle">Baza danych (Google)</span> <span id="statusSheetsText" style="font-size:11px; color:var(--text-dim); margin-left:5px;"></span></span>
             <div class="status-indicator"><span class="status-dot-small bg-red" id="statusSheets"></span></div>
         </div>
         <div class="status-row">
-            <span>Szukajka (Discogs)</span>
+            <span data-i18n="lblEngineDiscogs">Szukajka (Discogs)</span>
             <div class="status-indicator"><span class="status-dot-small bg-red" id="statusDiscogs"></span></div>
         </div>
 
         <button type="button" class="btn-primary" onclick="loadFromSheets(true)" style="margin-top: 10px; background: rgba(128,128,128,0.1); color: var(--text); display: flex; align-items:center; justify-content: center; gap: 8px;">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> 
-            Wymuś synchronizację
+            <span data-i18n="btnForceSync">Wymuś synchronizację</span>
         </button>
 
-        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px; margin-top:25px;">KONTO ADMINISTRATORA</p>
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px; margin-top:25px;" data-i18n="lblAdmin">KONTO ADMINISTRATORA</p>
         <div style="display:flex; gap:10px; margin-bottom: 15px;">
-            <input type="password" id="adminPasswordInput" class="add-input" placeholder="Wpisz hasło..." style="margin-bottom:0;">
-            <button type="button" class="btn-primary" id="adminLoginBtn" onclick="handleAdminLogin()" style="width:auto; padding:0 20px; background:var(--text); color:var(--bg);">Zaloguj</button>
+            <input type="password" id="adminPasswordInput" class="add-input" data-i18n-ph="phPassword" placeholder="Wpisz hasło..." style="margin-bottom:0;">
+            <button type="button" class="btn-primary" id="adminLoginBtn" onclick="handleAdminLogin()" style="width:auto; padding:0 20px; background:var(--text); color:var(--bg);" data-i18n="btnLogin">Zaloguj</button>
         </div>
         
-        <button type="button" class="btn-primary admin-only" onclick="exportToCSV()" style="background: rgba(128,128,128,0.05); color: var(--text); border: 1px solid var(--card-border);">💾 Eksportuj bazę do CSV</button>
+        <button type="button" class="btn-primary admin-only" onclick="exportToCSV()" style="background: rgba(128,128,128,0.05); color: var(--text); border: 1px solid var(--card-border);">
+            <span data-i18n="btnExportCsv">💾 Eksportuj bazę do CSV</span>
+        </button>
     </div>
 </div>
 
 <script>
     // ==========================================
+    // TRANSLATIONS DICTIONARY
+    // ==========================================
+    const T_DICT = {
+        pl: {
+            lblOwned: "KOLEKCJA", lblWishlist: "SZUKAM", optNewest: "Najnowsze", optAll: "Wszystkie",
+            optFormats: "Formaty", navCollection: "Kolekcja", navSearch: "Szukaj", navAdd: "Dodaj",
+            navSettings: "Ustaw.", titleAddAlbum: "Dodaj Płytę", lblSearchDiscogs: "SZUKAJ W DISCOGS",
+            btnSearch: "Szukaj", lblManualEntry: "RĘCZNE WPROWADZANIE", btnCancel: "Anuluj", btnSaveDb: "Zapisz do bazy",
+            titleEditAlbum: "Edytuj Album", btnClearTracklist: "🗑️ Wyczyść zapisaną tracklistę", btnSave: "Zapisz",
+            titleSettings: "Ustawienia", lblLanguage: "JĘZYK / LANGUAGE", lblTheme: "WYGLĄD / MOTYW",
+            optThemeDark: "Spotify Dark (Domyślny)", optThemeSports: "Sony Sports (Żółty Retro)",
+            optThemeClassic: "Classic 1979 (Srebrno-Niebieski)", lblGrid: "UKŁAD SIATKI", optGrid2: "2 kolumny (Domyślny)",
+            optGrid3: "3 kolumny (Gęsty)", lblApiConfig: "KONFIGURACJA API", btnSaveConfig: "Zapisz konfigurację",
+            lblConnection: "STATUS POŁĄCZENIA", lblDbGoogle: "Baza danych (Google)", lblEngineDiscogs: "Szukajka (Discogs)",
+            btnForceSync: "Wymuś synchronizację", lblAdmin: "KONTO ADMINISTRATORA", btnLogin: "Zaloguj", btnLogout: "Wyloguj",
+            btnExportCsv: "💾 Eksportuj bazę do CSV", btnEdit: "Edytuj", btnDelete: "Usuń", lblSync: "SYNCHRONIZACJA...",
+            // Placeholders
+            phFilter: "Filtruj kolekcję...", phArtistAlbum: "Artysta lub album...", phArtist: "Wykonawca",
+            phAlbumTitle: "Tytuł albumu", phCoverUrl: "Link do okładki (opcjonalnie)", phNotes: "Twoje notatki...",
+            phPassword: "Wpisz hasło...",
+            // JS Dynamics
+            noTitle: "Brak tytułu", errNoData: "Podaj Wykonawcę i Tytuł!", confDuplicate: "Ten album jest już w bazie! Dodać duplikat?",
+            toastAdded: "✅ Dodano do kolekcji!", errWrongPass: "❌ Błąd dodawania. Złe hasło?", errNoToken: "Skonfiguruj token Discogs w ustawieniach!",
+            errDiscogs: "Błąd Discogs API", errNoAlbumData: "Błąd: Nie znaleziono danych albumu", toastDiscogsAdded: "✅ Pobrano z Discogs!",
+            errAddFail: "❌ Błąd dodawania płyty!", errNoTracklist: "Brak tracklisty. Użyj skryptu iTunes API",
+            toastTracklistCleared: "Tracklista usunięta! (Zapisz album)", toastSaved: "💾 Zapisano zmiany", confDelete: "Na pewno usunąć ten album?",
+            toastDeleted: "🗑️ Usunięto z bazy", toastUndo: "Cofnięto usunięcie!", toastCsv: "💾 Pobrano plik CSV",
+            toastConfigSaved: "Zapisano konfigurację!", toastLogout: "🔒 Pomyślnie wylogowano", toastLogin: "🔓 Zalogowano (Zapisano hasło)",
+            toastNeedPass: "Wpisz hasło!", errConn: "Błąd połączenia z serwerem", lblQueue: "Kolejka: ", btnUndoAction: "COFNIJ",
+            lblAddBtn: "DODAJ"
+        },
+        en: {
+            lblOwned: "OWNED", lblWishlist: "WISHLIST", optNewest: "Newest", optAll: "All",
+            optFormats: "Formats", navCollection: "Collection", navSearch: "Search", navAdd: "Add",
+            navSettings: "Settings", titleAddAlbum: "Add Album", lblSearchDiscogs: "SEARCH DISCOGS",
+            btnSearch: "Search", lblManualEntry: "MANUAL ENTRY", btnCancel: "Cancel", btnSaveDb: "Save to database",
+            titleEditAlbum: "Edit Album", btnClearTracklist: "🗑️ Clear saved tracklist", btnSave: "Save",
+            titleSettings: "Settings", lblLanguage: "JĘZYK / LANGUAGE", lblTheme: "APPEARANCE / THEME",
+            optThemeDark: "Spotify Dark (Default)", optThemeSports: "Sony Sports (Retro Yellow)",
+            optThemeClassic: "Classic 1979 (Silver-Blue)", lblGrid: "GRID LAYOUT", optGrid2: "2 columns (Default)",
+            optGrid3: "3 columns (Dense)", lblApiConfig: "API CONFIGURATION", btnSaveConfig: "Save configuration",
+            lblConnection: "CONNECTION STATUS", lblDbGoogle: "Database (Google Sheets)", lblEngineDiscogs: "Search Engine (Discogs)",
+            btnForceSync: "Force synchronization", lblAdmin: "ADMIN ACCOUNT", btnLogin: "Log in", btnLogout: "Log out",
+            btnExportCsv: "💾 Export database to CSV", btnEdit: "Edit", btnDelete: "Delete", lblSync: "SYNCHRONIZING...",
+            // Placeholders
+            phFilter: "Filter collection...", phArtistAlbum: "Artist or album...", phArtist: "Artist",
+            phAlbumTitle: "Album title", phCoverUrl: "Cover URL (optional)", phNotes: "Your notes...",
+            phPassword: "Enter password...",
+            // JS Dynamics
+            noTitle: "No title", errNoData: "Enter Artist and Title!", confDuplicate: "This album is already in the database! Add duplicate?",
+            toastAdded: "✅ Added to collection!", errWrongPass: "❌ Adding failed. Wrong password?", errNoToken: "Configure Discogs token in settings!",
+            errDiscogs: "Discogs API Error", errNoAlbumData: "Error: Album data not found", toastDiscogsAdded: "✅ Fetched from Discogs!",
+            errAddFail: "❌ Failed to add album!", errNoTracklist: "No tracklist. Use iTunes API script",
+            toastTracklistCleared: "Tracklist cleared! (Save album)", toastSaved: "💾 Changes saved", confDelete: "Are you sure you want to delete this album?",
+            toastDeleted: "🗑️ Removed from database", toastUndo: "Deletion reverted!", toastCsv: "💾 CSV file downloaded",
+            toastConfigSaved: "Configuration saved!", toastLogout: "🔒 Successfully logged out", toastLogin: "🔓 Logged in (Password saved)",
+            toastNeedPass: "Enter password!", errConn: "Server connection error", lblQueue: "Queue: ", btnUndoAction: "UNDO",
+            lblAddBtn: "ADD"
+        }
+    };
+
+    let currentLang = localStorage.getItem('walkman_lang') || 'pl';
+    document.getElementById('langSelect').value = currentLang;
+
+    function t(key) { return T_DICT[currentLang][key] || key; }
+
+    function changeLanguage() {
+        currentLang = document.getElementById('langSelect').value;
+        localStorage.setItem('walkman_lang', currentLang);
+        updateLanguageUI();
+    }
+
+    function updateLanguageUI() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const k = el.getAttribute('data-i18n');
+            if (T_DICT[currentLang][k]) el.innerHTML = T_DICT[currentLang][k];
+        });
+        document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+            const k = el.getAttribute('data-i18n-ph');
+            if (T_DICT[currentLang][k]) el.placeholder = T_DICT[currentLang][k];
+        });
+        updateSettingsUI();
+        if(myCollection.length > 0) renderGrid();
+    }
+
+    // ==========================================
     let GOOGLE_URL = localStorage.getItem('walkman_google_url') || '';
     let DISCOGS_TOKEN = localStorage.getItem('walkman_discogs_token') || '';
-    
     const ARTIST_EXCEPTIONS = ["Tyler, The Creator", "Earth, Wind & Fire", "Crosby, Stills, Nash & Young"];
     // ==========================================
 
@@ -456,27 +545,24 @@
     let editTempTracklist = ""; 
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
     let currentDiscogsResults = []; 
-    
-    // OFFLINE QUEUE
     let offlineQueue = JSON.parse(localStorage.getItem('walkman_offline_queue') || '[]');
 
     function changeTheme() {
-        const t = document.getElementById('themeSelect').value;
+        const tm = document.getElementById('themeSelect').value;
         document.body.classList.remove('theme-sports', 'theme-classic');
-        if(t === 'sports') document.body.classList.add('theme-sports');
-        if(t === 'classic') document.body.classList.add('theme-classic');
-        localStorage.setItem('walkman_theme', t);
+        if(tm === 'sports') document.body.classList.add('theme-sports');
+        if(tm === 'classic') document.body.classList.add('theme-classic');
+        localStorage.setItem('walkman_theme', tm);
         
         let themeColor = "#09090b";
-        if(t === 'sports') themeColor = "#facc15";
-        if(t === 'classic') themeColor = "#e2e8f0";
+        if(tm === 'sports') themeColor = "#facc15";
+        if(tm === 'classic') themeColor = "#e2e8f0";
         document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
     }
     const savedTheme = localStorage.getItem('walkman_theme') || 'dark';
     document.getElementById('themeSelect').value = savedTheme;
     changeTheme();
 
-    // ZMIANA SIATKI
     function changeGrid() {
         const v = document.getElementById('gridSelect').value;
         const grid = document.getElementById('collectionGrid');
@@ -487,7 +573,6 @@
     const savedGrid = localStorage.getItem('walkman_grid') || '2';
     document.getElementById('gridSelect').value = savedGrid;
 
-    // POWRÓT DO GÓRY
     const btt = document.getElementById('backToTop');
     window.addEventListener('scroll', () => {
         if (window.scrollY > 300) btt.classList.add('visible');
@@ -541,18 +626,15 @@
     function handleSwipe() {
         if (detModalEl.style.display !== 'flex') return;
         let diffX = touchendX - touchstartX; let diffY = touchendY - touchstartY;
-
         if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
             let filteredIdx = currentFilteredArray.findIndex(item => item.originalIndex === currentDetailsIndex);
             if (filteredIdx === -1) return;
-            
             let nextIdx;
             if (diffX < 0 && filteredIdx < currentFilteredArray.length - 1) { 
                 nextIdx = currentFilteredArray[filteredIdx + 1].originalIndex;
             } else if (diffX > 0 && filteredIdx > 0) { 
                 nextIdx = currentFilteredArray[filteredIdx - 1].originalIndex;
             }
-
             if (nextIdx !== undefined) {
                 if (document.startViewTransition) { document.startViewTransition(() => openDetails(nextIdx)); } 
                 else { openDetails(nextIdx); }
@@ -561,31 +643,20 @@
     }
 
     let sheetStartY = 0; let sheetStartX = 0; let sheetCurrentY = 0; let isSheetDragging = false; let activeSheetContent = null;
-
     document.querySelectorAll('.bottom-sheet .modal-content').forEach(sheet => {
         sheet.addEventListener('touchstart', e => {
             if (e.target.closest('button, input, textarea, select')) return;
             if (sheet.scrollTop <= 0) {
-                isSheetDragging = true;
-                sheetStartY = e.touches[0].clientY;
-                sheetStartX = e.touches[0].clientX; 
-                sheetCurrentY = sheetStartY; 
-                activeSheetContent = sheet;
-                sheet.style.transition = 'none';
+                isSheetDragging = true; sheetStartY = e.touches[0].clientY; sheetStartX = e.touches[0].clientX; 
+                sheetCurrentY = sheetStartY; activeSheetContent = sheet; sheet.style.transition = 'none';
             }
         }, {passive: true});
 
         sheet.addEventListener('touchmove', e => {
             if (!isSheetDragging || !activeSheetContent) return;
-            sheetCurrentY = e.touches[0].clientY;
-            let currentX = e.touches[0].clientX;
-            let diffY = sheetCurrentY - sheetStartY;
-            let diffX = Math.abs(currentX - sheetStartX);
-
-            if (diffX > 10 && diffX > Math.abs(diffY)) {
-                isSheetDragging = false; activeSheetContent.style.transform = ''; return;
-            }
-            
+            sheetCurrentY = e.touches[0].clientY; let currentX = e.touches[0].clientX;
+            let diffY = sheetCurrentY - sheetStartY; let diffX = Math.abs(currentX - sheetStartX);
+            if (diffX > 10 && diffX > Math.abs(diffY)) { isSheetDragging = false; activeSheetContent.style.transform = ''; return; }
             if (diffY > 0) { 
                 if(e.cancelable) e.preventDefault(); 
                 activeSheetContent.style.transform = `translateY(${diffY}px) translateZ(0)`; 
@@ -594,10 +665,8 @@
 
         sheet.addEventListener('touchend', e => {
             if (!isSheetDragging || !activeSheetContent) return;
-            isSheetDragging = false;
-            let diffY = sheetCurrentY - sheetStartY;
+            isSheetDragging = false; let diffY = sheetCurrentY - sheetStartY;
             activeSheetContent.style.transition = 'transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1)';
-            
             if (diffY > 100) { 
                 let modalId = activeSheetContent.parentElement.id;
                 if (modalId === 'addModal') closeAddModal();
@@ -611,7 +680,7 @@
 
     function cleanHTML(text) {
         if (!text) return '';
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+        const map = { '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' };
         return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
@@ -649,7 +718,7 @@
         GOOGLE_URL = url; DISCOGS_TOKEN = token;
         localStorage.setItem('walkman_google_url', url);
         localStorage.setItem('walkman_discogs_token', token);
-        showToast("Zapisano konfigurację!", "success");
+        showToast(t('toastConfigSaved'), "success");
         updateSettingsUI();
         if(GOOGLE_URL && GOOGLE_URL.startsWith('http')) { loadFromSheets(true); }
     }
@@ -662,11 +731,11 @@
         const loginBtn = document.getElementById('adminLoginBtn');
         if (ADMIN_PASS) {
             passInput.style.display = 'none';
-            loginBtn.innerText = 'Wyloguj (' + '*'.repeat(ADMIN_PASS.length) + ')';
+            loginBtn.innerText = t('btnLogout') + ' (' + '*'.repeat(ADMIN_PASS.length) + ')';
             loginBtn.style.background = 'var(--danger)'; loginBtn.style.color = '#fff';
         } else {
             passInput.style.display = 'block'; passInput.value = '';
-            loginBtn.innerText = 'Zaloguj';
+            loginBtn.innerText = t('btnLogin');
             loginBtn.style.background = 'var(--text)'; loginBtn.style.color = 'var(--bg)';
         }
 
@@ -675,7 +744,7 @@
         
         if (offlineQueue.length > 0) {
             sheetsDot.className = 'status-dot-small bg-orange';
-            textPending.innerText = `(Kolejka: ${offlineQueue.length})`;
+            textPending.innerText = `(${t('lblQueue')}${offlineQueue.length})`;
         } else if (GOOGLE_URL && GOOGLE_URL.startsWith('http')) {
             sheetsDot.className = 'status-dot-small bg-green';
             textPending.innerText = "";
@@ -691,13 +760,13 @@
     function handleAdminLogin() {
         if (ADMIN_PASS) {
             ADMIN_PASS = ''; localStorage.removeItem('admin_pass');
-            showToast("🔒 Pomyślnie wylogowano", "success");
+            showToast(t('toastLogout'), "success");
         } else {
             const p = document.getElementById('adminPasswordInput').value.trim();
             if (p) {
                 ADMIN_PASS = p; localStorage.setItem('admin_pass', p);
-                showToast("🔓 Zalogowano (Zapisano hasło)", "success");
-            } else { showToast("Wpisz hasło!", "error"); return; }
+                showToast(t('toastLogin'), "success");
+            } else { showToast(t('toastNeedPass'), "error"); return; }
         }
         applyAdminUI();
     }
@@ -708,7 +777,7 @@
 
     function openAddModal() {
         setActiveNav(2);
-        if(!ADMIN_PASS) { showToast("Zaloguj się w Ustawieniach, żeby dodawać!", "error"); return; }
+        if(!ADMIN_PASS) { showToast(t('toastNeedPass'), "error"); return; }
         lockScroll(); document.getElementById('addModal').style.display = 'flex';
     }
     function closeAddModal() { document.getElementById('addModal').style.display = 'none'; checkModalsAndUnlock(); setActiveNav(0); }
@@ -728,7 +797,6 @@
     function clearSearch() { document.getElementById('localSearch').value = ''; toggleClearBtn(); renderGrid(); }
     function filterByArtist(artist) { closeDetailsModalWithTransition(); document.getElementById('localSearch').value = artist; toggleClearBtn(); renderGrid(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-    // --- SYSTEM OFFLINE i WYKONANIE API (Optimistic UI) ---
     function saveOfflineQueue() {
         localStorage.setItem('walkman_offline_queue', JSON.stringify(offlineQueue));
         updateSettingsUI();
@@ -748,14 +816,10 @@
 
     async function executeApiAction(payload) {
         if (!navigator.onLine) {
-            offlineQueue.push(payload); saveOfflineQueue();
-            return; 
+            offlineQueue.push(payload); saveOfflineQueue(); return; 
         }
-        try {
-            await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-        } catch(e) {
-            offlineQueue.push(payload); saveOfflineQueue();
-        }
+        try { await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); } 
+        catch(e) { offlineQueue.push(payload); saveOfflineQueue(); }
     }
 
     async function loadFromSheets(forceLoad = false) {
@@ -783,11 +847,11 @@
             }
             updateSettingsUI();
         } catch (e) { 
-            if(!cachedData && forceLoad) showToast("Błąd połączenia z serwerem", "error"); 
+            if(!cachedData && forceLoad) showToast(t('errConn'), "error"); 
             updateSettingsUI();
         }
         document.getElementById('loader').style.display = 'none';
-        changeGrid(); // Wymuszenie nakładania klasy siatki po załadowaniu
+        changeGrid();
     }
 
     function updateCounters() {
@@ -834,9 +898,9 @@
 
             return `<div class="grid-item" onclick="openDetailsWithTransition(${idx})">
                     <img id="img-${idx}" src="${szybkaOkladka}" loading="lazy" style="opacity:0; transition: opacity 0.3s;" onload="this.style.opacity=1">
-                    <div class="format-badge ${bClass}">${item.Status === 'SZUKAM' ? 'SZUKAM' : item.Format}</div>
+                    <div class="format-badge ${bClass}">${item.Status === 'SZUKAM' ? t('lblWishlist') : item.Format}</div>
                     ${tracklistIndicator}
-                    <div class="grid-overlay"><div class="grid-title">${cleanHTML(item.Album) || "Brak tytułu"}</div></div>
+                    <div class="grid-overlay"><div class="grid-title">${cleanHTML(item.Album) || t('noTitle')}</div></div>
                 </div>`;
         }).join('');
 
@@ -849,24 +913,24 @@
 
     async function addManual() {
         const artist = document.getElementById('manArtist').value.trim(); const album = document.getElementById('manAlbum').value.trim();
-        if (!artist || !album) { showToast("Podaj Wykonawcę i Tytuł!", "error"); return; }
+        if (!artist || !album) { showToast(t('errNoData'), "error"); return; }
 
         if (myCollection.some(i => (i.Wykonawca || "").toLowerCase() === artist.toLowerCase() && (i.Album || "").toLowerCase() === album.toLowerCase())) { 
-            if (!confirm(`Ten album jest już w bazie! Dodać duplikat?`)) return; 
+            if (!confirm(t('confDuplicate'))) return; 
         }
 
         const newEntry = { Wykonawca: artist, Album: album, Status: document.getElementById('manStatus').value, Format: document.getElementById('manFormat').value, Okładka: document.getElementById('manCover').value.trim(), Utwory: "", DiscogsID: "", Notatki: document.getElementById('manNotes').value.trim() };
         
-        myCollection.unshift(newEntry); // OPTIMISTIC UI: Natychmiast na listę
+        myCollection.unshift(newEntry);
         renderGrid(); updateCounters();
         executeApiAction({ password: ADMIN_PASS, action: "ADD", ...newEntry });
 
         ['manArtist', 'manAlbum', 'manCover', 'manNotes'].forEach(id => document.getElementById(id).value = '');
-        showToast("✅ Dodano do kolekcji!", "success"); closeAddModal();
+        showToast(t('toastAdded'), "success"); closeAddModal();
     }
 
     async function searchDiscogs() {
-        if(!DISCOGS_TOKEN) { showToast("Skonfiguruj token Discogs w ustawieniach!", "error"); return; }
+        if(!DISCOGS_TOKEN) { showToast(t('errNoToken'), "error"); return; }
         const q = document.getElementById('query').value; if(!q) return;
         document.getElementById('loader').style.display = 'flex';
         try {
@@ -881,60 +945,54 @@
                     <p>${cleanHTML(r.title)}</p>
                     <select id="sStat-${index}"><option value="MAM">MAM</option><option value="SZUKAM">SZUKAM</option></select>
                     <select id="sForm-${index}"><option value="FLAC">FLAC</option><option value="FLAC Hi-Res">Hi-Res</option><option value="MP3">MP3</option></select>
-                    <button type="button" class="btn-primary" onclick="addAlbumFromDiscogs(${index})" style="padding:10px; font-size:12px;">DODAJ</button>
+                    <button type="button" class="btn-primary" onclick="addAlbumFromDiscogs(${index})" style="padding:10px; font-size:12px;">${t('lblAddBtn')}</button>
                 </div>`;
             }).join('');
-        } catch(e) { showToast("Błąd Discogs API", "error"); }
+        } catch(e) { showToast(t('errDiscogs'), "error"); }
         document.getElementById('loader').style.display = 'none';
     }
 
     async function addAlbumFromDiscogs(index) {
         const item = currentDiscogsResults[index];
-        if (!item) { showToast("Błąd: Nie znaleziono danych albumu", "error"); return; }
+        if (!item) { showToast(t('errNoAlbumData'), "error"); return; }
 
         let title = item.title || "?"; let cover = item.cover_image || ''; let discogsId = item.id || '';
         let p = title.split(' - '); let rawArtist = p.shift() || "?"; let rawAlbum = p.join(' - ') || "?";
         let cleanArtist = rawArtist.replace(/\s*\(\d+\)\s*/g, '').trim();
 
         if (myCollection.some(i => (i.Wykonawca || "").toLowerCase() === cleanArtist.toLowerCase() && (i.Album || "").toLowerCase() === rawAlbum.toLowerCase())) { 
-            if (!confirm(`Ten album jest już w bazie! Dodać duplikat?`)) return; 
+            if (!confirm(t('confDuplicate'))) return; 
         }
 
         const s = document.getElementById(`sStat-${index}`).value; const f = document.getElementById(`sForm-${index}`).value;
         const finalFormat = s === "MAM" ? f : "-";
 
         const newEntry = { Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: finalFormat, Okładka: cover, Utwory: "", DiscogsID: discogsId, Notatki: "" };
-        myCollection.unshift(newEntry); // OPTIMISTIC UI
+        myCollection.unshift(newEntry);
         renderGrid(); updateCounters();
         executeApiAction({ password: ADMIN_PASS, action: "ADD", ...newEntry });
 
         document.getElementById('apiResults').innerHTML = ''; document.getElementById('query').value = '';
-        showToast("✅ Pobrano z Discogs!", "success"); closeAddModal();
+        showToast(t('toastDiscogsAdded'), "success"); closeAddModal();
     }
 
     function toggleCoverTracklist() {
         if(hasTracklist) { document.getElementById('coverTracklistWrapper').classList.toggle('flipped'); } 
-        else { showToast("Brak tracklisty. Użyj skryptu iTunes API", "error"); }
+        else { showToast(t('errNoTracklist'), "error"); }
     }
 
     function openDetailsWithTransition(idx) {
         const gridImg = document.getElementById(`img-${idx}`);
         const modalImg = document.getElementById('coverTracklistWrapper');
-
         if (document.startViewTransition && gridImg) {
-            gridImg.style.viewTransitionName = 'hero-cover';
-            modalImg.style.viewTransitionName = 'hero-cover';
-            
+            gridImg.style.viewTransitionName = 'hero-cover'; modalImg.style.viewTransitionName = 'hero-cover';
             const transition = document.startViewTransition(() => { openDetails(idx); });
-            transition.finished.finally(() => {
-                gridImg.style.viewTransitionName = ''; modalImg.style.viewTransitionName = '';
-            });
+            transition.finished.finally(() => { gridImg.style.viewTransitionName = ''; modalImg.style.viewTransitionName = ''; });
         } else { openDetails(idx); }
     }
 
     function openDetails(idx) {
-        lockScroll();
-        currentDetailsIndex = idx; const i = myCollection[idx];
+        lockScroll(); currentDetailsIndex = idx; const i = myCollection[idx];
         document.getElementById('coverTracklistWrapper').classList.remove('flipped');
         
         const detCover = document.getElementById('detCover');
@@ -1000,20 +1058,14 @@
     function closeDetailsModalWithTransition() {
         const gridImg = document.getElementById(`img-${currentDetailsIndex}`);
         const modalImg = document.getElementById('coverTracklistWrapper');
-
         if (document.startViewTransition && gridImg) {
-            gridImg.style.viewTransitionName = 'hero-cover';
-            modalImg.style.viewTransitionName = 'hero-cover';
+            gridImg.style.viewTransitionName = 'hero-cover'; modalImg.style.viewTransitionName = 'hero-cover';
             const transition = document.startViewTransition(() => { closeDetailsModal(); });
-            transition.finished.finally(() => {
-                gridImg.style.viewTransitionName = ''; modalImg.style.viewTransitionName = '';
-            });
+            transition.finished.finally(() => { gridImg.style.viewTransitionName = ''; modalImg.style.viewTransitionName = ''; });
         } else { closeDetailsModal(); }
     }
 
-    function closeDetailsModal() { 
-        document.getElementById('detailsModal').style.display = 'none'; checkModalsAndUnlock(); 
-    }
+    function closeDetailsModal() { document.getElementById('detailsModal').style.display = 'none'; checkModalsAndUnlock(); }
 
     function openEditFromDetails() {
         const i = myCollection[currentDetailsIndex];
@@ -1025,55 +1077,39 @@
         document.getElementById('editFormat').value = i.Format;
         document.getElementById('editNotes').value = i.Notatki;
         editTempTracklist = i.Utwory; 
-        document.getElementById('detailsModal').style.display = 'none'; 
-        document.getElementById('editModal').style.display = 'flex';
+        document.getElementById('detailsModal').style.display = 'none'; document.getElementById('editModal').style.display = 'flex';
     }
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; checkModalsAndUnlock(); }
 
-    function clearTracklistInEdit() {
-        editTempTracklist = "-"; showToast("Tracklista usunięta! (Zapisz album)", "success");
-    }
+    function clearTracklistInEdit() { editTempTracklist = "-"; showToast(t('toastTracklistCleared'), "success"); }
 
     async function saveEdit() {
         const idx = document.getElementById('editIndex').value; const old = myCollection[idx];
         const updatedEntry = {
-            Wykonawca: document.getElementById('editArtist').value,
-            Album: document.getElementById('editAlbum').value,
-            Okładka: document.getElementById('editCover').value,
-            Status: document.getElementById('editStatus').value,
-            Format: document.getElementById('editFormat').value,
-            Notatki: document.getElementById('editNotes').value,
-            Utwory: editTempTracklist,
-            DiscogsID: old.DiscogsID || ""
+            Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value,
+            Okładka: document.getElementById('editCover').value, Status: document.getElementById('editStatus').value,
+            Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value,
+            Utwory: editTempTracklist, DiscogsID: old.DiscogsID || ""
         };
 
-        myCollection[idx] = updatedEntry; // OPTIMISTIC UI
-        renderGrid(); updateCounters();
+        myCollection[idx] = updatedEntry; renderGrid(); updateCounters();
         executeApiAction({ password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, ...updatedEntry });
         
-        closeEditModal(); showToast("💾 Zapisano zmiany", "success");
+        closeEditModal(); showToast(t('toastSaved'), "success");
     }
 
-    // --- SYSTEM COFNIJ (UNDO) ---
-    let undoTimeout = null;
-    let deletedItemBackup = null;
-    let undoToastElement = null;
+    let undoTimeout = null; let deletedItemBackup = null; let undoToastElement = null;
 
     async function deleteFromDetails() {
-        const idx = currentDetailsIndex;
-        const item = myCollection[idx]; 
-        if(!confirm("Na pewno usunąć ten album?")) return;
+        const idx = currentDetailsIndex; const item = myCollection[idx]; 
+        if(!confirm(t('confDelete'))) return;
         closeDetailsModalWithTransition();
         
-        // Zapis do backupu i natychmiastowe usunięcie z siatki
         deletedItemBackup = { item: item, index: idx };
-        myCollection.splice(idx, 1);
-        renderGrid(); updateCounters();
+        myCollection.splice(idx, 1); renderGrid(); updateCounters();
 
-        // Powiadomienie z przyciskiem COFNIJ
-        undoToastElement = showToast(`Usunięto z bazy. <button class="toast-undo-btn" onclick="cancelUndo()">COFNIJ</button>`, "success", true);
+        undoToastElement = showToast(`${t('toastDeleted')} <button class="toast-undo-btn" onclick="cancelUndo()">${t('btnUndoAction')}</button>`, "success", true);
 
-        // Odczekanie 5 sekund na zmianę zdania
         undoTimeout = setTimeout(() => {
             if(undoToastElement) {
                 undoToastElement.style.animation = 'fadeOutToast 0.3s forwards';
@@ -1088,14 +1124,12 @@
         if (undoTimeout) { clearTimeout(undoTimeout); undoTimeout = null; }
         if (deletedItemBackup) {
             myCollection.splice(deletedItemBackup.index, 0, deletedItemBackup.item);
-            renderGrid(); updateCounters();
-            deletedItemBackup = null;
-            showToast("Cofnięto usunięcie!", "success");
+            renderGrid(); updateCounters(); deletedItemBackup = null;
+            showToast(t('toastUndo'), "success");
         }
         if (undoToastElement) {
             undoToastElement.style.animation = 'fadeOutToast 0.3s forwards';
-            setTimeout(() => undoToastElement.remove(), 300);
-            undoToastElement = null;
+            setTimeout(() => undoToastElement.remove(), 300); undoToastElement = null;
         }
     }
 
@@ -1104,11 +1138,15 @@
         let csv = "\uFEFFWykonawca;Album;Status;Format;Notatki\n";
         myCollection.forEach(i => csv += `${i.Wykonawca};${i.Album};${i.Status};${i.Format};${i.Notatki}\n`);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "walkman_kolekcja.csv"; link.click();
-        showToast("💾 Pobrano plik CSV", "success");
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "walkman_collection.csv"; link.click();
+        showToast(t('toastCsv'), "success");
     }
 
-    applyAdminUI(); loadFromSheets(); processOfflineQueue();
+    // Odpal tłumaczenia przed startem UI
+    updateLanguageUI();
+    applyAdminUI(); 
+    loadFromSheets(); 
+    processOfflineQueue();
 </script>
 </body>
 </html>
