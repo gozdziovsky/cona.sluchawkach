@@ -14,7 +14,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 6.3</title>
+    <title>Walkman Cloud 7.0</title>
     <style>
         /* DOMYŚLNY MOTYW: Spotify Dark */
         :root { 
@@ -30,7 +30,6 @@
             --ambient-bright: 0.35;
         }
 
-        /* MOTYW 2: Sony Sports (Żółto-Czarny) */
         body.theme-sports { 
             --accent: #000000; 
             --bg: #facc15; 
@@ -44,7 +43,6 @@
             --ambient-bright: 0.65;
         }
 
-        /* MOTYW 3: Classic 1979 (Srebrno-Niebieski) */
         body.theme-classic { 
             --accent: #0284c7; 
             --bg: #e2e8f0; 
@@ -98,6 +96,11 @@
         .filters select { padding: 10px 14px; border-radius: 20px; border: 1px solid var(--card-border); background: var(--card); color: var(--text); font-size: 13px; font-weight: 600; outline: none; white-space: nowrap; appearance: none; -webkit-appearance: none; }
 
         .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
+        
+        /* 3-KOLUMNOWA SIATKA Opcjonalna */
+        .grid-3-cols { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
+        .grid-3-cols .grid-title { font-size: 10px !important; }
+        .grid-3-cols .format-badge { font-size: 8px !important; padding: 3px 6px !important; }
         
         .grid-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 1/1; background: var(--card); cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.15s; will-change: transform; transform: translateZ(0);}
         .grid-item:active { transform: scale(0.95); }
@@ -185,6 +188,7 @@
         .status-indicator { display: flex; align-items: center; gap: 8px; }
         .status-dot-small { width: 10px; height: 10px; border-radius: 50%; }
         .bg-green { background: #1db954; box-shadow: 0 0 8px #1db954; }
+        .bg-orange { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
         .bg-red { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
 
         #apiResults { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; scrollbar-width: none; margin-bottom: 20px;}
@@ -193,17 +197,28 @@
         .search-card p { font-size: 11px; font-weight: 800; margin: 0; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4; }
         .search-card select { padding: 8px; font-size: 11px; border-radius: 6px; background: var(--bg); border: 1px solid var(--card-border); color: var(--text);}
 
+        /* POWIADOMIENIA I COFNIJ */
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 350px;}
-        .toast { background: var(--card); color: var(--text); padding: 16px 20px; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--card-border); animation: slideDown 0.3s forwards; text-align: center; transform: translateZ(0);}
+        .toast { pointer-events: auto; background: var(--card); color: var(--text); padding: 16px 20px; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--card-border); animation: slideDown 0.3s forwards; text-align: center; transform: translateZ(0); display: flex; align-items: center; justify-content: center;}
         .toast.success { color: var(--accent); }
         .toast.error { color: var(--danger); }
+        .toast-undo-btn { background: var(--text); color: var(--bg); border: none; padding: 6px 12px; border-radius: 8px; font-weight: 900; font-size: 12px; margin-left: 12px; cursor: pointer; transition: transform 0.1s;}
+        .toast-undo-btn:active { transform: scale(0.95); }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOutToast { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
 
         .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 99999; justify-content: center; align-items: center; color: var(--accent); font-weight: 900; letter-spacing: 2px; transform: translateZ(0);}
 
+        /* POWRÓT NA GÓRĘ */
+        .back-to-top { position: fixed; bottom: calc(85px + env(safe-area-inset-bottom)); right: 20px; width: 48px; height: 48px; background: var(--accent); color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 8900; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: none; transform: translateY(20px) translateZ(0); }
+        .back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0) translateZ(0); }
+        .back-to-top:active { transform: scale(0.9) translateZ(0); }
+
         body:not(.is-admin) .admin-only { display: none !important; }
-        @media (min-width: 600px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 600px) { 
+            .grid-container { grid-template-columns: repeat(4, 1fr); } 
+            .grid-3-cols { grid-template-columns: repeat(6, 1fr) !important; }
+        }
 
         ::view-transition-old(hero-cover),
         ::view-transition-new(hero-cover) {
@@ -216,6 +231,10 @@
 
 <div id="toast-container"></div>
 <div id="loader" class="loader-overlay">SYNCHRONIZACJA...</div>
+
+<button id="backToTop" class="back-to-top" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
+</button>
 
 <nav class="bottom-nav">
     <div class="nav-item active" onclick="goHome()">
@@ -238,7 +257,7 @@
 
 <div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman <span>Cloud</span><sup>6.3</sup></h1>
+        <h1>Walkman <span>Cloud</span><sup>7.0</sup></h1>
     </div>
 
     <div class="counters">
@@ -377,10 +396,16 @@
         <h3 style="margin-top:0; color:var(--text); font-weight:900; font-size:20px; border-bottom:1px solid var(--card-border); padding-bottom:15px; margin-bottom:20px;">Ustawienia</h3>
 
         <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">WYGLĄD / MOTYW</p>
-        <select id="themeSelect" class="add-input" onchange="changeTheme()" style="margin-bottom:25px;">
+        <select id="themeSelect" class="add-input" onchange="changeTheme()" style="margin-bottom:15px;">
             <option value="dark">Spotify Dark (Domyślny)</option>
             <option value="sports">Sony Sports (Żółty Retro)</option>
             <option value="classic">Classic 1979 (Srebrno-Niebieski)</option>
+        </select>
+        
+        <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">UKŁAD SIATKI</p>
+        <select id="gridSelect" class="add-input" onchange="changeGrid()" style="margin-bottom:25px;">
+            <option value="2">2 kolumny (Domyślny)</option>
+            <option value="3">3 kolumny (Gęsty)</option>
         </select>
 
         <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">KONFIGURACJA API</p>
@@ -390,7 +415,7 @@
 
         <p style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">STATUS POŁĄCZENIA</p>
         <div class="status-row">
-            <span>Baza danych (Google)</span>
+            <span>Baza danych (Google) <span id="statusSheetsText" style="font-size:11px; color:var(--text-dim); margin-left:5px;"></span></span>
             <div class="status-indicator"><span class="status-dot-small bg-red" id="statusSheets"></span></div>
         </div>
         <div class="status-row">
@@ -398,7 +423,7 @@
             <div class="status-indicator"><span class="status-dot-small bg-red" id="statusDiscogs"></span></div>
         </div>
 
-        <button type="button" class="btn-primary" onclick="syncDataFromSettings()" style="margin-top: 10px; background: rgba(128,128,128,0.1); color: var(--text); display: flex; align-items:center; justify-content: center; gap: 8px;">
+        <button type="button" class="btn-primary" onclick="loadFromSheets(true)" style="margin-top: 10px; background: rgba(128,128,128,0.1); color: var(--text); display: flex; align-items:center; justify-content: center; gap: 8px;">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> 
             Wymuś synchronizację
         </button>
@@ -415,11 +440,8 @@
 
 <script>
     // ==========================================
-    let GOOGLE_URL = localStorage.getItem('walkman_google_url');
-    if (GOOGLE_URL === null) GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz4JnEN2c4xOhJMKwQ8cXNdasCG3IjqXb02kFQeR-RVRcotmSfX_L5S27LcBCWBD3NimQ/exec';
-
-    let DISCOGS_TOKEN = localStorage.getItem('walkman_discogs_token');
-    if (DISCOGS_TOKEN === null) DISCOGS_TOKEN = 'iTRtcEKKihJyGhwufBlyPncxTrMDFjVtwiFNTeAa';
+    let GOOGLE_URL = localStorage.getItem('walkman_google_url') || '';
+    let DISCOGS_TOKEN = localStorage.getItem('walkman_discogs_token') || '';
     
     const ARTIST_EXCEPTIONS = ["Tyler, The Creator", "Earth, Wind & Fire", "Crosby, Stills, Nash & Young"];
     // ==========================================
@@ -433,8 +455,10 @@
     let hasTracklist = false; 
     let editTempTracklist = ""; 
     let ADMIN_PASS = localStorage.getItem('admin_pass') || '';
-    
     let currentDiscogsResults = []; 
+    
+    // OFFLINE QUEUE
+    let offlineQueue = JSON.parse(localStorage.getItem('walkman_offline_queue') || '[]');
 
     function changeTheme() {
         const t = document.getElementById('themeSelect').value;
@@ -451,6 +475,24 @@
     const savedTheme = localStorage.getItem('walkman_theme') || 'dark';
     document.getElementById('themeSelect').value = savedTheme;
     changeTheme();
+
+    // ZMIANA SIATKI
+    function changeGrid() {
+        const v = document.getElementById('gridSelect').value;
+        const grid = document.getElementById('collectionGrid');
+        if(v === '3') grid.classList.add('grid-3-cols');
+        else grid.classList.remove('grid-3-cols');
+        localStorage.setItem('walkman_grid', v);
+    }
+    const savedGrid = localStorage.getItem('walkman_grid') || '2';
+    document.getElementById('gridSelect').value = savedGrid;
+
+    // POWRÓT DO GÓRY
+    const btt = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) btt.classList.add('visible');
+        else btt.classList.remove('visible');
+    }, {passive: true});
 
     let scrollPosition = 0;
     function lockScroll() {
@@ -477,17 +519,12 @@
     detModalEl.addEventListener('touchmove', e => {
         let el = e.target;
         let canScroll = false;
-        
         while (el && el !== detModalEl) {
             if (el.classList.contains('modal-content') || el.classList.contains('back')) {
-                if (el.scrollHeight > el.clientHeight) {
-                    canScroll = true; 
-                    break;
-                }
+                if (el.scrollHeight > el.clientHeight) { canScroll = true; break; }
             }
             el = el.parentElement;
         }
-        
         if (!canScroll && e.cancelable) { e.preventDefault(); }
     }, {passive: false});
 
@@ -517,11 +554,8 @@
             }
 
             if (nextIdx !== undefined) {
-                if (document.startViewTransition) {
-                    document.startViewTransition(() => openDetails(nextIdx));
-                } else {
-                    openDetails(nextIdx);
-                }
+                if (document.startViewTransition) { document.startViewTransition(() => openDetails(nextIdx)); } 
+                else { openDetails(nextIdx); }
             }
         }
     }
@@ -530,9 +564,7 @@
 
     document.querySelectorAll('.bottom-sheet .modal-content').forEach(sheet => {
         sheet.addEventListener('touchstart', e => {
-            const tag = e.target.tagName.toLowerCase();
-            if (['input', 'textarea', 'select', 'button'].includes(tag)) return;
-
+            if (e.target.closest('button, input, textarea, select')) return;
             if (sheet.scrollTop <= 0) {
                 isSheetDragging = true;
                 sheetStartY = e.touches[0].clientY;
@@ -547,22 +579,17 @@
             if (!isSheetDragging || !activeSheetContent) return;
             sheetCurrentY = e.touches[0].clientY;
             let currentX = e.touches[0].clientX;
-            
             let diffY = sheetCurrentY - sheetStartY;
             let diffX = Math.abs(currentX - sheetStartX);
 
             if (diffX > 10 && diffX > Math.abs(diffY)) {
-                isSheetDragging = false;
-                activeSheetContent.style.transform = '';
-                return;
+                isSheetDragging = false; activeSheetContent.style.transform = ''; return;
             }
             
             if (diffY > 0) { 
                 if(e.cancelable) e.preventDefault(); 
                 activeSheetContent.style.transform = `translateY(${diffY}px) translateZ(0)`; 
-            } else { 
-                activeSheetContent.style.transform = `translateY(0px) translateZ(0)`; 
-            }
+            } else { activeSheetContent.style.transform = `translateY(0px) translateZ(0)`; }
         }, {passive: false});
 
         sheet.addEventListener('touchend', e => {
@@ -577,36 +604,30 @@
                 if (modalId === 'editModal') closeEditModal();
                 if (modalId === 'settingsModal') closeSettingsModal();
                 setTimeout(() => { if(activeSheetContent) activeSheetContent.style.transform = ''; }, 300);
-            } else {
-                activeSheetContent.style.transform = '';
-            }
+            } else { activeSheetContent.style.transform = ''; }
             activeSheetContent = null;
         }, {passive: true});
     });
 
-    // PRAWIDŁOWO NAPRAWIONA FUNKCJA ZABEZPIECZAJĄCA HTML
     function cleanHTML(text) {
         if (!text) return '';
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        };
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
         return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    function showToast(message, type = 'success') {
+    function showToast(message, type = 'success', sticky = false) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.innerText = message;
+        toast.innerHTML = message;
         container.appendChild(toast);
-        setTimeout(() => {
-            toast.style.animation = 'fadeOutToast 0.3s forwards';
-            setTimeout(() => toast.remove(), 300);
-        }, 2500);
+        if(!sticky) {
+            setTimeout(() => {
+                toast.style.animation = 'fadeOutToast 0.3s forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+        return toast;
     }
 
     function applyAdminUI() {
@@ -616,34 +637,21 @@
     }
 
     function openSettingsModal() {
-        setActiveNav(3);
-        lockScroll();
-        updateSettingsUI();
-        document.getElementById('settingsModal').style.display = 'flex';
+        setActiveNav(3); lockScroll(); updateSettingsUI(); document.getElementById('settingsModal').style.display = 'flex';
     }
-    
     function closeSettingsModal() { 
-        document.getElementById('settingsModal').style.display = 'none'; 
-        checkModalsAndUnlock();
-        setActiveNav(0); 
+        document.getElementById('settingsModal').style.display = 'none'; checkModalsAndUnlock(); setActiveNav(0); 
     }
 
     function saveApiSettings() {
         const url = document.getElementById('settingGoogleUrl').value.trim();
         const token = document.getElementById('settingDiscogsToken').value.trim();
-        
-        GOOGLE_URL = url;
-        DISCOGS_TOKEN = token;
-        
+        GOOGLE_URL = url; DISCOGS_TOKEN = token;
         localStorage.setItem('walkman_google_url', url);
         localStorage.setItem('walkman_discogs_token', token);
-        
         showToast("Zapisano konfigurację!", "success");
         updateSettingsUI();
-        
-        if(GOOGLE_URL && GOOGLE_URL.startsWith('http')) {
-            loadFromSheets();
-        }
+        if(GOOGLE_URL && GOOGLE_URL.startsWith('http')) { loadFromSheets(true); }
     }
 
     function updateSettingsUI() {
@@ -655,26 +663,29 @@
         if (ADMIN_PASS) {
             passInput.style.display = 'none';
             loginBtn.innerText = 'Wyloguj (' + '*'.repeat(ADMIN_PASS.length) + ')';
-            loginBtn.style.background = 'var(--danger)';
-            loginBtn.style.color = '#fff';
+            loginBtn.style.background = 'var(--danger)'; loginBtn.style.color = '#fff';
         } else {
-            passInput.style.display = 'block';
-            passInput.value = '';
+            passInput.style.display = 'block'; passInput.value = '';
             loginBtn.innerText = 'Zaloguj';
-            loginBtn.style.background = 'var(--text)';
-            loginBtn.style.color = 'var(--bg)';
+            loginBtn.style.background = 'var(--text)'; loginBtn.style.color = 'var(--bg)';
         }
 
         const sheetsDot = document.getElementById('statusSheets');
-        const discogsDot = document.getElementById('statusDiscogs');
+        const textPending = document.getElementById('statusSheetsText');
         
-        if (GOOGLE_URL && GOOGLE_URL.startsWith('http')) {
+        if (offlineQueue.length > 0) {
+            sheetsDot.className = 'status-dot-small bg-orange';
+            textPending.innerText = `(Kolejka: ${offlineQueue.length})`;
+        } else if (GOOGLE_URL && GOOGLE_URL.startsWith('http')) {
             sheetsDot.className = 'status-dot-small bg-green';
-        } else { sheetsDot.className = 'status-dot-small bg-red'; }
+            textPending.innerText = "";
+        } else { 
+            sheetsDot.className = 'status-dot-small bg-red'; textPending.innerText = "";
+        }
 
-        if (DISCOGS_TOKEN && DISCOGS_TOKEN.length > 5) {
-            discogsDot.className = 'status-dot-small bg-green';
-        } else { discogsDot.className = 'status-dot-small bg-red'; }
+        const discogsDot = document.getElementById('statusDiscogs');
+        if (DISCOGS_TOKEN && DISCOGS_TOKEN.length > 5) { discogsDot.className = 'status-dot-small bg-green'; } 
+        else { discogsDot.className = 'status-dot-small bg-red'; }
     }
 
     function handleAdminLogin() {
@@ -691,8 +702,6 @@
         applyAdminUI();
     }
 
-    function syncDataFromSettings() { closeSettingsModal(); loadFromSheets(); }
-
     function setActiveNav(index) { document.querySelectorAll('.nav-item').forEach((el, i) => { el.classList.toggle('active', i === index); }); }
     function goHome() { setActiveNav(0); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function focusSearch() { setActiveNav(1); window.scrollTo({ top: 0, behavior: 'smooth' }); document.getElementById('localSearch').focus(); }
@@ -700,8 +709,7 @@
     function openAddModal() {
         setActiveNav(2);
         if(!ADMIN_PASS) { showToast("Zaloguj się w Ustawieniach, żeby dodawać!", "error"); return; }
-        lockScroll();
-        document.getElementById('addModal').style.display = 'flex';
+        lockScroll(); document.getElementById('addModal').style.display = 'flex';
     }
     function closeAddModal() { document.getElementById('addModal').style.display = 'none'; checkModalsAndUnlock(); setActiveNav(0); }
 
@@ -720,11 +728,39 @@
     function clearSearch() { document.getElementById('localSearch').value = ''; toggleClearBtn(); renderGrid(); }
     function filterByArtist(artist) { closeDetailsModalWithTransition(); document.getElementById('localSearch').value = artist; toggleClearBtn(); renderGrid(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-    async function loadFromSheets() {
-        if(!GOOGLE_URL || !GOOGLE_URL.startsWith('http')) {
-            updateSettingsUI();
-            return;
+    // --- SYSTEM OFFLINE i WYKONANIE API (Optimistic UI) ---
+    function saveOfflineQueue() {
+        localStorage.setItem('walkman_offline_queue', JSON.stringify(offlineQueue));
+        updateSettingsUI();
+    }
+
+    async function processOfflineQueue() {
+        if (!navigator.onLine || offlineQueue.length === 0) return;
+        let newQueue = [];
+        for (let payload of offlineQueue) {
+            try { await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); } 
+            catch(e) { newQueue.push(payload); }
         }
+        offlineQueue = newQueue; saveOfflineQueue();
+        if(offlineQueue.length === 0) { loadFromSheets(false); }
+    }
+    window.addEventListener('online', processOfflineQueue);
+
+    async function executeApiAction(payload) {
+        if (!navigator.onLine) {
+            offlineQueue.push(payload); saveOfflineQueue();
+            return; 
+        }
+        try {
+            await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        } catch(e) {
+            offlineQueue.push(payload); saveOfflineQueue();
+        }
+    }
+
+    async function loadFromSheets(forceLoad = false) {
+        if(!GOOGLE_URL || !GOOGLE_URL.startsWith('http')) { updateSettingsUI(); return; }
+        closeSettingsModal();
 
         const cachedData = localStorage.getItem('walkman_collection_cache');
         if (cachedData) {
@@ -733,26 +769,25 @@
                 if (!Array.isArray(myCollection)) myCollection = [];
                 renderGrid(); updateCounters(); updateSettingsUI();
             } catch(e) { myCollection = []; }
-        } else {
-            document.getElementById('loader').style.display = 'flex';
-        }
+        } 
+        
+        if (!cachedData || forceLoad) { document.getElementById('loader').style.display = 'flex'; }
 
         try {
             const res = await fetch(GOOGLE_URL, { redirect: 'follow' });
             const newData = await res.json();
-            
             if (JSON.stringify(myCollection) !== JSON.stringify(newData)) {
                 myCollection = Array.isArray(newData) ? newData : [];
                 localStorage.setItem('walkman_collection_cache', JSON.stringify(myCollection));
-                renderGrid(); 
-                updateCounters(); 
+                renderGrid(); updateCounters(); 
             }
             updateSettingsUI();
         } catch (e) { 
-            if(!cachedData) showToast("Błąd połączenia z serwerem", "error"); 
+            if(!cachedData && forceLoad) showToast("Błąd połączenia z serwerem", "error"); 
             updateSettingsUI();
         }
         document.getElementById('loader').style.display = 'none';
+        changeGrid(); // Wymuszenie nakładania klasy siatki po załadowaniu
     }
 
     function updateCounters() {
@@ -816,16 +851,18 @@
         const artist = document.getElementById('manArtist').value.trim(); const album = document.getElementById('manAlbum').value.trim();
         if (!artist || !album) { showToast("Podaj Wykonawcę i Tytuł!", "error"); return; }
 
-        const exists = myCollection.some(i => (i.Wykonawca || "").toLowerCase() === artist.toLowerCase() && (i.Album || "").toLowerCase() === album.toLowerCase());
-        if (exists) { if (!confirm(`Ten album jest już w bazie! Dodać duplikat?`)) return; }
+        if (myCollection.some(i => (i.Wykonawca || "").toLowerCase() === artist.toLowerCase() && (i.Album || "").toLowerCase() === album.toLowerCase())) { 
+            if (!confirm(`Ten album jest już w bazie! Dodać duplikat?`)) return; 
+        }
 
-        document.getElementById('loader').style.display = 'flex';
-        try {
-            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: artist, Album: album, Status: document.getElementById('manStatus').value, Format: document.getElementById('manFormat').value, Okładka: document.getElementById('manCover').value.trim(), Utwory: "", DiscogsID: "", Notatki: document.getElementById('manNotes').value.trim() };
-            await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
-            ['manArtist', 'manAlbum', 'manCover', 'manNotes'].forEach(id => document.getElementById(id).value = '');
-            showToast("✅ Dodano do kolekcji!", "success"); closeAddModal(); setTimeout(loadFromSheets, 1500);
-        } catch(e) { showToast("❌ Błąd dodawania. Złe hasło?", "error"); document.getElementById('loader').style.display = 'none'; }
+        const newEntry = { Wykonawca: artist, Album: album, Status: document.getElementById('manStatus').value, Format: document.getElementById('manFormat').value, Okładka: document.getElementById('manCover').value.trim(), Utwory: "", DiscogsID: "", Notatki: document.getElementById('manNotes').value.trim() };
+        
+        myCollection.unshift(newEntry); // OPTIMISTIC UI: Natychmiast na listę
+        renderGrid(); updateCounters();
+        executeApiAction({ password: ADMIN_PASS, action: "ADD", ...newEntry });
+
+        ['manArtist', 'manAlbum', 'manCover', 'manNotes'].forEach(id => document.getElementById(id).value = '');
+        showToast("✅ Dodano do kolekcji!", "success"); closeAddModal();
     }
 
     async function searchDiscogs() {
@@ -835,7 +872,6 @@
         try {
             const res = await fetch(`https://api.discogs.com/database/search?q=${q}&token=${DISCOGS_TOKEN}&per_page=12`);
             const data = await res.json();
-            
             currentDiscogsResults = data.results; 
             
             document.getElementById('apiResults').innerHTML = currentDiscogsResults.map((r, index) => {
@@ -856,10 +892,7 @@
         const item = currentDiscogsResults[index];
         if (!item) { showToast("Błąd: Nie znaleziono danych albumu", "error"); return; }
 
-        let title = item.title || "?";
-        let cover = item.cover_image || '';
-        let discogsId = item.id || '';
-        
+        let title = item.title || "?"; let cover = item.cover_image || ''; let discogsId = item.id || '';
         let p = title.split(' - '); let rawArtist = p.shift() || "?"; let rawAlbum = p.join(' - ') || "?";
         let cleanArtist = rawArtist.replace(/\s*\(\d+\)\s*/g, '').trim();
 
@@ -867,23 +900,21 @@
             if (!confirm(`Ten album jest już w bazie! Dodać duplikat?`)) return; 
         }
 
-        const s = document.getElementById(`sStat-${index}`).value;
-        const f = document.getElementById(`sForm-${index}`).value;
+        const s = document.getElementById(`sStat-${index}`).value; const f = document.getElementById(`sForm-${index}`).value;
         const finalFormat = s === "MAM" ? f : "-";
 
-        document.getElementById('loader').style.display = 'flex';
-        try {
-            const entry = { password: ADMIN_PASS, action: "ADD", Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: finalFormat, Okładka: cover, Utwory: "", DiscogsID: discogsId, Notatki: "" };
-            await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(entry) });
-            document.getElementById('apiResults').innerHTML = ''; document.getElementById('query').value = '';
-            showToast("✅ Pobrano z Discogs!", "success"); closeAddModal(); setTimeout(loadFromSheets, 1500);
-        } catch(e) { showToast("❌ Błąd dodawania płyty!", "error"); document.getElementById('loader').style.display = 'none'; }
+        const newEntry = { Wykonawca: cleanArtist, Album: rawAlbum, Status: s, Format: finalFormat, Okładka: cover, Utwory: "", DiscogsID: discogsId, Notatki: "" };
+        myCollection.unshift(newEntry); // OPTIMISTIC UI
+        renderGrid(); updateCounters();
+        executeApiAction({ password: ADMIN_PASS, action: "ADD", ...newEntry });
+
+        document.getElementById('apiResults').innerHTML = ''; document.getElementById('query').value = '';
+        showToast("✅ Pobrano z Discogs!", "success"); closeAddModal();
     }
 
     function toggleCoverTracklist() {
-        if(hasTracklist) {
-            document.getElementById('coverTracklistWrapper').classList.toggle('flipped');
-        } else { showToast("Brak tracklisty. Użyj skryptu iTunes API", "error"); }
+        if(hasTracklist) { document.getElementById('coverTracklistWrapper').classList.toggle('flipped'); } 
+        else { showToast("Brak tracklisty. Użyj skryptu iTunes API", "error"); }
     }
 
     function openDetailsWithTransition(idx) {
@@ -894,72 +925,55 @@
             gridImg.style.viewTransitionName = 'hero-cover';
             modalImg.style.viewTransitionName = 'hero-cover';
             
-            const transition = document.startViewTransition(() => {
-                openDetails(idx);
-            });
-            
+            const transition = document.startViewTransition(() => { openDetails(idx); });
             transition.finished.finally(() => {
-                gridImg.style.viewTransitionName = '';
-                modalImg.style.viewTransitionName = '';
+                gridImg.style.viewTransitionName = ''; modalImg.style.viewTransitionName = '';
             });
-        } else {
-            openDetails(idx);
-        }
+        } else { openDetails(idx); }
     }
 
     function openDetails(idx) {
         lockScroll();
         currentDetailsIndex = idx; const i = myCollection[idx];
-        
         document.getElementById('coverTracklistWrapper').classList.remove('flipped');
         
         const detCover = document.getElementById('detCover');
-        detCover.style.opacity = '0';
-        detCover.src = i.Okładka;
-        
+        detCover.style.opacity = '0'; detCover.src = i.Okładka;
         document.getElementById('ambientBg').style.backgroundImage = `url('${i.Okładka}')`;
 
         const tracksContainer = document.getElementById('detTracks');
         const hintIcon = document.getElementById('flipHint');
         
         if (i.Utwory && i.Utwory.trim() !== '' && i.Utwory.trim() !== '-') {
-            hasTracklist = true;
-            hintIcon.style.display = 'flex'; 
+            hasTracklist = true; hintIcon.style.display = 'flex'; 
             const tracks = i.Utwory.split('\n');
             tracksContainer.innerHTML = tracks.map(track => {
                 const match = track.match(/(.*?)\s+\((\d+:\d{2})\)$/);
                 if(match) {
-                    const title = match[1]; const time = match[2];
-                    const dotIndex = title.indexOf('.');
-                    let num = title.substring(0, dotIndex + 1);
-                    let name = title.substring(dotIndex + 1).trim();
+                    const title = match[1]; const time = match[2]; const dotIndex = title.indexOf('.');
+                    let num = title.substring(0, dotIndex + 1); let name = title.substring(dotIndex + 1).trim();
                     if(dotIndex === -1) { num = '-'; name = title; }
                     return `<div class="tracklist-item"><span style="flex:1"><span class="track-num">${num}</span> ${name}</span> <span style="color:var(--text-dim);">${time}</span></div>`;
                 }
                 return `<div class="tracklist-item">${cleanHTML(track)}</div>`;
             }).join('');
         } else {
-            hasTracklist = false;
-            hintIcon.style.display = 'none'; 
-            tracksContainer.innerHTML = '';
+            hasTracklist = false; hintIcon.style.display = 'none'; tracksContainer.innerHTML = '';
         }
         
         document.getElementById('detAlbum').innerText = i.Album;
-        
         const q = encodeURIComponent(`${i.Wykonawca} ${i.Album}`);
         document.getElementById('btnSpotify').href = `https://open.spotify.com/search/${q}`;
         document.getElementById('btnYoutube').href = `https://www.youtube.com/results?search_query=${q}`;
         
         const detArtistEl = document.getElementById('detArtist'); detArtistEl.innerHTML = ''; 
         const artistArray = splitArtists(i.Wykonawca);
-        
         artistArray.forEach((artistName, index) => {
             const span = document.createElement('span'); span.className = 'artist-link'; span.innerText = artistName;
             span.onclick = () => filterByArtist(artistName);
             detArtistEl.appendChild(span);
             if (index < artistArray.length - 1) {
-                const comma = document.createElement('span'); comma.innerText = ', '; comma.style.color = 'var(--text-dim)';
-                detArtistEl.appendChild(comma);
+                const comma = document.createElement('span'); comma.innerText = ', '; comma.style.color = 'var(--text-dim)'; detArtistEl.appendChild(comma);
             }
         });
 
@@ -977,11 +991,8 @@
 
         const detNotesEl = document.getElementById('detNotes');
         if (i.Notatki && i.Notatki.trim() !== '') {
-            detNotesEl.innerText = i.Notatki;
-            detNotesEl.style.display = 'block';
-        } else {
-            detNotesEl.style.display = 'none';
-        }
+            detNotesEl.innerText = i.Notatki; detNotesEl.style.display = 'block';
+        } else { detNotesEl.style.display = 'none'; }
 
         document.getElementById('detailsModal').style.display = 'flex';
     }
@@ -993,23 +1004,15 @@
         if (document.startViewTransition && gridImg) {
             gridImg.style.viewTransitionName = 'hero-cover';
             modalImg.style.viewTransitionName = 'hero-cover';
-            
-            const transition = document.startViewTransition(() => {
-                closeDetailsModal();
-            });
-            
+            const transition = document.startViewTransition(() => { closeDetailsModal(); });
             transition.finished.finally(() => {
-                gridImg.style.viewTransitionName = '';
-                modalImg.style.viewTransitionName = '';
+                gridImg.style.viewTransitionName = ''; modalImg.style.viewTransitionName = '';
             });
-        } else {
-            closeDetailsModal();
-        }
+        } else { closeDetailsModal(); }
     }
 
     function closeDetailsModal() { 
-        document.getElementById('detailsModal').style.display = 'none'; 
-        checkModalsAndUnlock(); 
+        document.getElementById('detailsModal').style.display = 'none'; checkModalsAndUnlock(); 
     }
 
     function openEditFromDetails() {
@@ -1028,23 +1031,72 @@
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; checkModalsAndUnlock(); }
 
     function clearTracklistInEdit() {
-        editTempTracklist = "-"; 
-        showToast("Tracklista usunięta! (Zapisz album)", "success");
+        editTempTracklist = "-"; showToast("Tracklista usunięta! (Zapisz album)", "success");
     }
 
     async function saveEdit() {
         const idx = document.getElementById('editIndex').value; const old = myCollection[idx];
-        const payload = { password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, Wykonawca: document.getElementById('editArtist').value, Album: document.getElementById('editAlbum').value, Okładka: document.getElementById('editCover').value, Status: document.getElementById('editStatus').value, Format: document.getElementById('editFormat').value, Notatki: document.getElementById('editNotes').value, Utwory: editTempTracklist };
-        closeEditModal(); document.getElementById('loader').style.display = 'flex';
-        await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-        showToast("💾 Zapisano zmiany", "success"); setTimeout(loadFromSheets, 1500);
+        const updatedEntry = {
+            Wykonawca: document.getElementById('editArtist').value,
+            Album: document.getElementById('editAlbum').value,
+            Okładka: document.getElementById('editCover').value,
+            Status: document.getElementById('editStatus').value,
+            Format: document.getElementById('editFormat').value,
+            Notatki: document.getElementById('editNotes').value,
+            Utwory: editTempTracklist,
+            DiscogsID: old.DiscogsID || ""
+        };
+
+        myCollection[idx] = updatedEntry; // OPTIMISTIC UI
+        renderGrid(); updateCounters();
+        executeApiAction({ password: ADMIN_PASS, action: "EDIT", oldWykonawca: old.Wykonawca, oldAlbum: old.Album, ...updatedEntry });
+        
+        closeEditModal(); showToast("💾 Zapisano zmiany", "success");
     }
 
+    // --- SYSTEM COFNIJ (UNDO) ---
+    let undoTimeout = null;
+    let deletedItemBackup = null;
+    let undoToastElement = null;
+
     async function deleteFromDetails() {
-        const i = myCollection[currentDetailsIndex]; if(!confirm("Na pewno usunąć ten album?")) return;
-        closeDetailsModalWithTransition(); document.getElementById('loader').style.display = 'flex';
-        await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({password: ADMIN_PASS, action:"DELETE", Wykonawca:i.Wykonawca, Album:i.Album}) });
-        showToast("🗑️ Usunięto z bazy", "success"); setTimeout(loadFromSheets, 1500);
+        const idx = currentDetailsIndex;
+        const item = myCollection[idx]; 
+        if(!confirm("Na pewno usunąć ten album?")) return;
+        closeDetailsModalWithTransition();
+        
+        // Zapis do backupu i natychmiastowe usunięcie z siatki
+        deletedItemBackup = { item: item, index: idx };
+        myCollection.splice(idx, 1);
+        renderGrid(); updateCounters();
+
+        // Powiadomienie z przyciskiem COFNIJ
+        undoToastElement = showToast(`Usunięto z bazy. <button class="toast-undo-btn" onclick="cancelUndo()">COFNIJ</button>`, "success", true);
+
+        // Odczekanie 5 sekund na zmianę zdania
+        undoTimeout = setTimeout(() => {
+            if(undoToastElement) {
+                undoToastElement.style.animation = 'fadeOutToast 0.3s forwards';
+                setTimeout(() => undoToastElement.remove(), 300);
+            }
+            executeApiAction({password: ADMIN_PASS, action:"DELETE", Wykonawca:item.Wykonawca, Album:item.Album});
+            deletedItemBackup = null;
+        }, 5000);
+    }
+
+    function cancelUndo() {
+        if (undoTimeout) { clearTimeout(undoTimeout); undoTimeout = null; }
+        if (deletedItemBackup) {
+            myCollection.splice(deletedItemBackup.index, 0, deletedItemBackup.item);
+            renderGrid(); updateCounters();
+            deletedItemBackup = null;
+            showToast("Cofnięto usunięcie!", "success");
+        }
+        if (undoToastElement) {
+            undoToastElement.style.animation = 'fadeOutToast 0.3s forwards';
+            setTimeout(() => undoToastElement.remove(), 300);
+            undoToastElement = null;
+        }
     }
 
     function exportToCSV() {
@@ -1056,7 +1108,7 @@
         showToast("💾 Pobrano plik CSV", "success");
     }
 
-    applyAdminUI(); loadFromSheets();
+    applyAdminUI(); loadFromSheets(); processOfflineQueue();
 </script>
 </body>
 </html>
