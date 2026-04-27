@@ -1,0 +1,21 @@
+{
+  "name": "Walkman Cloud Collection",
+  "short_name": "Walkman",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/192px-Walkman_logo.svg.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/512px-Walkman_logo.svg.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
