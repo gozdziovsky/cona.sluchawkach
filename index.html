@@ -14,7 +14,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 6.1</title>
+    <title>Walkman Cloud 6.2</title>
     <style>
         /* DOMYŚLNY MOTYW: Spotify Dark */
         :root { 
@@ -98,7 +98,9 @@
         .filters select { padding: 10px 14px; border-radius: 20px; border: 1px solid var(--card-border); background: var(--card); color: var(--text); font-size: 13px; font-weight: 600; outline: none; white-space: nowrap; appearance: none; -webkit-appearance: none; }
 
         .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
-        .grid-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 1/1; background: var(--card); cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.15s; }
+        
+        /* OPTYMALIZACJA: Hardware acceleration dla kart */
+        .grid-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 1/1; background: var(--card); cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.15s; will-change: transform; transform: translateZ(0);}
         .grid-item:active { transform: scale(0.95); }
         .grid-item img { width: 100%; height: 100%; object-fit: cover; }
         .grid-overlay { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%); padding: 25px 12px 12px 12px; }
@@ -111,29 +113,31 @@
         .tracklist-icon { position: absolute; top: 32px; right: 8px; background: rgba(0,0,0,0.6); color: white; padding: 4px; border-radius: 50%; width: 22px; height: 22px; display: flex; justify-content: center; align-items: center; z-index: 2; backdrop-filter: blur(5px); }
         .tracklist-icon svg { width: 12px; height: 12px; fill: currentColor; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg); border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)) 0; z-index: 9000; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg); border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)) 0; z-index: 9000; transform: translateZ(0);}
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); cursor: pointer; transition: color 0.15s; width: 60px;}
         .nav-item.active { color: var(--text); }
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
         .nav-item span { font-size: 10px; font-weight: 600; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; overscroll-behavior: none;}
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; overscroll-behavior: none; transform: translateZ(0);}
         
-        .ambient-bg { position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; background-size: cover; background-position: center; filter: blur(50px) brightness(var(--ambient-bright)); z-index: 0; transition: background-image 0.4s ease; opacity: 0.8;}
+        /* OPTYMALIZACJA: Przeniesienie renderowania blur na kartę graficzną */
+        .ambient-bg { position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; background-size: cover; background-position: center; filter: blur(40px) brightness(var(--ambient-bright)); z-index: 0; transition: background-image 0.4s ease; opacity: 0.8; will-change: filter, opacity, background-image; transform: translateZ(0);}
 
         #detailsModal .modal-content { background: transparent; width: 100%; max-width: 420px; height: 85vh; position: relative; display: flex; flex-direction: column; padding: 25px 20px 20px 20px; overflow-y: auto; animation: fadeInModal 0.2s forwards; pointer-events: none; scrollbar-width: none; z-index: 1;}
         #detailsModal .modal-content > * { pointer-events: auto; }
         @keyframes fadeInModal { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
-        .cover-tracklist-wrapper { width: 80%; max-width: 320px; margin: 0 auto 20px auto; aspect-ratio: 1/1; position: relative; cursor: pointer; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: var(--card); flex-shrink: 0;}
-        .toggle-face { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); border-radius: 12px; overflow: hidden; }
+        /* OPTYMALIZACJA: Płynniejszy obrót okładki bez zacinania krawędzi */
+        .cover-tracklist-wrapper { width: 80%; max-width: 320px; margin: 0 auto 20px auto; aspect-ratio: 1/1; position: relative; cursor: pointer; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: var(--card); flex-shrink: 0; transform-style: preserve-3d; perspective: 1000px;}
+        .toggle-face { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); border-radius: 12px; overflow: hidden; backface-visibility: hidden; will-change: transform, opacity; transform: translateZ(0);}
         .toggle-face.front { object-fit: cover; z-index: 2; }
-        .toggle-face.back { background: var(--bg); padding: 15px; overflow-y: auto; scrollbar-width: none; border: 1px solid var(--card-border); z-index: 1; opacity: 0; transform: scale(0.95); pointer-events: none; overscroll-behavior: contain;}
+        .toggle-face.back { background: var(--bg); padding: 15px; overflow-y: auto; scrollbar-width: none; border: 1px solid var(--card-border); z-index: 1; opacity: 0; transform: scale(0.95) translateZ(0); pointer-events: none; overscroll-behavior: contain;}
         
-        .cover-tracklist-wrapper.flipped .front { opacity: 0 !important; transform: scale(0.95); pointer-events: none; z-index: 0; }
-        .cover-tracklist-wrapper.flipped .back { opacity: 1 !important; transform: scale(1); pointer-events: auto; z-index: 3; }
+        .cover-tracklist-wrapper.flipped .front { opacity: 0 !important; transform: scale(0.95) translateZ(0); pointer-events: none; z-index: 0; }
+        .cover-tracklist-wrapper.flipped .back { opacity: 1 !important; transform: scale(1) translateZ(0); pointer-events: auto; z-index: 3; }
 
-        .flip-hint { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 50%; color: white; z-index: 4; display: flex; pointer-events: none; transition: opacity 0.3s; }
+        .flip-hint { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 50%; color: white; z-index: 4; display: flex; pointer-events: none; transition: opacity 0.3s; transform: translateZ(0);}
         .cover-tracklist-wrapper.flipped .flip-hint { opacity: 0; }
         
         .tracklist-item { display: flex; justify-content: space-between; align-items: flex-start; font-size: 11px; font-weight: 600; color: var(--text); padding: 8px 0; border-bottom: 1px solid var(--card-border); }
@@ -146,7 +150,7 @@
         .artist-link:hover { color: var(--accent); }
         
         .listen-container { display: flex; gap: 12px; justify-content: center; align-items: center; margin: 15px 0; flex-wrap: wrap;}
-        .listen-btn { width: 52px; height: 52px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: transform 0.15s; cursor: pointer; text-decoration: none; flex-shrink: 0;}
+        .listen-btn { width: 52px; height: 52px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: transform 0.15s; cursor: pointer; text-decoration: none; flex-shrink: 0; will-change: transform;}
         .listen-btn svg { width: 22px; height: 22px; }
         .listen-btn:active { transform: scale(0.92); }
         .listen-btn.spotify { background: #1db954; color: #000; box-shadow: 0 4px 15px rgba(29, 185, 84, 0.2); }
@@ -162,13 +166,14 @@
 
         .admin-buttons { display:flex; gap:12px; margin-bottom: 15px; width: 100%; flex-shrink: 0; }
 
+        /* OPTYMALIZACJA: Bottom sheets również przeniesione na GPU */
         .bottom-sheet { align-items: flex-end; }
         .bottom-sheet .modal-content { 
             background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; 
             padding: 15px 25px 25px 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom)); 
             animation: slideUpSheet 0.25s cubic-bezier(0.175, 0.885, 0.32, 1); 
             border-top: 1px solid var(--card-border); max-height: 90vh; overflow-y: auto; pointer-events: auto;
-            overscroll-behavior: none; z-index: 1;
+            overscroll-behavior: none; z-index: 1; will-change: transform; transform: translateZ(0);
         }
         @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
@@ -193,20 +198,20 @@
         .search-card select { padding: 8px; font-size: 11px; border-radius: 6px; background: var(--bg); border: 1px solid var(--card-border); color: var(--text);}
 
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 350px;}
-        .toast { background: var(--card); color: var(--text); padding: 16px 20px; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--card-border); animation: slideDown 0.3s forwards; text-align: center;}
+        .toast { background: var(--card); color: var(--text); padding: 16px 20px; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--card-border); animation: slideDown 0.3s forwards; text-align: center; transform: translateZ(0);}
         .toast.success { color: var(--accent); }
         .toast.error { color: var(--danger); }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOutToast { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
 
-        .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 99999; justify-content: center; align-items: center; color: var(--accent); font-weight: 900; letter-spacing: 2px;}
+        .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 99999; justify-content: center; align-items: center; color: var(--accent); font-weight: 900; letter-spacing: 2px; transform: translateZ(0);}
 
         body:not(.is-admin) .admin-only { display: none !important; }
         @media (min-width: 600px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
 
         ::view-transition-old(hero-cover),
         ::view-transition-new(hero-cover) {
-            animation-duration: 0.35s;
+            animation-duration: 0.3s; /* Przyspieszona, bardziej snappy animacja */
             animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
         }
     </style>
@@ -237,7 +242,7 @@
 
 <div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman <span>Cloud</span><sup>6.1</sup></h1>
+        <h1>Walkman <span>Cloud</span><sup>6.2</sup></h1>
     </div>
 
     <div class="counters">
@@ -269,7 +274,7 @@
 
 <div id="detailsModal" class="modal" onclick="if(event.target === this) closeDetailsModalWithTransition()">
     <div id="ambientBg" class="ambient-bg"></div>
-    <div class="modal-content">
+    <div class="modal-content" id="detModalContent">
         
         <div id="coverTracklistWrapper" class="cover-tracklist-wrapper" onclick="toggleCoverTracklist()">
             <img id="detCover" src="" class="toggle-face front" style="opacity:0;" onload="this.style.opacity=1">
@@ -472,18 +477,25 @@
         if (!isAnyOpen) unlockScroll();
     }
 
+    // --- OPTYMALIZACJA WYDAJNOŚCI - BEZ GETCOMPUTEDSTYLE ---
     const detModalEl = document.getElementById('detailsModal');
     detModalEl.addEventListener('touchmove', e => {
         let el = e.target;
         let canScroll = false;
+        
+        // Zamiast czytać skomplikowane style na każdej klatce, po prostu patrzymy, 
+        // czy element to konkretny kontener z tekstem/tracklistą
         while (el && el !== detModalEl) {
-            const style = window.getComputedStyle(el);
-            if (el.scrollHeight > el.clientHeight && (style.overflowY === 'auto' || style.overflowY === 'scroll')) {
-                canScroll = true; break;
+            if (el.classList.contains('modal-content') || el.classList.contains('back')) {
+                if (el.scrollHeight > el.clientHeight) {
+                    canScroll = true; 
+                    break;
+                }
             }
             el = el.parentElement;
         }
-        if (!canScroll) { e.preventDefault(); }
+        
+        if (!canScroll && e.cancelable) { e.preventDefault(); }
     }, {passive: false});
 
     let touchstartX = 0; let touchstartY = 0; let touchendX = 0; let touchendY = 0;
@@ -554,9 +566,9 @@
             
             if (diffY > 0) { 
                 if(e.cancelable) e.preventDefault(); 
-                activeSheetContent.style.transform = `translateY(${diffY}px)`; 
+                activeSheetContent.style.transform = `translateY(${diffY}px) translateZ(0)`; 
             } else { 
-                activeSheetContent.style.transform = `translateY(0px)`; 
+                activeSheetContent.style.transform = `translateY(0px) translateZ(0)`; 
             }
         }, {passive: false});
 
@@ -579,16 +591,9 @@
         }, {passive: true});
     });
 
-    // PRAWIDŁOWO DZIAŁAJĄCE ZABEZPIECZENIE HTML!
     function cleanHTML(text) {
         if (!text) return '';
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        };
+        const map = { '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' };
         return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
