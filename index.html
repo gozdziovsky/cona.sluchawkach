@@ -11,9 +11,10 @@
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Walkman_logo.svg/512px-Walkman_logo.svg.png">
     
     <meta name="theme-color" content="#09090b">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
-    <title>Walkman Cloud 6.0</title>
+    <title>Walkman Cloud 6.1</title>
     <style>
         /* DOMYŚLNY MOTYW: Spotify Dark */
         :root { 
@@ -116,9 +117,8 @@
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
         .nav-item span { font-size: 10px; font-weight: 600; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 9999; justify-content: center; align-items: center; overscroll-behavior: none;}
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; overscroll-behavior: none;}
         
-        /* Tło AMBIENT GLOW w modalu */
         .ambient-bg { position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; background-size: cover; background-position: center; filter: blur(50px) brightness(var(--ambient-bright)); z-index: 0; transition: background-image 0.4s ease; opacity: 0.8;}
 
         #detailsModal .modal-content { background: transparent; width: 100%; max-width: 420px; height: 85vh; position: relative; display: flex; flex-direction: column; padding: 25px 20px 20px 20px; overflow-y: auto; animation: fadeInModal 0.2s forwards; pointer-events: none; scrollbar-width: none; z-index: 1;}
@@ -204,7 +204,6 @@
         body:not(.is-admin) .admin-only { display: none !important; }
         @media (min-width: 600px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
 
-        /* View Transitions API (Płynne animacje) */
         ::view-transition-old(hero-cover),
         ::view-transition-new(hero-cover) {
             animation-duration: 0.35s;
@@ -238,7 +237,7 @@
 
 <div class="container" id="mainContainer">
     <div class="header">
-        <h1>Walkman <span>Cloud</span><sup>6.0</sup></h1>
+        <h1>Walkman <span>Cloud</span><sup>6.1</sup></h1>
     </div>
 
     <div class="counters">
@@ -436,7 +435,6 @@
     
     let currentDiscogsResults = []; 
 
-    // --- MOTYWY RETRO ---
     function changeTheme() {
         const t = document.getElementById('themeSelect').value;
         document.body.classList.remove('theme-sports', 'theme-classic');
@@ -444,7 +442,6 @@
         if(t === 'classic') document.body.classList.add('theme-classic');
         localStorage.setItem('walkman_theme', t);
         
-        // Zmiana koloru paska przeglądarki (PWA)
         let themeColor = "#09090b";
         if(t === 'sports') themeColor = "#facc15";
         if(t === 'classic') themeColor = "#e2e8f0";
@@ -499,7 +496,6 @@
         handleSwipe();
     }, {passive: true});
 
-    // PŁYNNE PRZEJŚCIE PRZY SWIPE
     function handleSwipe() {
         if (detModalEl.style.display !== 'flex') return;
         let diffX = touchendX - touchstartX; let diffY = touchendY - touchstartY;
@@ -583,10 +579,16 @@
         }, {passive: true});
     });
 
-    // CZYSTE WYŚWIETLANIE TYTUŁÓW
+    // PRAWIDŁOWO DZIAŁAJĄCE ZABEZPIECZENIE HTML!
     function cleanHTML(text) {
         if (!text) return '';
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
         return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
@@ -713,18 +715,19 @@
     function clearSearch() { document.getElementById('localSearch').value = ''; toggleClearBtn(); renderGrid(); }
     function filterByArtist(artist) { closeDetailsModalWithTransition(); document.getElementById('localSearch').value = artist; toggleClearBtn(); renderGrid(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-    // --- BŁYSKAWICZNY START (CACHE) ---
     async function loadFromSheets() {
         if(!GOOGLE_URL || !GOOGLE_URL.startsWith('http')) {
             updateSettingsUI();
             return;
         }
 
-        // Natychmiastowe ładowanie z pamięci (Znika loader przy kolejnych wejściach)
         const cachedData = localStorage.getItem('walkman_collection_cache');
         if (cachedData) {
-            myCollection = JSON.parse(cachedData);
-            renderGrid(); updateCounters(); updateSettingsUI();
+            try {
+                myCollection = JSON.parse(cachedData);
+                if (!Array.isArray(myCollection)) myCollection = [];
+                renderGrid(); updateCounters(); updateSettingsUI();
+            } catch(e) { myCollection = []; }
         } else {
             document.getElementById('loader').style.display = 'flex';
         }
@@ -733,9 +736,8 @@
             const res = await fetch(GOOGLE_URL, { redirect: 'follow' });
             const newData = await res.json();
             
-            // Renderujemy ponownie tylko jeśli baza na serwerze ma nowe dane
             if (JSON.stringify(myCollection) !== JSON.stringify(newData)) {
-                myCollection = newData;
+                myCollection = Array.isArray(newData) ? newData : [];
                 localStorage.setItem('walkman_collection_cache', JSON.stringify(myCollection));
                 renderGrid(); 
                 updateCounters(); 
@@ -790,12 +792,11 @@
                 tracklistIndicator = `<div class="tracklist-icon"><svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div>`;
             }
 
-            // KINOWA ANIMACJA: Każdy obrazek ma teraz swoje ID (id="img-...")
             return `<div class="grid-item" onclick="openDetailsWithTransition(${idx})">
                     <img id="img-${idx}" src="${szybkaOkladka}" loading="lazy" style="opacity:0; transition: opacity 0.3s;" onload="this.style.opacity=1">
                     <div class="format-badge ${bClass}">${item.Status === 'SZUKAM' ? 'SZUKAM' : item.Format}</div>
                     ${tracklistIndicator}
-                    <div class="grid-overlay"><div class="grid-title">${escapeHtml(item.Album) || "Brak tytułu"}</div></div>
+                    <div class="grid-overlay"><div class="grid-title">${cleanHTML(item.Album) || "Brak tytułu"}</div></div>
                 </div>`;
         }).join('');
 
@@ -880,7 +881,6 @@
         } else { showToast("Brak tracklisty. Użyj skryptu iTunes API", "error"); }
     }
 
-    // --- KINOWE OTWIERANIE MODALU ---
     function openDetailsWithTransition(idx) {
         const gridImg = document.getElementById(`img-${idx}`);
         const modalImg = document.getElementById('coverTracklistWrapper');
@@ -912,7 +912,6 @@
         detCover.style.opacity = '0';
         detCover.src = i.Okładka;
         
-        // --- AMBIENT GLOW Z OKŁADKI ---
         document.getElementById('ambientBg').style.backgroundImage = `url('${i.Okładka}')`;
 
         const tracksContainer = document.getElementById('detTracks');
@@ -982,7 +981,6 @@
         document.getElementById('detailsModal').style.display = 'flex';
     }
     
-    // --- KINOWE ZAMYKANIE MODALU ---
     function closeDetailsModalWithTransition() {
         const gridImg = document.getElementById(`img-${currentDetailsIndex}`);
         const modalImg = document.getElementById('coverTracklistWrapper');
